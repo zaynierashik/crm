@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
+
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+.nav-link{
+    color: #082852;
+}
+
+.nav-link:hover{
+    color: #FE5B3E;
+}
+
+.btn{
+    background-color: #FE5B3E;
+    color: white;
+    padding-bottom: 1.1vh;
+}
+
+.btn:hover{
+    background-color: #082852;
+    color: white;
+}
+
+.content, .sub-content{
+    margin-top: 20%;
+}
+
+.helmet-content, .reason-content, .contact-content, .category-content, .product-content, .location-content, .review-content{
+    margin-top: 10%;
+}
+
+.register-content, .login-content, .details-content, .features-content{
+    margin-top: 7%;
+}
+
+.content p, .sub-content p, .helmet-content p, .register-content p, .login-content p, .contact-content p{
+    color: #FE5B3E;
+    letter-spacing: 7px;
+}
+
+.details-content h5{
+    letter-spacing: 1.7px;
+    font-weight: 400;
+}
+
+.helmet-content .row, .reason-content .row{
+    width: 86.5%;
+}
+
+.content .row, .category-content .row, .product-content .row{
+    width: 95%;
+}
+
+.content img, .helmet-content img, .category-content img, .product-content img{
+    width: 55%;
+}
+
+.hl{
+    background-color: #FE5B3E;
+    height: 0.25vh;
+}
+
+.helmet-content h6{
+    background-color: #082852;
+    color: white;
+    letter-spacing: 5px;
+    font-weight: 400;
+}
+
+.category-content h6, .product-content h6{
+    color: #082852;
+    letter-spacing: 5px;
+    font-weight: 500;
+}
+
+.helmet-content .helmet-name{
+    color: #082852;
+    letter-spacing: 1.5px;
+}
+
+.card{
+    transition: box-shadow 0.25s ease-in-out;;
+    border-radius: 17px;
+    border-color: #e8e8e8;
+}
+
+.card:hover{
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+}
+
+.custom-title{
+    color: #FE5B3E;
+    letter-spacing: 7px;
+}
+
+.custom-font{
+    font-family: "EB Garamond", serif;
+    color: #082852;
+}
+
+.form-control{
+    background-color: #e8e8e8;
+    border: none;
+}
+
+.form-control:focus{
+    background-color: #e8e8e8;
+    border: none;
+}
+
+.details-content .carousel-item{
+    height: 500px;
+    overflow: hidden;
+}
+
+.details-content .carousel-item img{
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.features-content ul{
+    list-style-type: none;
+}
+
+.review-content p, li{
+    line-height: 3.7vh;
+    text-align: justify;
+}
+
+/* Footer */
+
+#footer{
+    margin-top: 7%;
+    background-color: #082852;
+    color: white;
+}
+
+.footer-content{
+    line-height: 3.7vh;
+    text-align: justify;
+}
+
+.footer h5{
+    font-family: "EB Garamond", serif;
+}
+
+.footer .col{
+    line-height: 3.17vh;
+}
+
+.top{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #FE5B3E;
+    padding: 10px 15px;
+    border-radius: 5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.show{
+    opacity: 1;
+    pointer-events: auto;
+}
