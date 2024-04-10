@@ -10,6 +10,10 @@ html{
     scroll-behavior: smooth;
 }
 
+.navbar>.container-fluid{
+    justify-content: center;
+}
+
 .nav-link{
     color: #082852;
 }
@@ -25,12 +29,12 @@ html{
 }
 
 .btn:hover{
-    background-color: #082852;
+    background-color: 	#28282B;
     color: white;
 }
 
 .content, .sub-content{
-    margin-top: 20%;
+    margin-top: 15%;
 }
 
 .helmet-content, .reason-content, .contact-content, .category-content, .product-content, .location-content, .review-content{
@@ -103,7 +107,7 @@ html{
 
 .custom-font{
     font-family: "EB Garamond", serif;
-    color: #082852;
+    color: 	#28282B;
 }
 
 .form-control{
