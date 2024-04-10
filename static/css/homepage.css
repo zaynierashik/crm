@@ -1,0 +1,9 @@
+@import url(style.css);
+
+.content{
+    margin-top: 10%;
+}
+
+.content .row{
+    width: 55%;
+}

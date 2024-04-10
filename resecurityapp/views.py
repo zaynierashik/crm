@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-
 def index(request):
     return render(request, 'index.html')
 
@@ -28,3 +27,7 @@ def login(request):
             msg = "email or password is incorrect"
             return render(request, "index.html", {'message': msg})
     return render(request, 'index.html', {})
+
+def homepage(request):
+    companies = Company.objects.all()
+    return render(request, 'homepage.html', {'companies': companies})
