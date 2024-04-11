@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Resecurity CRM</title>
+    <title>Homepage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
 </head>
@@ -14,7 +14,7 @@
         <div id="navbar">
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
-                    <a class="navbar-brand" href="{% url 'index' %}">
+                    <a class="navbar-brand" href="{% url 'homepage' %}">
                         <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="55">
                     </a>
     
@@ -23,12 +23,20 @@
                     </button>
 
                     <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
+                        <ul class="navbar-nav mt-3">
                             <li class="nav-item" id="master">
-                                <a class="nav-link fw-semibold fs-5" href="#">Master</a>
+                                <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
+                                </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
-                                <a class="nav-link fw-semibold fs-5" href="#">Transactions</a>
+                                <a class="nav-link fw-semibold" href="{% url 'homepage' %}">Transactions</a>
                             </li>
                         </ul>
                     </div>
@@ -38,7 +46,7 @@
     
         <div id="form-content">
             <div class="content d-flex justify-content-center">
-                <form action="" method="POST" class="row g-3 needs-validation" novalidate>
+                <form id="myForm" action="" method="POST" class="row g-3 needs-validation" novalidate>
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control py-2" name="company" id="company" required>
@@ -59,20 +67,41 @@
                         <textarea class="form-control" name="action" id="action" cols="30" rows="5" required></textarea>
                     </div>        
                         
-                    <div class="d-flex justify-content-evenly">
-                        <a href="#">
-                            <button type="submit" class="btn rounded-pill fw-semibold px-4" name="submit">Submit</button>
-                        </a>
-                                
-                        <a href="#">
-                            <button type="submit" class="btn rounded-pill fw-semibold px-4" name="cancel">Cancel</button>
-                        </a>
+                    <div class="d-flex justify-content-evenly column-gap-3 mt-5">
+                        <div class="col">
+                            <a href="#">
+                                <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
+                            </a>
+                        </div>
+
+                        <div class="col-2">
+                            <button type="button" class="btn fw-semibold w-100" name="cancel" onclick="clearForm()" style="background-color: #FE5B3E;">Cancel</button>
+                        </div>   
                     </div>
-                    
                 </form>
             </div>
         </div>
-    </div>   
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
+            
+            dropdownLinks.forEach(function(link) {
+                link.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    var selectedValue = link.getAttribute("value");
+                    window.location.href = "{% url 'master' %}?selection=" + selectedValue;
+                });
+            });
+        });
+    </script>
+    
+    <script>
+        function clearForm() {
+            document.getElementById("myForm").reset();
+        }
+    </script>
 
     <script src="/static/js/script.js"></script>
     <script src="https://kit.fontawesome.com/296ff2fa8f.js" crossorigin="anonymous"></script>

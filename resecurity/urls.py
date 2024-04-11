@@ -25,6 +25,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('login/', views.login, name='login'),
     path('homepage/', views.homepage, name='homepage'),
+    path('master/', views.master, name='master'),
 ]
 
 if settings.DEBUG:

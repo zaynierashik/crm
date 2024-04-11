@@ -40,6 +40,9 @@ class Partner(models.Model):
     Contact_Person = models.CharField(max_length=100)
     email = models.EmailField()
 
+    def __str__(self):
+        return self.Partner_Name
+
 class Company(models.Model):
     Company_Name = models.CharField(max_length=100)
     sector = models.ForeignKey(Sector, on_delete=models.CASCADE)
@@ -55,7 +58,17 @@ class Company(models.Model):
     price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
-    partner = models.ForeignKey(Partner, on_delete=models.CASCADE, blank=True, null=True)
 
+    def __str__(self):
+        return self.Company_Name
+    
     class Meta:
         verbose_name_plural = "companies"
+
+class Transaction(models.Model):
+    date = models.DateField()
+    Company_Name = models.CharField(max_length=100)
+    action = models.TextField()
+
+    def __str__(self):
+        return self.Company_Name

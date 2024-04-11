@@ -31,3 +31,13 @@ def login(request):
 def homepage(request):
     companies = Company.objects.all()
     return render(request, 'homepage.html', {'companies': companies})
+
+def master(request):
+    sectors = Sector.objects.all()
+    requirements = Requirement.objects.all()
+    vias = Via.objects.all()
+    statuses = Status.objects.all()
+
+    selection = request.GET.get('selection', None)
+    
+    return render(request, 'master.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})
