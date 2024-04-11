@@ -1,0 +1,51 @@
+@import url(style.css);
+
+.navbar-nav .nav-link{
+    margin-left: 1vw;
+    font-size: 1.1rem;
+}
+
+.dropdown-menu{
+    display: none;
+    position: absolute;
+    z-index: 1000;
+}
+
+.nav-item:hover .dropdown-menu{
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 7vw;
+}
+
+.dropdown-menu li{
+    margin-left: 0.25vw;
+}
+
+.dropdown-menu li a:hover{
+    color: #FE5B3E;
+}
+
+.dropdown-menu li:last-child{
+    margin-right: 0.25vw;
+}
+
+.content{
+    margin-top: 10%;
+}
+
+.content .row{
+    width: 55%;
+}
+
+.company-content, .sector-content, .requirement-content, .via-content, .status-content, .partner-content{
+    margin-top: 3%;
+}
+
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
