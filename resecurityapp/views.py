@@ -32,6 +32,19 @@ def homepage(request):
     companies = Company.objects.all()
     return render(request, 'homepage.html', {'companies': companies})
 
+def submit_transaction(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company')
+        date = request.POST.get('date')
+        action = request.POST.get('action')
+
+        transaction = Transaction(Company_Name=company_name, date=date, action=action)
+        transaction.save()
+
+        return redirect('homepage')
+    else:
+        return HttpResponse("Form Submission Error!")
+
 def master(request):
     sectors = Sector.objects.all()
     requirements = Requirement.objects.all()

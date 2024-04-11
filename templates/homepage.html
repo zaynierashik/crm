@@ -46,13 +46,14 @@
     
         <div id="form-content">
             <div class="content d-flex justify-content-center">
-                <form id="myForm" action="" method="POST" class="row g-3 needs-validation" novalidate>
+                <form id="myForm" action="{% url 'submit_transaction' %}" method="POST" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control py-2" name="company" id="company" required>
                             <option value=""></option>
                             {% for company in companies %}
-                            <option value="{{ company.id }}">{{ company.Company_Name }}</option>
+                            <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -63,7 +64,7 @@
                     </div>                    
         
                     <div>
-                        <label for="password" class="form-label fw-semibold">Action</label>
+                        <label for="action" class="form-label fw-semibold">Action</label>
                         <textarea class="form-control" name="action" id="action" cols="30" rows="5" required></textarea>
                     </div>        
                         
@@ -83,6 +84,37 @@
         </div>
     </div>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+
+            <div class="toast-body"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            showToast('Data saved successfully!', 'success');
+        });
+    </script>
+
+    <script>
+        function showToast(message, type) {
+            var toastElement = document.getElementById('toast');
+            var toastBody = toastElement.querySelector('.toast-body');
+    
+            if (type === 'success') {
+                toastBody.textContent = message;
+            }
+    
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
@@ -98,8 +130,14 @@
     </script>
     
     <script>
-        function clearForm() {
+        function clearForm(){
             document.getElementById("myForm").reset();
+        }
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
         }
     </script>
 

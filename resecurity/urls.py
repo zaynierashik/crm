@@ -26,6 +26,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('homepage/', views.homepage, name='homepage'),
     path('master/', views.master, name='master'),
+    path('submit_transaction/', views.submit_transaction, name='submit_transaction'),
 ]
 
 if settings.DEBUG:
