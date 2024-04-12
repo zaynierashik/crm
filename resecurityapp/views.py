@@ -55,3 +55,91 @@ def master(request):
 
     selection = request.GET.get('selection', None)
     return render(request, 'master.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})
+
+def submit_company(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company')
+        sector_name = request.POST.get('sector')
+        sector = Sector.objects.get(Sector_Name=sector_name)
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('number')
+        requirement_name = request.POST.get('requirement')
+        requirement = Requirement.objects.get(Requirement_Name=requirement_name)
+        requirement_description = request.POST.get('requirement-description')
+        price = request.POST.get('price')
+        via_name = request.POST.get('via')
+        via = Via.objects.get(Via_Name=via_name)
+        status_name = request.POST.get('status')
+        status = Status.objects.get(Status_Name=status_name)
+
+        company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
+        company.save()
+
+        return redirect(reverse('master') + '?selection=company')
+    else:
+        return HttpResponse("Form Submission Error!")
+
+def submit_sector(request):
+    if request.method == 'POST':
+        sector_name = request.POST.get('sector')
+
+        sector = Sector(Sector_Name=sector_name)
+        sector.save()
+
+        return redirect(reverse('master') + '?selection=sector')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def submit_requirement(request):
+    if request.method == 'POST':
+        requirement_name = request.POST.get('requirement')
+
+        requirement = Requirement(Requirement_Name=requirement_name)
+        requirement.save()
+
+        return redirect(reverse('master') + '?selection=requirement')
+    else:
+        return HttpResponse("Form Submission Error!")
+
+def submit_via(request):
+    if request.method == 'POST':
+        via_name = request.POST.get('via')
+
+        via = Via(Via_Name=via_name)
+        via.save()
+
+        return redirect(reverse('master') + '?selection=via')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def submit_status(request):
+    if request.method == 'POST':
+        status_name = request.POST.get('status')
+
+        status = Status(Status_Name=status_name)
+        status.save()
+
+        return redirect(reverse('master') + '?selection=status')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def submit_partner(request):
+    if request.method == 'POST':
+        partner_name = request.POST.get('partner')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        email = request.POST.get('email')
+
+        partner = Partner(Partner_Name=partner_name, city=city, country=country, Contact_Person=contact_person, email=email)
+        partner.save()
+
+        return redirect(reverse('master') + '?selection=partner')
+    else:
+        return HttpResponse("Form Submission Error!")

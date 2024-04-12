@@ -105,8 +105,7 @@
                 window.history.replaceState({}, document.title, "{{ request.path }}");
             }
         });
-    </script>
-    
+    </script>   
 
     <script>
         function showToast(message, type){
@@ -136,20 +135,19 @@
         });
     </script>
 
-<script>
-    // Custom validation using JavaScript
-    document.addEventListener("DOMContentLoaded", function() {
-        var form = document.getElementById("myForm");
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var form = document.getElementById("myForm");
 
-        form.addEventListener("submit", function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add("was-validated");
-        }, false);
-    });
-</script>
+            form.addEventListener("submit", function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            }, false);
+        });
+    </script>
     
     <script>
         function clearForm(){

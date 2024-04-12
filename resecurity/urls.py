@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 from resecurityapp import views
@@ -27,7 +28,13 @@ urlpatterns = [
     path('homepage/', views.homepage, name='homepage'),
     path('master/', views.master, name='master'),
     path('submit_transaction/', views.submit_transaction, name='submit_transaction'),
-]
+    path('submit_company/', views.submit_company, name='submit_company'),
+    path('submit_sector/', views.submit_sector, name='submit_sector'),
+    path('submit_requirement/', views.submit_requirement, name='submit_requirement'),
+    path('submit_via/', views.submit_via, name='submit_via'),
+    path('submit_status/', views.submit_status, name='submit_status'),
+    path('submit_partner/', views.submit_partner, name='submit_partner'),
+]   
 
 if settings.DEBUG:
     urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
