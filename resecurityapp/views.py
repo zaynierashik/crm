@@ -132,12 +132,13 @@ def submit_status(request):
 def submit_partner(request):
     if request.method == 'POST':
         partner_name = request.POST.get('partner')
+        address = request.POST.get('address')
         city = request.POST.get('city')
         country = request.POST.get('country')
         contact_person = request.POST.get('contact')
         email = request.POST.get('email')
 
-        partner = Partner(Partner_Name=partner_name, city=city, country=country, Contact_Person=contact_person, email=email)
+        partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
         partner.save()
 
         return redirect(reverse('master') + '?selection=partner')

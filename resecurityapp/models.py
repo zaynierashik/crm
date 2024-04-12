@@ -35,6 +35,7 @@ class Via(models.Model):
 
 class Partner(models.Model):
     Partner_Name = models.CharField(max_length=100)
+    address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
     Contact_Person = models.CharField(max_length=100)
