@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 
 def index(request):
     return render(request, 'index.html')
@@ -30,7 +31,8 @@ def login(request):
 
 def homepage(request):
     companies = Company.objects.all()
-    return render(request, 'homepage.html', {'companies': companies})
+    success = request.GET.get('success')
+    return render(request, 'homepage.html', {'companies': companies, 'success': success})
 
 def submit_transaction(request):
     if request.method == 'POST':
@@ -41,7 +43,7 @@ def submit_transaction(request):
         transaction = Transaction(Company_Name=company_name, date=date, action=action)
         transaction.save()
 
-        return redirect('homepage')
+        return redirect(reverse('homepage') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
 
@@ -52,5 +54,4 @@ def master(request):
     statuses = Status.objects.all()
 
     selection = request.GET.get('selection', None)
-    
     return render(request, 'master.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})

@@ -35,6 +35,7 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
+                            
                             <li class="nav-item active" id="transactions">
                                 <a class="nav-link fw-semibold" href="{% url 'homepage' %}">Transactions</a>
                             </li>
@@ -96,13 +97,18 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            showToast('Data saved successfully!', 'success');
+        document.addEventListener("DOMContentLoaded", function(){
+            var success = "{{ success }}";
+            if (success === "True") {
+                showToast('Data saved successfully!', 'success');
+                window.history.replaceState({}, document.title, "{{ request.path }}");
+            }
         });
     </script>
+    
 
     <script>
-        function showToast(message, type) {
+        function showToast(message, type){
             var toastElement = document.getElementById('toast');
             var toastBody = toastElement.querySelector('.toast-body');
     
@@ -119,8 +125,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
             
-            dropdownLinks.forEach(function(link) {
-                link.addEventListener("click", function(event) {
+            dropdownLinks.forEach(function(link){
+                link.addEventListener("click", function(event){
                     event.preventDefault();
                     var selectedValue = link.getAttribute("value");
                     window.location.href = "{% url 'master' %}?selection=" + selectedValue;
