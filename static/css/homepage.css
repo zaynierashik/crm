@@ -49,3 +49,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
     -webkit-appearance: none;
     margin: 0;
 }
+
+.was-validated .form-control:invalid, .was-validated .form-control:valid{
+    background-image: none;
+}
