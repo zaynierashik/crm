@@ -68,11 +68,17 @@
                 
                     <div>
                         <label for="action" class="form-label fw-semibold">Action</label>
-                        <textarea class="form-control" name="action" id="action" cols="30" rows="5" required></textarea>
+                        <textarea class="form-control" name="action" id="action" cols="30" rows="3" required></textarea>
                         <div class="invalid-feedback">Please enter an action.</div>
                     </div>
+
+                    <div>
+                        <label for="remark" class="form-label fw-semibold">Remarks</label>
+                        <textarea class="form-control" name="remark" id="remark" cols="30" rows="2" required></textarea>
+                        <div class="invalid-feedback">Please enter a remark.</div>
+                    </div>
                 
-                    <div class="d-flex justify-content-evenly column-gap-3 mt-5">
+                    <div class="d-flex justify-content-evenly column-gap-3 mt-4">
                         <div class="col">
                             <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
                         </div>

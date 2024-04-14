@@ -39,8 +39,9 @@ def submit_transaction(request):
         company_name = request.POST.get('company')
         date = request.POST.get('date')
         action = request.POST.get('action')
+        remark = request.POST.get('remark')
 
-        transaction = Transaction(Company_Name=company_name, date=date, action=action)
+        transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark)
         transaction.save()
 
         return redirect(reverse('homepage') + '?success=True')
@@ -48,13 +49,14 @@ def submit_transaction(request):
         return HttpResponse("Form Submission Error!")
 
 def master(request):
+    companies = Company.objects.all()
     sectors = Sector.objects.all()
     requirements = Requirement.objects.all()
     vias = Via.objects.all()
     statuses = Status.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})
+    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})
 
 def submit_company(request):
     if request.method == 'POST':
@@ -144,3 +146,10 @@ def submit_partner(request):
         return redirect(reverse('master') + '?selection=partner')
     else:
         return HttpResponse("Form Submission Error!")
+    
+def form(request):
+    return render(request, 'form.html')
+
+def details(request, company_id):
+    company = Company.objects.get(pk=company_id)
+    return render(request, 'details.html', {'company': company})

@@ -34,15 +34,24 @@
 }
 
 .content{
-    margin-top: 10%;
+    margin-top: 5%;
 }
 
 .content .row{
     width: 55%;
 }
 
-.company-content, .sector-content, .requirement-content, .via-content, .status-content, .partner-content{
+.hl{
+    border-top: 2px solid rgb(69, 69, 69);
+}
+
+.company-content, .company-detail-content, .sector-content, .sector-detail-content, .requirement-content, .requirement-detail-content, 
+.via-content, .via-detail-content, .status-content, .status-detail-content, .partner-content, .partner-detail-content{
     margin-top: 3%;
+}
+
+.company-detail-content th, .sector-detail-content th, .requirement-detail-content th, .via-detail-content th, .status-detail-content th, .partner-detail-content th{
+    color: #212529;
 }
 
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{

@@ -70,6 +70,7 @@ class Transaction(models.Model):
     date = models.DateField()
     Company_Name = models.CharField(max_length=100)
     action = models.TextField()
+    remark = models.TextField()
 
     def __str__(self):
         return self.Company_Name

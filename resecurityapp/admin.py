@@ -8,7 +8,7 @@ class PartnerAdmin(admin.ModelAdmin):
     list_display = ('Partner_Name', 'Contact_Person', 'email')
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('date', 'Company_Name', 'action')
+    list_display = ('Company_Name', 'date', 'action', 'remark')
 
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Sector)
