@@ -73,11 +73,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for company in companies %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
-                        <td>Lalitpur</td>
-                        <td>Rajan Pant</td>
+                        <td>{{ company.Company_Name }}</td>
+                        <td>{{ company.city }}</td>
+                        <td>{{ company.Contact_Person }}</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
 
@@ -94,16 +96,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for transaction in transactions %}
                         <tr>
-                            <td>4/14/2024</td>
-                            <td>Email Received</td>
-                            <td>Wants demo</td>
+                            <td>{{ transaction.date }}</td>
+                            <td>{{ transaction.action }}</td>
+                            <td>{{ transaction.remark }}</td>
                         </tr>
-                        <tr>
-                            <td>4/14/2024</td>
-                            <td>Demo link sent</td>
-                            <td></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

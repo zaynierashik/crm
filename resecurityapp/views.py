@@ -151,5 +151,6 @@ def form(request):
     return render(request, 'form.html')
 
 def details(request, company_id):
-    company = Company.objects.get(pk=company_id)
-    return render(request, 'details.html', {'company': company})
+    transactions = Transaction.objects.filter(pk=company_id)
+    companies = Company.objects.filter(pk=company_id)
+    return render(request, 'details.html', {'companies': companies, 'transactions': transactions})
