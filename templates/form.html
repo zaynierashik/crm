@@ -47,7 +47,6 @@
 
         <!-- Company Details Form -->
 
-        {% if selection == "company" %}
         <div id="company-content" class="company-content container">
             <h3>Company Master</h3>
             <form id="companyForm" action="{% url 'submit_company' %}" method="POST" class="needs-validation" novalidate>
@@ -55,7 +54,7 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
-                        <input type="text" class="form-control py-2" name="company" id="company" required>
+                        <input type="text" class="form-control py-2" name="company" id="company" value="{{ company.Company_Name }}" required>
                         <div class="invalid-feedback">Please enter a country name.</div>
                     </div>
 
@@ -74,19 +73,19 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="address" class="form-label fw-semibold">Address</label>
-                        <input type="text" class="form-control py-2" name="address" id="address" required>
+                        <input type="text" class="form-control py-2" name="address" id="address" value="{{ company.address }}" required>
                         <div class="invalid-feedback">Please enter an address.</div>
                     </div>     
     
                     <div class="col">
                         <label for="city" class="form-label fw-semibold">City</label>
-                        <input type="text" class="form-control py-2" name="city" id="city" required>
+                        <input type="text" class="form-control py-2" name="city" id="city" value="{{ company.city }}" required>
                         <div class="invalid-feedback">Please enter a city.</div>
                     </div>
     
                     <div class="col">
                         <label for="country" class="form-label fw-semibold">Country</label>
-                        <input type="text" class="form-control py-2" name="country" id="country" required>
+                        <input type="text" class="form-control py-2" name="country" id="country" value="{{ company.country }}" required>
                         <div class="invalid-feedback">Please enter a country.</div>
                     </div>
                 </div>
@@ -94,13 +93,13 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="contact" class="form-label fw-semibold">Contact Person</label>
-                        <input type="text" class="form-control py-2" name="contact" id="contact" required>
+                        <input type="text" class="form-control py-2" name="contact" id="contact" value="{{ company.Contact_Person }}" required>
                         <div class="invalid-feedback">Please enter a contact person.</div>
                     </div>
     
                     <div class="col-4">
                         <label for="designation" class="form-label fw-semibold">Designation</label>
-                        <input type="text" class="form-control py-2" name="designation" id="designation" required>
+                        <input type="text" class="form-control py-2" name="designation" id="designation" value="{{ company.designation }}" required>
                         <div class="invalid-feedback">Please enter a designation.</div>
                     </div>
                 </div>
@@ -108,13 +107,13 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="email" class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control py-2" name="email" id="email" required>
+                        <input type="email" class="form-control py-2" name="email" id="email" value="{{ company.email }}" required>
                         <div class="invalid-feedback">Please enter an email.</div>
                     </div>
     
                     <div class="col-4">
                         <label for="number" class="form-label fw-semibold">Phone Number</label>
-                        <input type="number" class="form-control py-2" name="number" id="number" placeholder="Format: 98XXXXXXXX" required>
+                        <input type="number" class="form-control py-2" name="number" id="number" placeholder="Format: 98XXXXXXXX" value="{{ company.Phone_Number }}" required>
                         <div class="invalid-feedback">Please enter a phone number.</div>
                     </div> 
                 </div>
@@ -132,14 +131,14 @@
 
                 <div class="mb-3">
                     <label for="requirement-description" class="form-label fw-semibold">Requirement Description</label>
-                    <textarea class="form-control" name="requirement-description" id="requirement-description" cols="30" rows="5" required></textarea>
+                    <textarea class="form-control" name="requirement-description" id="requirement-description" cols="30" rows="5" required>{{ company.Requirement_Description }}</textarea>
                     <div class="invalid-feedback">Please enter a requirement description.</div>
                 </div>   
                     
                 <div class="row g-3">
                     <div class="col">
                         <label for="price" class="form-label fw-semibold">Price</label>
-                        <input type="text" class="form-control py-2" name="price" id="price" required>
+                        <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
                         <div class="invalid-feedback">Please enter a price.</div>
                     </div> 
     
@@ -166,21 +165,17 @@
                     </div>
                 </div>
                         
-                <div class="d-flex justify-content-evenly column-gap-3 mt-4 mb-4">
+                <div class="d-flex justify-content-end mt-4 mb-4">
                     <div class="col">
                         <button type="submit" class="btn fw-semibold w-100 px-4" name="company-submit">Submit</button>
                     </div>
-
-                    <div class="col-2">
-                        <button type="button" class="btn fw-semibold w-100" name="company-cancel" onclick="clearCompany()" style="background-color: #FE5B3E;">Cancel</button>
-                    </div>   
                 </div>
             </form>
         </div>
 
         <!-- Sector Details Form -->
 
-        {% elif selection == "sector" %}
+        {% if selection == "sector" %}
         <div id="sector-content" class="sector-content container">
             <h3>Sector Master</h3>
             <form id="sectorForm" action="{% url 'submit_sector' %}" method="POST" class="needs-validation" novalidate>

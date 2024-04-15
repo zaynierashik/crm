@@ -97,41 +97,30 @@
 
         <!-- Sector Details Form -->
 
-        {% elif selection == "sector" %}
+        {% elif selection == "sector" %}        
         <div id="sector-detail-content" class="sector-detail-content container">
-            <h3>Sector Master</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>Sector Master</h3>
+                </div>
+                <div class="col-3">
+                    <button type="submit" class="btn fw-semibold w-100" name="sector-submit" style="background-color: #212529;">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new sector
+                    </button>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
                         <th scope="col">Sector Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for sector in sectors %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
-                        <td>
-                            <a href="{% url 'form' %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'details' %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
+                        <td>{{ sector.Sector_Name }}</td>
                     </tr>
-                    <tr>
-                        <td>New Business Age Pvt. Ltd.</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Larry the Bird</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -140,39 +129,28 @@
 
         {% elif selection == "requirement" %}
         <div id="requirement-detail-content" class="requirement-detail-content container">
-            <h3>Requirement Master</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>Requirement Master</h3>
+                </div>
+                <div class="col-3">
+                    <button type="submit" class="btn fw-semibold w-100" name="requirement-submit" style="background-color: #212529;">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new requirement
+                    </button>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Sector Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
+                        <th scope="col">Requirement Name</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for requirement in requirements %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
-                        <td>
-                            <a href="{% url 'form' %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'details' %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
+                        <td>{{ requirement.Requirement_Name }}</td>
                     </tr>
-                    <tr>
-                        <td>New Business Age Pvt. Ltd.</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Larry the Bird</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -181,39 +159,28 @@
 
         {% elif selection == "via" %}
         <div id="via-detail-content" class="via-detail-content container">
-            <h3>Via Master</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>Via Master</h3>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn fw-semibold w-100" name="via-submit" style="background-color: #212529;">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new via
+                    </button>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Sector Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
+                        <th scope="col">Via Name</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for via in vias %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
-                        <td>
-                            <a href="{% url 'form' %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'details' %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
+                        <td>{{ via.Via_Name }}</td>
                     </tr>
-                    <tr>
-                        <td>New Business Age Pvt. Ltd.</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Larry the Bird</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -222,39 +189,28 @@
 
         {% elif selection == "status" %}
         <div id="status-detail-content" class="status-detail-content container">
-            <h3>Status Master</h3>
+            <div class="row">
+                <div class="col">
+                    <h3>Status Master</h3>
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn fw-semibold w-100" name="status-submit" style="background-color: #212529;">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new status
+                    </button>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Sector Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
+                        <th scope="col">Status Name</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for status in statuses %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
-                        <td>
-                            <a href="{% url 'form' %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'details' %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
+                        <td>{{ status.Status_Name }}</td>
                     </tr>
-                    <tr>
-                        <td>New Business Age Pvt. Ltd.</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Larry the Bird</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -290,29 +246,21 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for partner in partners %}
                     <tr>
-                        <td>Green Tech Concern Pvt. Ltd.</td>
+                        <td>{{ partner.Partner_Name }}</td>
                         <td>
-                            <a href="{% url 'form' %}">
+                            <a href="{% url 'form' partner.id %}">
                                 <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'details' %}">
+                            <a href="{% url 'details' partner.id %}">
                                 <i class="fa-solid fa-eye" style="color: #212529;"></i>
                             </a>
                         </td>
                     </tr>
-                    <tr>
-                        <td>New Business Age Pvt. Ltd.</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
-                    <tr>
-                        <td>Larry the Bird</td>
-                        <td><i class="fa-solid fa-pen-to-square" style="color: #212529;"></i></td>
-                        <td><i class="fa-solid fa-eye" style="color: #212529;"></i></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

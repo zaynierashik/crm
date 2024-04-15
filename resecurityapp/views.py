@@ -54,9 +54,10 @@ def master(request):
     requirements = Requirement.objects.all()
     vias = Via.objects.all()
     statuses = Status.objects.all()
+    partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'selection': selection})
+    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'partners': partners, 'selection': selection})
 
 def submit_company(request):
     if request.method == 'POST':
@@ -147,10 +148,15 @@ def submit_partner(request):
     else:
         return HttpResponse("Form Submission Error!")
     
-def form(request):
-    return render(request, 'form.html')
+def form(request, company_id):
+    company = Company.objects.get(pk=company_id)
+    sectors = Sector.objects.all()
+    requirements = Requirement.objects.all()
+    vias = Via.objects.all()
+    statuses = Status.objects.all()
+    return render(request, 'form.html', {'company': company, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
 
 def details(request, company_id):
-    transactions = Transaction.objects.filter(pk=company_id)
-    companies = Company.objects.filter(pk=company_id)
-    return render(request, 'details.html', {'companies': companies, 'transactions': transactions})
+    company = Company.objects.get(pk=company_id)
+    transactions = Transaction.objects.filter(Company_Name=company.Company_Name)
+    return render(request, 'details.html', {'company': company, 'transactions': transactions})
