@@ -148,15 +148,24 @@ def submit_partner(request):
     else:
         return HttpResponse("Form Submission Error!")
     
-def form(request, company_id):
+def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
     sectors = Sector.objects.all()
     requirements = Requirement.objects.all()
     vias = Via.objects.all()
     statuses = Status.objects.all()
-    return render(request, 'form.html', {'company': company, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
+    return render(request, 'companyform.html', {'company': company, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
 
-def details(request, company_id):
+def companydetails(request, company_id):
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(Company_Name=company.Company_Name)
-    return render(request, 'details.html', {'company': company, 'transactions': transactions})
+    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions})
+
+def partnerform(request, partner_id):
+    partners = Partner.objects.get(pk=partner_id)
+    return render(request, 'partnerform.html', {'partners': partners})
+
+def partnerdetails(request, partner_id):
+    partner = Partner.objects.get(pk=partner_id)
+    partners = Partner.objects.all()
+    return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})

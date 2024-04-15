@@ -34,8 +34,10 @@ urlpatterns = [
     path('submit_via/', views.submit_via, name='submit_via'),
     path('submit_status/', views.submit_status, name='submit_status'),
     path('submit_partner/', views.submit_partner, name='submit_partner'),
-    path('form/<int:company_id>/', views.form, name='form'),
-    path('details/<int:company_id>/', views.details, name='details'),
+    path('companyform/<int:company_id>/', views.companyform, name='companyform'),
+    path('companydetails/<int:company_id>/', views.companydetails, name='companydetails'),
+    path('partnerform/<int:partner_id>/', views.partnerform, name='partnerform'),
+    path('partnerdetails/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
 ]   
 
 if settings.DEBUG:

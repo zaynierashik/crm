@@ -80,12 +80,12 @@
                     <tr>
                         <td>{{ company.Company_Name }}</td>
                         <td>
-                            <a href="{% url 'form' company.id %}">
+                            <a href="{% url 'companyform' company.id %}">
                                 <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'details' company.id %}">
+                            <a href="{% url 'companydetails' company.id %}">
                                 <i class="fa-solid fa-eye" style="color: #212529;"></i>
                             </a>
                         </td>
@@ -250,12 +250,12 @@
                     <tr>
                         <td>{{ partner.Partner_Name }}</td>
                         <td>
-                            <a href="{% url 'form' partner.id %}">
+                            <a href="{% url 'partnerform' partner.id %}">
                                 <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
                             </a>
                         </td>
                         <td>
-                            <a href="{% url 'details' partner.id %}">
+                            <a href="{% url 'partnerdetails' partner.id %}">
                                 <i class="fa-solid fa-eye" style="color: #212529;"></i>
                             </a>
                         </td>
