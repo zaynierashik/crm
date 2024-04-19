@@ -51,6 +51,8 @@
             <h3>Partner Master</h3>
             <form id="partnerForm" action="{% url 'submit_partner' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
+
+                <input type="hidden" name="partner_id" value="{{ partner.id }}">
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="partner" class="form-label fw-semibold">Partner Name</label>

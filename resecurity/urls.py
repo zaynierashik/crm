@@ -38,7 +38,8 @@ urlpatterns = [
     path('companydetails/<int:company_id>/', views.companydetails, name='companydetails'),
     path('partnerform/<int:partner_id>/', views.partnerform, name='partnerform'),
     path('partnerdetails/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
-    # path('newcompany/', views.newcompany, name='newcompany'),
+    path('newcompany/', views.newcompany, name='newcompany'),
+    path('submit_newcompany/', views.submit_newcompany, name='submit_newcompany'),
 ]   
 
 if settings.DEBUG:

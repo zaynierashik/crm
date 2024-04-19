@@ -83,7 +83,6 @@ def submit_company(request):
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
 
-        # Update company fields
         company.Company_Name = company_name
         company.sector = sector
         company.address = address
@@ -100,7 +99,6 @@ def submit_company(request):
         company.status = status
         
         company.save()
-
         return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
@@ -151,6 +149,9 @@ def submit_status(request):
     
 def submit_partner(request):
     if request.method == 'POST':
+        partner_id = request.POST.get('partner_id')
+        partner = get_object_or_404(Partner, id=partner_id)
+
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
         city = request.POST.get('city')
@@ -158,10 +159,37 @@ def submit_partner(request):
         contact_person = request.POST.get('contact')
         email = request.POST.get('email')
 
+        partner.Partner_Name = 
+        partner.address = 
+        partner.city = 
+        partner.country = 
+        partner.Contact_person = 
+        partner.email = 
+
         partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
         partner.save()
 
         return redirect(reverse('master') + '?selection=partner')
+    else:
+        return HttpResponse("Form Submission Error!")
+
+        company.Company_Name = company_name
+        company.sector = sector
+        company.address = address
+        company.city = city
+        company.country = country
+        company.Contact_Person = contact_person
+        company.designation = designation
+        company.email = email
+        company.Phone_Number = phone_number
+        company.requirement = requirement
+        company.Requirement_Description = requirement_description
+        company.price = price
+        company.via = via
+        company.status = status
+        
+        company.save()
+        return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -186,3 +214,37 @@ def partnerdetails(request, partner_id):
     partner = Partner.objects.get(pk=partner_id)
     partners = Partner.objects.all()
     return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})
+
+def newcompany(request):
+    sectors = Sector.objects.all()
+    requirements = Requirement.objects.all()
+    vias = Via.objects.all()
+    statuses = Status.objects.all()
+    return render(request, 'newcompany.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
+
+def submit_newcompany(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company')
+        sector_name = request.POST.get('sector')
+        sector = Sector.objects.get(Sector_Name=sector_name)
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('number')
+        requirement_name = request.POST.get('requirement')
+        requirement = Requirement.objects.get(Requirement_Name=requirement_name)
+        requirement_description = request.POST.get('requirement-description')
+        price = request.POST.get('price')
+        via_name = request.POST.get('via')
+        via = Via.objects.get(Via_Name=via_name)
+        status_name = request.POST.get('status')
+        status = Status.objects.get(Status_Name=status_name)
+        company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
+        company.save()
+        return redirect(reverse('master') + '?selection=company')
+    else:
+        return HttpResponse("Form Submission Error!")
