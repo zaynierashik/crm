@@ -48,8 +48,8 @@
         <!-- Company Details Form -->
 
         <div id="company-content" class="company-content container">
-            <h3>Company Master - Edit Company</h3>
-            <form id="companyForm" action="{% url 'submit_company' %}" method="POST" class="needs-validation" novalidate>
+            <h3>Company Master - Add Company</h3>
+            <form id="companyForm" action="{% url 'submit_newcompany' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
                 
                 <input type="hidden" name="company_id" value="{{ company.id }}">

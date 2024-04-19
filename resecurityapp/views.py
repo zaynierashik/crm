@@ -61,6 +61,9 @@ def master(request):
 
 def submit_company(request):
     if request.method == 'POST':
+        company_id = request.POST.get('company_id')
+        company = get_object_or_404(Company, id=company_id)
+        
         company_name = request.POST.get('company')
         sector_name = request.POST.get('sector')
         sector = Sector.objects.get(Sector_Name=sector_name)
@@ -80,8 +83,22 @@ def submit_company(request):
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
 
-        company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
+        # Update company fields
+        company.Company_Name = company_name
+        company.sector = sector
+        company.address = address
+        company.city = city
+        company.country = country
+        company.Contact_Person = contact_person
+        company.designation = designation
+        company.email = email
+        company.Phone_Number = phone_number
+        company.requirement = requirement
+        company.Requirement_Description = requirement_description
+        company.price = price
+        company.via = via
+        company.status = status
+        
         company.save()
 
         return redirect(reverse('master') + '?selection=company')
