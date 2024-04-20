@@ -159,37 +159,15 @@ def submit_partner(request):
         contact_person = request.POST.get('contact')
         email = request.POST.get('email')
 
-        partner.Partner_Name = 
-        partner.address = 
-        partner.city = 
-        partner.country = 
-        partner.Contact_person = 
-        partner.email = 
+        partner.Partner_Name = partner_name
+        partner.address = address
+        partner.city = city
+        partner.country = country
+        partner.Contact_person = contact_person
+        partner.email = email
 
-        partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
         partner.save()
-
         return redirect(reverse('master') + '?selection=partner')
-    else:
-        return HttpResponse("Form Submission Error!")
-
-        company.Company_Name = company_name
-        company.sector = sector
-        company.address = address
-        company.city = city
-        company.country = country
-        company.Contact_Person = contact_person
-        company.designation = designation
-        company.email = email
-        company.Phone_Number = phone_number
-        company.requirement = requirement
-        company.Requirement_Description = requirement_description
-        company.price = price
-        company.via = via
-        company.status = status
-        
-        company.save()
-        return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
     
