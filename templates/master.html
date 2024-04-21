@@ -106,9 +106,11 @@
                     <h3>Sector Master</h3>
                 </div>
                 <div class="col-3">
-                    <button type="submit" class="btn fw-semibold w-100" name="sector-submit" style="background-color: #212529;">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new sector
-                    </button>
+                    <a href="{% url 'newform' %}?formtype=sector">
+                        <button type="submit" class="btn fw-semibold w-100" name="sector-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new sector
+                        </button>
+                    </a>
                 </div>
             </div>
             <table class="table">
@@ -136,9 +138,11 @@
                     <h3>Requirement Master</h3>
                 </div>
                 <div class="col-3">
-                    <button type="submit" class="btn fw-semibold w-100" name="requirement-submit" style="background-color: #212529;">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new requirement
-                    </button>
+                    <a href="{% url 'newform' %}?formtype=requirement">
+                        <button type="submit" class="btn fw-semibold w-100" name="requirement-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new requirement
+                        </button>
+                    </a>
                 </div>
             </div>
             <table class="table">
@@ -166,9 +170,11 @@
                     <h3>Via Master</h3>
                 </div>
                 <div class="col-2">
-                    <button type="submit" class="btn fw-semibold w-100" name="via-submit" style="background-color: #212529;">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new via
-                    </button>
+                    <a href="{% url 'newform' %}?formtype=via">
+                        <button type="submit" class="btn fw-semibold w-100" name="via-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new via
+                        </button>
+                    </a>
                 </div>
             </div>
             <table class="table">
@@ -196,9 +202,11 @@
                     <h3>Status Master</h3>
                 </div>
                 <div class="col-2">
-                    <button type="submit" class="btn fw-semibold w-100" name="status-submit" style="background-color: #212529;">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new status
-                    </button>
+                    <a href="{% url 'newform' %}?formtype=status">
+                        <button type="submit" class="btn fw-semibold w-100" name="status-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new status
+                        </button>
+                    </a>
                 </div>
             </div>
             <table class="table">
@@ -228,9 +236,11 @@
                     </form>
                 </div>
                 <div class="col-3">
-                    <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
-                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new partner
-                    </button>
+                    <a href="{% url 'newpartner' %}">
+                        <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new partner
+                        </button>
+                    </a>
                 </div>
             </div>
 

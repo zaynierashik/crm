@@ -27,6 +27,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('homepage/', views.homepage, name='homepage'),
     path('master/', views.master, name='master'),
+    path('newform/', views.newform, name='newform'),
     path('submit_transaction/', views.submit_transaction, name='submit_transaction'),
     path('submit_company/', views.submit_company, name='submit_company'),
     path('submit_sector/', views.submit_sector, name='submit_sector'),
@@ -40,6 +41,8 @@ urlpatterns = [
     path('partnerdetails/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
     path('newcompany/', views.newcompany, name='newcompany'),
     path('submit_newcompany/', views.submit_newcompany, name='submit_newcompany'),
+    path('newpartner/', views.newpartner, name='newpartner'),
+    path('submit_newpartner/', views.submit_newpartner, name='submit_newpartner'),
 ]   
 
 if settings.DEBUG:

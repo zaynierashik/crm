@@ -59,6 +59,10 @@ def master(request):
     selection = request.GET.get('selection', None)
     return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'partners': partners, 'selection': selection})
 
+def newform(request):
+    formtype = request.GET.get('formtype', None)
+    return render(request, 'form.html', {'formtype': formtype})
+
 def submit_company(request):
     if request.method == 'POST':
         company_id = request.POST.get('company_id')
@@ -163,7 +167,7 @@ def submit_partner(request):
         partner.address = address
         partner.city = city
         partner.country = country
-        partner.Contact_person = contact_person
+        partner.Contact_Person = contact_person
         partner.email = email
 
         partner.save()
@@ -185,8 +189,8 @@ def companydetails(request, company_id):
     return render(request, 'companydetails.html', {'company': company, 'transactions': transactions})
 
 def partnerform(request, partner_id):
-    partners = Partner.objects.get(pk=partner_id)
-    return render(request, 'partnerform.html', {'partners': partners})
+    partner = Partner.objects.get(pk=partner_id)
+    return render(request, 'partnerform.html', {'partner': partner})
 
 def partnerdetails(request, partner_id):
     partner = Partner.objects.get(pk=partner_id)
@@ -224,5 +228,22 @@ def submit_newcompany(request):
                          email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
         company.save()
         return redirect(reverse('master') + '?selection=company')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def newpartner(request):
+    return render(request, 'newpartner.html')
+
+def submit_newpartner(request):
+    if request.method == 'POST':
+        partner_name = request.POST.get('partner')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        email = request.POST.get('email')
+        partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
+        partner.save()
+        return redirect(reverse('master') + '?selection=partner')
     else:
         return HttpResponse("Form Submission Error!")
