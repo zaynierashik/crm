@@ -48,53 +48,53 @@
         <!-- Company -->
 
         {% if selection == "company" %}
-        <div class="container mt-5">
-            <div class="row g-3">
-                <div class="col">
-                    <form class="d-flex" id="search" role="search">
-                        <input class="form-control me-2 py-2" type="search" placeholder="Search" aria-label="Search">
-                    </form>
+        <div id="company-section">
+            <div class="container mt-5">
+                <div class="row g-3">
+                    <div class="col">
+                        <input class="form-control me-2 py-2" type="search" id="company-search" placeholder="Search" aria-label="Search">
+                    </div>
+                    <div class="col-3">
+                        <a href="{% url 'newcompany' %}">
+                            <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
+                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new company
+                            </button>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-3">
-                    <a href="{% url 'newcompany' %}">
-                        <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new company
-                        </button>
-                    </a>
-                </div>
+
+                <div class="hl mt-3"></div>
             </div>
 
-            <div class="hl mt-3"></div>
-        </div>
-
-        <div id="company-detail-content" class="company-detail-content container">
-            <h3>Company Master</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Company Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for company in companies %}
-                    <tr>
-                        <td>{{ company.Company_Name }}</td>
-                        <td>
-                            <a href="{% url 'companyform' company.id %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'companydetails' company.id %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div id="company-detail-content" class="company-detail-content container">
+                <h3>Company Master</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Company Name</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for company in companies %}
+                        <tr>
+                            <td>{{ company.Company_Name }}</td>
+                            <td>
+                                <a href="{% url 'companyform' company.id %}">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'companydetails' company.id %}">
+                                    <i class="fa-solid fa-eye" style="color: #212529;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Sector Details Form -->
@@ -228,53 +228,53 @@
         <!-- Partner Details Form -->
         
         {% elif selection == "partner" %}
-        <div class="container mt-5">
-            <div class="row g-3">
-                <div class="col">
-                    <form class="d-flex" id="search" role="search">
-                        <input class="form-control me-2 py-2" type="search" placeholder="Search" aria-label="Search">
-                    </form>
+        <div id="partner-section">
+            <div class="container mt-5">
+                <div class="row g-3">
+                    <div class="col">
+                        <input class="form-control me-2 py-2" type="search" id="partner-search" placeholder="Search" aria-label="Search">
+                    </div>
+                    <div class="col-3">
+                        <a href="{% url 'newpartner' %}">
+                            <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
+                                <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new partner
+                            </button>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-3">
-                    <a href="{% url 'newpartner' %}">
-                        <button type="submit" class="btn fw-semibold w-100" name="company-submit" style="background-color: #212529;">
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new partner
-                        </button>
-                    </a>
-                </div>
+
+                <div class="hl mt-3"></div>
             </div>
 
-            <div class="hl mt-3"></div>
-        </div>
-
-        <div id="partner-detail-content" class="partner-detail-content container">
-            <h3>Partner Master</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Sector Name</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for partner in partners %}
-                    <tr>
-                        <td>{{ partner.Partner_Name }}</td>
-                        <td>
-                            <a href="{% url 'partnerform' partner.id %}">
-                                <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{% url 'partnerdetails' partner.id %}">
-                                <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div id="partner-detail-content" class="partner-detail-content container">
+                <h3>Partner Master</h3>
+                <table class="table" id="partner-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sector Name</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partner in partners %}
+                        <tr>
+                            <td>{{ partner.Partner_Name }}</td>
+                            <td>
+                                <a href="{% url 'partnerform' partner.id %}">
+                                    <i class="fa-solid fa-pen-to-square" style="color: #212529;"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'partnerdetails' partner.id %}">
+                                    <i class="fa-solid fa-eye" style="color: #212529;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -290,6 +290,45 @@
                     window.location.href = "{% url 'master' %}?selection=" + selectedValue;
                 });
             });
+        });
+    </script>
+
+    <script>
+        function searchTable(inputId, tableId){
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById(inputId);
+            filter = input.value.toUpperCase();
+            table = document.getElementById(tableId);
+            tr = table.getElementsByTagName("tr");
+
+            for(i = 0; i < tr.length; i++){
+                td = tr[i].getElementsByTagName("td")[0];
+                if(td){
+                    txtValue = td.textContent || td.innerText;
+                    if(txtValue.toUpperCase().indexOf(filter) > -1){
+                        tr[i].style.display = "";
+                    }else{
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function(){
+            var companySearchInput = document.getElementById("company-search");
+            var partnerSearchInput = document.getElementById("partner-search");
+
+            if(companySearchInput){
+                companySearchInput.addEventListener("input", function(){
+                    searchTable('company-search', 'company-detail-content');
+                });
+            }
+
+            if(partnerSearchInput){
+                partnerSearchInput.addEventListener("input", function(){
+                    searchTable('partner-search', 'partner-detail-content');
+                });
+            }
         });
     </script>
 
