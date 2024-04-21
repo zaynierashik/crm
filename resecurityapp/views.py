@@ -7,27 +7,27 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
-def index(request):
-    return render(request, 'index.html')
+# def index(request):
+#     return render(request, 'index.html')
 
-def login(request):
-    if request.user.is_authenticated:
-        print("Already logged in.")
-        return redirect('index')
-    if request.method == "POST":
-        email = request.POST["email"]
-        password = request.POST["password"]
+# def login(request):
+#     if request.user.is_authenticated:
+#         print("Already logged in.")
+#         return redirect('index')
+#     if request.method == "POST":
+#         email = request.POST["email"]
+#         password = request.POST["password"]
         
-        user = authenticate(request, email=email, password=password)
+#         user = authenticate(request, email=email, password=password)
         
-        if user is not None:
-            login(request, user)
-            return redirect('index')
-        else:
-            print("email or password is incorrect")
-            msg = "email or password is incorrect"
-            return render(request, "index.html", {'message': msg})
-    return render(request, 'index.html', {})
+#         if user is not None:
+#             login(request, user)
+#             return redirect('index')
+#         else:
+#             print("email or password is incorrect")
+#             msg = "email or password is incorrect"
+#             return render(request, "index.html", {'message': msg})
+#     return render(request, 'index.html', {})
 
 def homepage(request):
     companies = Company.objects.all()
