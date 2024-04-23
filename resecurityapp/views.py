@@ -7,32 +7,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
-# def index(request):
-#     return render(request, 'index.html')
-
-# def login(request):
-#     if request.user.is_authenticated:
-#         print("Already logged in.")
-#         return redirect('index')
-#     if request.method == "POST":
-#         email = request.POST["email"]
-#         password = request.POST["password"]
-        
-#         user = authenticate(request, email=email, password=password)
-        
-#         if user is not None:
-#             login(request, user)
-#             return redirect('index')
-#         else:
-#             print("email or password is incorrect")
-#             msg = "email or password is incorrect"
-#             return render(request, "index.html", {'message': msg})
-#     return render(request, 'index.html', {})
-
-def homepage(request):
+def index(request):
     companies = Company.objects.all()
     success = request.GET.get('success')
-    return render(request, 'homepage.html', {'companies': companies, 'success': success})
+    return render(request, 'index.html', {'companies': companies, 'success': success})
 
 def submit_transaction(request):
     if request.method == 'POST':
@@ -44,7 +22,7 @@ def submit_transaction(request):
         transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark)
         transaction.save()
 
-        return redirect(reverse('homepage') + '?success=True')
+        return redirect(reverse('index') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
 
