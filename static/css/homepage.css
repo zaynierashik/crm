@@ -1,8 +1,23 @@
-@import url(style.css);
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap');
 
-.navbar-nav .nav-link{
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+.nav-link{
     margin-left: 1vw;
     font-size: 1.1rem;
+    color: black;
+}
+
+.nav-link:hover{
+    color: #FE5B3E;
 }
 
 .dropdown-menu{
@@ -39,6 +54,27 @@
 
 .content .row{
     width: 55%;
+}
+
+.form-control{
+    background-color: #e8e8e8;
+    border: none;
+}
+
+.form-control:focus{
+    background-color: #e8e8e8;
+    border: none;
+}
+
+.btn{
+    background-color: black;
+    color: white;
+    padding-bottom: 1.1vh;
+}
+
+.btn:hover{
+    background-color: black;
+    color: white;
 }
 
 .hl{

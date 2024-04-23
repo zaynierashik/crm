@@ -163,8 +163,16 @@ def companyform(request, company_id):
 
 def companydetails(request, company_id):
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name=company.Company_Name)
-    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions})
+    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        filtered_transactions = transactions.filter(date__range=[start_date, end_date])
+    else:
+        filtered_transactions = transactions
+
+    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions})
 
 def partnerform(request, partner_id):
     partner = Partner.objects.get(pk=partner_id)
