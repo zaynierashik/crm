@@ -32,6 +32,12 @@ class Via(models.Model):
 
     def __str__(self):
         return self.Via_Name
+    
+class Brand(models.Model):
+    Brand_Name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.Brand_Name
 
 class Partner(models.Model):
     Partner_Name = models.CharField(max_length=100)
@@ -59,6 +65,8 @@ class Company(models.Model):
     currency = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.CASCADE)
+    Referral_Name = models.CharField(max_length=100)
+    Partner_Name = models.CharField(max_length=100)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
 
     def __str__(self):

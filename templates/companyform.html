@@ -16,7 +16,7 @@
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
                     <a class="navbar-brand" href="{% url 'index' %}">
-                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="55">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
@@ -216,6 +217,12 @@
                 }, false);
             });
         });
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
     </script>
 
     <script src="/static/js/script.js"></script>
