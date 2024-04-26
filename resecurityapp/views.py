@@ -59,6 +59,7 @@ def submit_company(request):
         requirement_name = request.POST.get('requirement')
         requirement = Requirement.objects.get(Requirement_Name=requirement_name)
         requirement_description = request.POST.get('requirement-description')
+        currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
@@ -76,6 +77,7 @@ def submit_company(request):
         company.Phone_Number = phone_number
         company.requirement = requirement
         company.Requirement_Description = requirement_description
+        company.currency = currency
         company.price = price
         company.via = via
         company.status = status
@@ -205,13 +207,14 @@ def submit_newcompany(request):
         requirement_name = request.POST.get('requirement')
         requirement = Requirement.objects.get(Requirement_Name=requirement_name)
         requirement_description = request.POST.get('requirement-description')
+        currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
         company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
+                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, currency=currency, price=price, via=via, status=status)
         company.save()
         return redirect(reverse('master') + '?selection=company')
     else:

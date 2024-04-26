@@ -56,6 +56,7 @@ class Company(models.Model):
     Phone_Number = models.CharField(max_length=20)
     requirement = models.ForeignKey(Requirement, on_delete=models.CASCADE)
     Requirement_Description = models.TextField()
+    currency = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)

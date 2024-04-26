@@ -137,6 +137,17 @@
                 </div>   
                     
                 <div class="row g-3">
+                    <div class="col-2">
+                        <label for="currency" class="form-label fw-semibold">Currency</label>
+                        <select class="form-control py-2" name="currency" id="currency" required>
+                            <option value="">Choose a currency</option>
+                            <option value="NPR">NPR</option>
+                            <option value="USD">USD</option>
+                            <option value="SGD">Singapore Dollar</option>
+                            <option value="Riyal">Riyal</option>
+                        </select>
+                    </div> 
+
                     <div class="col">
                         <label for="price" class="form-label fw-semibold">Price</label>
                         <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
