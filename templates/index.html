@@ -52,7 +52,7 @@
                     {% csrf_token %}
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
-                        <select class="form-control py-2" name="company" id="company" required>
+                        <select class="form-control form-select py-2" name="company" id="company" required>
                             <option value=""></option>
                             {% for company in companies %}
                             <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>

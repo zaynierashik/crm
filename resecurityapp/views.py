@@ -1,5 +1,5 @@
 from django.shortcuts import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import *
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -92,10 +92,16 @@ def submit_sector(request):
     if request.method == 'POST':
         sector_name = request.POST.get('sector')
 
+        # Save sector to database
         sector = Sector(Sector_Name=sector_name)
         sector.save()
 
-        return redirect(reverse('master') + '?selection=sector')
+        if request.is_ajax():
+            # If the request is AJAX, return JSON response with newly added sector data
+            return JsonResponse({'id': sector.id, 'Sector_Name': sector.Sector_Name})
+        else:
+            # If not AJAX, redirect to the appropriate page
+            return redirect(reverse('master') + '?selection=sector')
     else:
         return HttpResponse("Form Submission Error!")
     

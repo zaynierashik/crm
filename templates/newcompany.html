@@ -59,15 +59,20 @@
                         <input type="text" class="form-control py-2" name="company" id="company" value="{{ company.Company_Name }}" required>
                         <div class="invalid-feedback">Please enter a country name.</div>
                     </div>
-
+                
                     <div class="col-4">
                         <label for="sector" class="form-label fw-semibold">Sector</label>
-                        <select class="form-control py-2" name="sector" id="sector" required>
-                            <option value="">Choose a sector</option>
-                            {% for sector in sectors %}
-                            <option value="{{ sector.Sector_Name }}">{{ sector.Sector_Name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="input-group">
+                            <select class="form-control form-select py-2" name="sector" id="sector" required>
+                                <option value="">Choose a sector</option>
+                                {% for sector in sectors %}
+                                <option value="{{ sector.Sector_Name }}">{{ sector.Sector_Name }}</option>
+                                {% endfor %}
+                            </select>
+                            <a href="#" class="input-group-text" data-bs-toggle="modal" data-bs-target="#sectorModal">
+                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                            </a>
+                        </div>
                         <div class="invalid-feedback">Please select a sector.</div>
                     </div>   
                 </div>
@@ -123,7 +128,7 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="requirement" class="form-label fw-semibold">Requirement</label>
-                        <select class="form-control py-2" name="requirement" id="requirement" required>
+                        <select class="form-control form-select py-2" name="requirement" id="requirement" required>
                             <option value="">Choose a requirement</option>
                             {% for requirement in requirements %}
                             <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
@@ -134,7 +139,7 @@
 
                     <div class="col-4">
                         <label for="brand" class="form-label fw-semibold">Brand</label>
-                        <select class="form-control py-2" name="brand" id="brand" required>
+                        <select class="form-control form-select py-2" name="brand" id="brand" required>
                             <option value="">Choose a brand</option>
                             {% for brand in brands %}
                             <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
@@ -153,7 +158,7 @@
                 <div class="row g-3">
                     <div class="col-2">
                         <label for="currency" class="form-label fw-semibold">Currency</label>
-                        <select class="form-control py-2" name="currency" id="currency" required>
+                        <select class="form-control form-select py-2" name="currency" id="currency" required>
                             <option value="">Choose a currency</option>
                             <option value="NPR">NPR</option>
                             <option value="USD">USD</option>
@@ -170,7 +175,7 @@
     
                     <div class="col-2">
                         <label for="via" class="form-label fw-semibold">Via</label>
-                        <select class="form-control py-2" name="via" id="via" required>
+                        <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
                             {% for via in vias %}
                             <option value="{{ via.Via_Name }}">{{ via.Via_Name }}</option>
@@ -186,7 +191,7 @@
                     
                     <div id="partnerDropdown" class="col" style="display: none;">
                         <label for="partner" class="form-label fw-semibold">Partner</label>
-                        <select class="form-control py-2" name="partner" id="partner">
+                        <select class="form-control form-select py-2" name="partner" id="partner">
                             <option value="">Choose a partner</option>
                             {% for partner in partners %}
                                 <option value="{{ partner.id }}">{{ partner.Partner_Name }}</option>
@@ -196,7 +201,7 @@
     
                     <div class="col">
                         <label for="status" class="form-label fw-semibold">Status</label>
-                        <select class="form-control py-2" name="status" id="status" required>
+                        <select class="form-control form-select py-2" name="status" id="status" required>
                             <option value="">Choose a status</option>
                             {% for status in statuses %}
                             <option value="{{ status.Status_Name }}">{{ status.Status_Name }}</option>
@@ -212,6 +217,32 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="sectorModal" tabindex="-1" aria-labelledby="sectorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sectorModalLabel">Add New Sector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="sectorForm" action="{% url 'submit_sector' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="sector" class="form-label fw-semibold">Sector Name</label>
+                                <input type="text" class="form-control py-2" name="sector" id="sector" required>
+                                <div class="invalid-feedback">Please enter a sector name.</div>
+                            </div>  
+                        </div>                    
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitSectorBtn">Add Sector</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -263,6 +294,28 @@
                     referralNameInput.style.display = "none";
                     partnerDropdown.style.display = "none";
                 }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("submitSectorBtn").addEventListener("click", function() {
+                var form = document.getElementById("sectorForm");
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action);
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        refreshSectorDropdown();
+                        var modal = bootstrap.Modal.getInstance(document.getElementById("sectorModal"));
+                        modal.hide();
+                    } else {
+                        // Handle error responses
+                    }
+                };
+                xhr.send(formData);
             });
         });
     </script>

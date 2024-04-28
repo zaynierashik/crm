@@ -63,7 +63,7 @@
 
                     <div class="col-4">
                         <label for="sector" class="form-label fw-semibold">Sector</label>
-                        <select class="form-control py-2" name="sector" id="sector" required>
+                        <select class="form-control form-select py-2" name="sector" id="sector" required>
                             <option value="">Choose a sector</option>
                             {% for sector in sectors %}
                             <option value="{{ sector.Sector_Name }}">{{ sector.Sector_Name }}</option>
@@ -123,7 +123,7 @@
                     
                 <div class="mb-3">
                     <label for="requirement" class="form-label fw-semibold">Requirement</label>
-                    <select class="form-control py-2" name="requirement" id="requirement" required>
+                    <select class="form-control form-select py-2" name="requirement" id="requirement" required>
                         <option value="">Choose a requirement</option>
                         {% for requirement in requirements %}
                         <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
@@ -141,7 +141,7 @@
                 <div class="row g-3">
                     <div class="col-2">
                         <label for="currency" class="form-label fw-semibold">Currency</label>
-                        <select class="form-control py-2" name="currency" id="currency" required>
+                        <select class="form-control form-select py-2" name="currency" id="currency" required>
                             <option value="">Choose a currency</option>
                             <option value="NPR">NPR</option>
                             <option value="USD">USD</option>
@@ -159,7 +159,7 @@
     
                     <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
-                        <select class="form-control py-2" name="via" id="via" required>
+                        <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
                             {% for via in vias %}
                             <option value="{{ via.Via_Name }}">{{ via.Via_Name }}</option>
@@ -170,7 +170,7 @@
     
                     <div class="col">
                         <label for="status" class="form-label fw-semibold">Status</label>
-                        <select class="form-control py-2" name="status" id="status" required>
+                        <select class="form-control form-select py-2" name="status" id="status" required>
                             <option value="">Choose a status</option>
                             {% for status in statuses %}
                             <option value="{{ status.Status_Name }}">{{ status.Status_Name }}</option>

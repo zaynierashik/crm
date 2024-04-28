@@ -42,7 +42,7 @@ urlpatterns = [
     path('submit_newcompany/', views.submit_newcompany, name='submit_newcompany'),
     path('newpartner/', views.newpartner, name='newpartner'),
     path('submit_newpartner/', views.submit_newpartner, name='submit_newpartner'),
-]   
+]
 
 if settings.DEBUG:
     urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
