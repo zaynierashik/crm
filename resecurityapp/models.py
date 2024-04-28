@@ -32,6 +32,12 @@ class Via(models.Model):
 
     def __str__(self):
         return self.Via_Name
+    
+class Brand(models.Model):
+    Brand_Name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.Brand_Name
 
 class Partner(models.Model):
     Partner_Name = models.CharField(max_length=100)
@@ -46,7 +52,7 @@ class Partner(models.Model):
 
 class Company(models.Model):
     Company_Name = models.CharField(max_length=100)
-    sector = models.ForeignKey(Sector, on_delete=models.CASCADE)
+    sector = models.ForeignKey(Sector, on_delete=models.SET_NULL, null=True)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
@@ -54,11 +60,15 @@ class Company(models.Model):
     designation = models.CharField(max_length=100)
     email = models.EmailField()
     Phone_Number = models.CharField(max_length=20)
-    requirement = models.ForeignKey(Requirement, on_delete=models.CASCADE)
+    requirement = models.ForeignKey(Requirement, on_delete=models.SET_NULL, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     Requirement_Description = models.TextField()
+    currency = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
-    via = models.ForeignKey(Via, on_delete=models.CASCADE)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    via = models.ForeignKey(Via, on_delete=models.SET_NULL, null=True)
+    Referral_Name = models.CharField(max_length=100)
+    Partner_Name = models.CharField(max_length=100)
+    status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.Company_Name

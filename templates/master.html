@@ -16,7 +16,7 @@
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
                     <a class="navbar-brand" href="{% url 'index' %}">
-                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="55">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
@@ -225,6 +226,38 @@
             </table>
         </div>
 
+        <!-- Brand Details Form -->
+
+        {% elif selection == "brand" %}
+        <div id="brand-detail-content" class="brand-detail-content container">
+            <div class="row">
+                <div class="col">
+                    <h3>Brand Master</h3>
+                </div>
+                <div class="col-2">
+                    <a href="{% url 'newform' %}?formtype=brand">
+                        <button type="submit" class="btn fw-semibold w-100" name="brand-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new brand
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Brand Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for brand in brands %}
+                    <tr>
+                        <td>{{ brand.Brand_Name }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
         <!-- Partner Details Form -->
         
         {% elif selection == "partner" %}
@@ -330,6 +363,12 @@
                 });
             }
         });
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
     </script>
 
     <script src="/static/js/script.js"></script>

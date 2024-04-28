@@ -32,10 +32,11 @@ def master(request):
     requirements = Requirement.objects.all()
     vias = Via.objects.all()
     statuses = Status.objects.all()
+    brands = Brand.objects.all()
     partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'partners': partners, 'selection': selection})
+    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection})
 
 def newform(request):
     formtype = request.GET.get('formtype', None)
@@ -59,6 +60,7 @@ def submit_company(request):
         requirement_name = request.POST.get('requirement')
         requirement = Requirement.objects.get(Requirement_Name=requirement_name)
         requirement_description = request.POST.get('requirement-description')
+        currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
@@ -76,6 +78,7 @@ def submit_company(request):
         company.Phone_Number = phone_number
         company.requirement = requirement
         company.Requirement_Description = requirement_description
+        company.currency = currency
         company.price = price
         company.via = via
         company.status = status
@@ -126,6 +129,17 @@ def submit_status(request):
         status.save()
 
         return redirect(reverse('master') + '?selection=status')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def submit_brand(request):
+    if request.method == 'POST':
+        brand_name = request.POST.get('brand')
+
+        brand = Brand(Brand_Name=brand_name)
+        brand.save()
+
+        return redirect(reverse('master') + '?selection=brand')
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -186,9 +200,11 @@ def partnerdetails(request, partner_id):
 def newcompany(request):
     sectors = Sector.objects.all()
     requirements = Requirement.objects.all()
+    brands = Brand.objects.all()
     vias = Via.objects.all()
     statuses = Status.objects.all()
-    return render(request, 'newcompany.html', {'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
+    partners = Partner.objects.all()
+    return render(request, 'newcompany.html', {'sectors': sectors, 'requirements': requirements, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
 
 def submit_newcompany(request):
     if request.method == 'POST':
@@ -204,14 +220,38 @@ def submit_newcompany(request):
         phone_number = request.POST.get('number')
         requirement_name = request.POST.get('requirement')
         requirement = Requirement.objects.get(Requirement_Name=requirement_name)
+        brand_name = request.POST.get('brand')
+        brand = Brand.objects.get(Brand_Name=brand_name)
         requirement_description = request.POST.get('requirement-description')
+        currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
+        
+        if via_name == 'Referral':
+            referral_name = request.POST.get('referral_name')
+        elif via_name == 'Partner':
+            partner_id = request.POST.get('partner')
+            partner_name = Partner.objects.get(pk=partner_id)
+        else:
+            referral_name = None
+
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
-        company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                         email=email, Phone_Number=phone_number, requirement=requirement, Requirement_Description=requirement_description, price=price, via=via, status=status)
+        
+        if via_name == 'Referral':
+            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
+        elif via_name == 'Partner':
+            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
+        else:
+            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status)
+            
         company.save()
         return redirect(reverse('master') + '?selection=company')
     else:

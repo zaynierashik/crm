@@ -16,7 +16,7 @@
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
                     <a class="navbar-brand" href="{% url 'index' %}">
-                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="55">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
@@ -119,15 +120,28 @@
                     </div> 
                 </div>
                     
-                <div class="mb-3">
-                    <label for="requirement" class="form-label fw-semibold">Requirement</label>
-                    <select class="form-control py-2" name="requirement" id="requirement" required>
-                        <option value="">Choose a requirement</option>
-                        {% for requirement in requirements %}
-                        <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div class="invalid-feedback">Please select a requirement.</div>
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="requirement" class="form-label fw-semibold">Requirement</label>
+                        <select class="form-control py-2" name="requirement" id="requirement" required>
+                            <option value="">Choose a requirement</option>
+                            {% for requirement in requirements %}
+                            <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a requirement.</div>
+                    </div>
+
+                    <div class="col-4">
+                        <label for="brand" class="form-label fw-semibold">Brand</label>
+                        <select class="form-control py-2" name="brand" id="brand" required>
+                            <option value="">Choose a brand</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a brand.</div>
+                    </div>
                 </div>   
 
                 <div class="mb-3">
@@ -137,13 +151,24 @@
                 </div>   
                     
                 <div class="row g-3">
-                    <div class="col">
+                    <div class="col-2">
+                        <label for="currency" class="form-label fw-semibold">Currency</label>
+                        <select class="form-control py-2" name="currency" id="currency" required>
+                            <option value="">Choose a currency</option>
+                            <option value="NPR">NPR</option>
+                            <option value="USD">USD</option>
+                            <option value="SGD">Singapore Dollar</option>
+                            <option value="Riyal">Riyal</option>
+                        </select>
+                    </div> 
+
+                    <div class="col-2">
                         <label for="price" class="form-label fw-semibold">Price</label>
                         <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
                         <div class="invalid-feedback">Please enter a price.</div>
                     </div> 
     
-                    <div class="col">
+                    <div class="col-2">
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <select class="form-control py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
@@ -152,6 +177,21 @@
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a via.</div>
+                    </div>
+
+                    <div id="referralNameInput" class="col" style="display: none;">
+                        <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
+                        <input type="text" class="form-control py-2" name="referral_name" id="referral_name">
+                    </div>
+                    
+                    <div id="partnerDropdown" class="col" style="display: none;">
+                        <label for="partner" class="form-label fw-semibold">Partner</label>
+                        <select class="form-control py-2" name="partner" id="partner">
+                            <option value="">Choose a partner</option>
+                            {% for partner in partners %}
+                                <option value="{{ partner.id }}">{{ partner.Partner_Name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
     
                     <div class="col">
@@ -203,6 +243,34 @@
                 }, false);
             });
         });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var viaDropdown = document.getElementById("via");
+            var referralNameInput = document.getElementById("referralNameInput");
+            var partnerDropdown = document.getElementById("partnerDropdown");
+
+            viaDropdown.addEventListener("change", function(){
+                var selectedVia = viaDropdown.value;
+                if (selectedVia === "Referral") {
+                    referralNameInput.style.display = "block";
+                    partnerDropdown.style.display = "none";
+                } else if (selectedVia === "Partner") {
+                    referralNameInput.style.display = "none";
+                    partnerDropdown.style.display = "block";
+                } else {
+                    referralNameInput.style.display = "none";
+                    partnerDropdown.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
     </script>
 
     <script src="/static/js/script.js"></script>

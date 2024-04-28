@@ -16,7 +16,7 @@
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
                     <a class="navbar-brand" href="{% url 'index' %}">
-                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="55">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,7 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
@@ -129,6 +130,27 @@
             </form>
         </div>
 
+        <!-- Brand Details Form -->
+
+        {% elif formtype == "brand" %}
+        <div id="brand-content" class="brand-content container">
+            <h3>Brand Master</h3>
+            <form id="brandForm" action="{% url 'submit_brand' %}" method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="brand" class="form-label fw-semibold">Brand Name</label>
+                        <input type="text" class="form-control py-2" name="brand" id="brand" required>
+                        <div class="invalid-feedback">Please enter a brand name.</div>
+                    </div>  
+                </div>
+                        
+                <div class="d-flex justify-content-end column-gap-3 mt-4 mb-4">
+                    <button type="submit" class="btn fw-semibold w-100 px-4" name="brand-submit">Submit</button>
+                </div>
+            </form>
+        </div>
+
         {% endif %}
     </div>
 
@@ -169,6 +191,12 @@
 
         function clearPartner(){
             document.getElementById("partnerForm").reset();
+        }
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
         }
     </script>
 

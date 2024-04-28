@@ -82,11 +82,11 @@ html{
 }
 
 .company-content, .company-detail-content, .sector-content, .sector-detail-content, .requirement-content, .requirement-detail-content, 
-.via-content, .via-detail-content, .status-content, .status-detail-content, .partner-content, .partner-detail-content{
+.via-content, .via-detail-content, .status-content, .status-detail-content, .brand-content, .brand-detail-content, .partner-content, .partner-detail-content{
     margin-top: 3%;
 }
 
-.company-detail-content th, .sector-detail-content th, .requirement-detail-content th, .via-detail-content th, .status-detail-content th, .partner-detail-content th{
+.company-detail-content th, .sector-detail-content th, .requirement-detail-content th, .via-detail-content th, .status-detail-content th, .brand-detail-content, .partner-detail-content th{
     color: #212529;
 }
 
