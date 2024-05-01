@@ -69,9 +69,10 @@
                                 <option value="{{ sector.Sector_Name }}">{{ sector.Sector_Name }}</option>
                                 {% endfor %}
                             </select>
-                            <a href="#" class="input-group-text" data-bs-toggle="modal" data-bs-target="#sectorModal">
+
+                            <a href="#" class="input-group-text" data-bs-toggle="modal" data-bs-target="#sectorModal" style="text-decoration: none;">
                                 <i class="fa-solid fa-plus" style="color: #212529;"></i>
-                            </a>
+                            </a>                            
                         </div>
                         <div class="invalid-feedback">Please select a sector.</div>
                     </div>   
@@ -92,8 +93,13 @@
     
                     <div class="col">
                         <label for="country" class="form-label fw-semibold">Country</label>
-                        <input type="text" class="form-control py-2" name="country" id="country" value="{{ company.country }}" required>
-                        <div class="invalid-feedback">Please enter a country.</div>
+                        <select class="form-control form-select py-2" name="country" id="country" required>
+                            <option value="">Choose a country</option>
+                            <option value="Nepal">Nepal</option>
+                            <option value="USA">United States of America</option>
+                            <option value="Singapore">Singapore</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a country.</div>
                     </div>
                 </div>
                     
@@ -163,7 +169,6 @@
                             <option value="NPR">NPR</option>
                             <option value="USD">USD</option>
                             <option value="SGD">Singapore Dollar</option>
-                            <option value="Riyal">Riyal</option>
                         </select>
                     </div> 
 
@@ -239,6 +244,7 @@
                         </div>                    
                     </form>
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn px-4" id="submitSectorBtn">Add Sector</button>
                 </div>
