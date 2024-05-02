@@ -46,9 +46,11 @@ def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
     sectors = Sector.objects.all()
     requirements = Requirement.objects.all()
+    brands = Brand.objects.all()
     vias = Via.objects.all()
+    partners = Partner.objects.all()
     statuses = Status.objects.all()
-    return render(request, 'companyform.html', {'company': company, 'sectors': sectors, 'requirements': requirements, 'vias': vias, 'statuses': statuses})
+    return render(request, 'companyform.html', {'company': company, 'sectors': sectors, 'requirements': requirements, 'brands': brands, 'vias': vias, 'partners': partners, 'statuses': statuses})
 
 def submit_company(request):
     if request.method == 'POST':
