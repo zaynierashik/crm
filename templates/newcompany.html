@@ -101,6 +101,7 @@
                             <option value="">Choose a country</option>
                             <option value="Nepal">Nepal</option>
                             <option value="USA">United States of America</option>
+                            <option value="India">India</option>
                             <option value="Singapore">Singapore</option>
                         </select>
                         <div class="invalid-feedback">Please select a country.</div>
@@ -138,24 +139,36 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="requirement" class="form-label fw-semibold">Requirement</label>
-                        <select class="form-control form-select py-2" name="requirement" id="requirement" required>
-                            <option value="">Choose a requirement</option>
-                            {% for requirement in requirements %}
-                            <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a requirement.</div>
+                        <div class="input-group">
+                            <select class="form-control form-select py-2" name="requirement" id="requirement" required>
+                                <option value="">Choose a requirement</option>
+                                {% for requirement in requirements %}
+                                <option value="{{ requirement.Requirement_Name }}">{{ requirement.Requirement_Name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#requirementModal" style="text-decoration: none;">
+                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                            </a>
+                            <div class="invalid-feedback">Please select a requirement.</div>
+                        </div>
                     </div>
 
                     <div class="col-4">
                         <label for="brand" class="form-label fw-semibold">Brand</label>
-                        <select class="form-control form-select py-2" name="brand" id="brand" required>
-                            <option value="">Choose a brand</option>
-                            {% for brand in brands %}
-                            <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a brand.</div>
+                        <div class="input-group">
+                            <select class="form-control form-select py-2" name="brand" id="brand" required>
+                                <option value="">Choose a brand</option>
+                                {% for brand in brands %}
+                                <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
+                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                            </a>
+                            <div class="invalid-feedback">Please select a brand.</div>
+                        </div>
                     </div>
                 </div>   
 
@@ -173,6 +186,7 @@
                             <option value="NPR">NPR</option>
                             <option value="USD">USD</option>
                             <option value="SGD">Singapore Dollar</option>
+                            <option value="INR">INR</option>
                         </select>
                         <div class="invalid-feedback">Please select a currency.</div>
                     </div> 
@@ -257,6 +271,60 @@
         </div>
     </div>
 
+    <div class="modal fade" id="requirementModal" tabindex="-1" aria-labelledby="requirementModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requirementModalLabel">Add New Requirement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="requirementForm" action="{% url 'submit_requirement' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="requirement" class="form-label fw-semibold">Requirement Name</label>
+                                <input type="text" class="form-control py-2" name="requirement" id="requirement" required>
+                                <div class="invalid-feedback">Please enter a requirement name.</div>
+                            </div>  
+                        </div>                    
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitRequirementBtn">Add Requirement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="brandModalLabel">Add New Brand</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="brandForm" action="{% url 'submit_brand' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="brand" class="form-label fw-semibold">Brand Name</label>
+                                <input type="text" class="form-control py-2" name="brand" id="brand" required>
+                                <div class="invalid-feedback">Please enter a brand name.</div>
+                            </div>  
+                        </div>                    
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitBrandBtn">Add Brand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function(){
             var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
@@ -313,6 +381,26 @@
         document.addEventListener("DOMContentLoaded", function(){
             document.getElementById("submitSectorBtn").addEventListener("click", function(){
                 var form = document.getElementById("sectorForm");
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action);
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+
+                xhr.send(formData);
+            });
+
+            document.getElementById("submitRequirementBtn").addEventListener("click", function(){
+                var form = document.getElementById("requirementForm");
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action);
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+
+                xhr.send(formData);
+            });
+
+            document.getElementById("submitBrandBtn").addEventListener("click", function(){
+                var form = document.getElementById("brandForm");
                 var formData = new FormData(form);
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", form.action);
