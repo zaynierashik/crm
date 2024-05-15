@@ -7,11 +7,11 @@ class Sector(models.Model):
     def __str__(self):
         return self.Sector_Name
 
-class Requirement(models.Model):
-    Requirement_Name = models.CharField(max_length=100)
+class Service(models.Model):
+    Service_Name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.Requirement_Name
+        return self.Service_Name
 
 class Status(models.Model):
     Status_Name = models.CharField(max_length=100)
@@ -60,7 +60,7 @@ class Company(models.Model):
     designation = models.CharField(max_length=100)
     email = models.EmailField()
     Phone_Number = models.CharField(max_length=20)
-    requirement = models.ForeignKey(Requirement, on_delete=models.SET_NULL, null=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100)

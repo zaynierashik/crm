@@ -34,7 +34,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
@@ -134,18 +134,18 @@
             </table>
         </div>
 
-        <!-- Requirement Details Form -->
+        <!-- Service Details Form -->
 
-        {% elif selection == "requirement" %}
-        <div id="requirement-detail-content" class="requirement-detail-content container">
+        {% elif selection == "service" %}
+        <div id="service-detail-content" class="service-detail-content container">
             <div class="row">
                 <div class="col">
-                    <h3>Requirement Master</h3>
+                    <h3>Service Master</h3>
                 </div>
                 <div class="col-3">
-                    <a href="{% url 'newform' %}?formtype=requirement">
-                        <button type="submit" class="btn fw-semibold w-100" name="requirement-submit" style="background-color: #212529;">
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new requirement
+                    <a href="{% url 'newform' %}?formtype=service">
+                        <button type="submit" class="btn fw-semibold w-100" name="service-submit" style="background-color: #212529;">
+                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new service
                         </button>
                     </a>
                 </div>
@@ -153,13 +153,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Requirement Name</th>
+                        <th scope="col">Service Name</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for requirement in requirements %}
+                    {% for service in services %}
                     <tr>
-                        <td>{{ requirement.Requirement_Name }}</td>
+                        <td>{{ service.Service_Name }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

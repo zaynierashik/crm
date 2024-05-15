@@ -34,7 +34,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
@@ -71,23 +71,23 @@
             </form>
         </div>
 
-        <!-- Requirement Details Form -->
+        <!-- Service Details Form -->
 
-        {% elif formtype == "requirement" %}
-        <div id="requirement-content" class="requirement-content container">
-            <h3>Requirement Master</h3>
-            <form id="requirementForm" action="{% url 'submit_requirement' %}" method="POST" class="needs-validation" novalidate>
+        {% elif formtype == "service" %}
+        <div id="service-content" class="service-content container">
+            <h3>Service Master</h3>
+            <form id="serviceForm" action="{% url 'submit_service' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
                     <div class="col">
-                        <label for="requirement" class="form-label fw-semibold">Requirement Name</label>
-                        <input type="text" class="form-control py-2" name="requirement" id="requirement" required>
-                        <div class="invalid-feedback">Please enter a requirement name.</div>
+                        <label for="service" class="form-label fw-semibold">Service Name</label>
+                        <input type="text" class="form-control py-2" name="service" id="service" required>
+                        <div class="invalid-feedback">Please enter a service name.</div>
                     </div>  
                 </div>
                         
                 <div class="d-flex justify-content-end column-gap-3 mt-4 mb-4">
-                    <button type="submit" class="btn fw-semibold w-100 px-4" name="requirement-submit">Submit</button>
+                    <button type="submit" class="btn fw-semibold w-100 px-4" name="service-submit">Submit</button>
                 </div>
             </form>
         </div>
