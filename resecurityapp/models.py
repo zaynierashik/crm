@@ -60,6 +60,7 @@ class Company(models.Model):
     designation = models.CharField(max_length=100)
     email = models.EmailField()
     Phone_Number = models.CharField(max_length=20)
+    requirement = models.CharField(max_length=100, default=None)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
     Requirement_Description = models.TextField()

@@ -139,14 +139,12 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
-                        <div class="input-group">
-                            <select class="form-control form-select py-2" name="requirement-type" id="requirement-type" required>
-                                <option value="">Choose a requirement</option>
-                                <option value="Product">Product</option>
-                                <option value="Service">Service</option>
-                            </select>
-                            <div class="invalid-feedback">Please select a requirement.</div>
-                        </div>
+                        <select class="form-control form-select py-2" name="requirement-type" id="requirement-type" required>
+                            <option value="">Choose a requirement</option>
+                            <option value="Product">Product</option>
+                            <option value="Service">Service</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a requirement.</div>
                     </div>
 
                     <div id="serviceInput" class="col" style="display: none;">
@@ -369,6 +367,35 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
+            function handleFormSubmission(formId){
+                var form = document.getElementById(formId);
+                if (form.checkValidity()) {
+                    var formData = new FormData(form);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", form.action);
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    xhr.send(formData);
+                } else {
+                    form.classList.add("was-validated");
+                }
+            }
+
+            document.getElementById("submitSectorBtn").addEventListener("click", function(){
+                handleFormSubmission("sectorForm");
+            });
+
+            document.getElementById("submitServiceBtn").addEventListener("click", function(){
+                handleFormSubmission("serviceForm");
+            });
+
+            document.getElementById("submitBrandBtn").addEventListener("click", function(){
+                handleFormSubmission("brandForm");
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
             var viaDropdown = document.getElementById("via");
             var referralNameInput = document.getElementById("referralNameInput");
             var partnerDropdown = document.getElementById("partnerDropdown");
@@ -389,28 +416,27 @@
         });
     </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function(){
-        var requirementDropdown = document.getElementById("requirement-type");
-        var brandInput = document.getElementById("brandInput");
-        var serviceInput = document.getElementById("serviceInput");
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var requirementDropdown = document.getElementById("requirement-type");
+            var brandInput = document.getElementById("brandInput");
+            var serviceInput = document.getElementById("serviceInput");
 
-        requirementDropdown.addEventListener("change", function(){
-            var selectedRequirement = requirementDropdown.value;
-            if(selectedRequirement === "Product"){
-                brandInput.style.display = "block";
-                serviceInput.style.display = "none";
-            } else if(selectedRequirement === "Service"){
-                serviceInput.style.display = "block";
-                brandInput.style.display = "none";
-            } else {
-                brandInput.style.display = "none";
-                serviceInput.style.display = "none";
-            }
+            requirementDropdown.addEventListener("change", function(){
+                var selectedRequirement = requirementDropdown.value;
+                if(selectedRequirement === "Product"){
+                    brandInput.style.display = "block";
+                    serviceInput.style.display = "none";
+                } else if(selectedRequirement === "Service"){
+                    serviceInput.style.display = "block";
+                    brandInput.style.display = "none";
+                } else {
+                    brandInput.style.display = "none";
+                    serviceInput.style.display = "none";
+                }
+            });
         });
-    });
-</script>
-
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
