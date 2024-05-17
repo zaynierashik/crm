@@ -128,7 +128,7 @@ def submit_sector(request):
             if 'newcompany' in referring_page:
                 return HttpResponseRedirect(reverse('newcompany'))
         
-        return HttpResponseRedirect(reverse('master') + '?selection=sector')
+        return redirect(reverse('master') + '?selection=sector')
     else:
         return HttpResponse("Form Submission Error!")
     

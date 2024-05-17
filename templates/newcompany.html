@@ -369,13 +369,13 @@
         document.addEventListener("DOMContentLoaded", function(){
             function handleFormSubmission(formId){
                 var form = document.getElementById(formId);
-                if (form.checkValidity()) {
+                if(form.checkValidity()){
                     var formData = new FormData(form);
                     var xhr = new XMLHttpRequest();
                     xhr.open("POST", form.action);
                     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                     xhr.send(formData);
-                } else {
+                }else{
                     form.classList.add("was-validated");
                 }
             }
@@ -439,37 +439,27 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            document.getElementById("submitSectorBtn").addEventListener("click", function(){
-                var form = document.getElementById("sectorForm");
+        function handleFormSubmission(formId){
+            var form = document.getElementById(formId);
+            if(form.checkValidity()){
                 var formData = new FormData(form);
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", form.action);
                 xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState === XMLHttpRequest.DONE){
+                        if(xhr.status === 200){
+                            window.location.reload();
+                        }else{
+                            console.error('Error:', xhr.statusText);
+                        }
+                    }
+                };
                 xhr.send(formData);
-            });
-
-            document.getElementById("submitRequirementBtn").addEventListener("click", function(){
-                var form = document.getElementById("serviceForm");
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-
-                xhr.send(formData);
-            });
-
-            document.getElementById("submitBrandBtn").addEventListener("click", function(){
-                var form = document.getElementById("brandForm");
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-
-                xhr.send(formData);
-            });
-        });
+            }else{
+                form.classList.add("was-validated");
+            }
+        }
     </script>
 
     <script>
