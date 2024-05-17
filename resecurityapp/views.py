@@ -123,14 +123,10 @@ def submit_sector(request):
         sector = Sector(Sector_Name=sector_name)
         sector.save()
 
-        if 'HTTP_REFERER' in request.META:
-            referring_page = request.META['HTTP_REFERER']
-            if 'newcompany' in referring_page:
-                return HttpResponseRedirect(reverse('newcompany'))
-        
-        return redirect(reverse('master') + '?selection=sector')
+        return JsonResponse({'sector_name': sector_name})
     else:
         return HttpResponse("Form Submission Error!")
+
     
 def submit_service(request):
     if request.method == 'POST':
