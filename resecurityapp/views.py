@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 
 def index(request):
@@ -21,18 +22,17 @@ def submit_transaction(request):
 
         transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark)
         transaction.save()
-
         return redirect(reverse('index') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
 
 def master(request):
-    companies = Company.objects.all()
-    sectors = Sector.objects.all()
-    services = Service.objects.all()
+    companies = Company.objects.order_by('Company_Name')
+    sectors = Sector.objects.values('Sector_Name').distinct()
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     statuses = Status.objects.all()
-    brands = Brand.objects.all()
     partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
@@ -44,9 +44,9 @@ def newform(request):
 
 def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
-    sectors = Sector.objects.all()
-    services = Service.objects.all()
-    brands = Brand.objects.all()
+    sectors = Sector.objects.values('Sector_Name').distinct()
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     partners = Partner.objects.all()
     statuses = Status.objects.all()
@@ -116,47 +116,39 @@ def companydetails(request, company_id):
 
     return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions})
 
+@csrf_exempt
 def submit_sector(request):
     if request.method == 'POST':
         sector_name = request.POST.get('sector')
-
-        sector = Sector(Sector_Name=sector_name)
-        sector.save()
-
-        return JsonResponse({'sector_name': sector_name})
+        
+        if sector_name:
+            sector = Sector(Sector_Name=sector_name)
+            sector.save()
+            return JsonResponse({'sector_name': sector_name})
     else:
         return HttpResponse("Form Submission Error!")
-
     
+@csrf_exempt
 def submit_service(request):
     if request.method == 'POST':
         service_name = request.POST.get('service')
-
-        service = Service(Service_Name=service_name)
-        service.save()
-
-        if 'HTTP_REFERER' in request.META:
-            referring_page = request.META['HTTP_REFERER']
-            if 'newcompany' in referring_page:
-                return HttpResponseRedirect(reverse('newcompany'))
-
-        return redirect(reverse('master') + '?selection=service')
+        
+        if service_name:
+            service = Service(Service_Name=service_name)
+            service.save()
+            return JsonResponse({'service_name': service_name})
     else:
         return HttpResponse("Form Submission Error!")
-
+    
+@csrf_exempt
 def submit_brand(request):
     if request.method == 'POST':
         brand_name = request.POST.get('brand')
-
-        brand = Brand(Brand_Name=brand_name)
-        brand.save()
-
-        if 'HTTP_REFERER' in request.META:
-            referring_page = request.META['HTTP_REFERER']
-            if 'newcompany' in referring_page:
-                return HttpResponseRedirect(reverse('newcompany'))
-
-        return redirect(reverse('master') + '?selection=brand')
+        
+        if brand_name:
+            brand = Brand(Brand_Name=brand_name)
+            brand.save()
+            return JsonResponse({'brand_name': brand_name})
     else:
         return HttpResponse("Form Submission Error!")
 
@@ -216,9 +208,9 @@ def partnerdetails(request, partner_id):
     return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})
 
 def newcompany(request):
-    sectors = Sector.objects.all()
-    services = Service.objects.all()
-    brands = Brand.objects.all()
+    sectors = Sector.objects.values('Sector_Name').distinct()
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.all()
@@ -228,7 +220,13 @@ def submit_newcompany(request):
     if request.method == 'POST':
         company_name = request.POST.get('company')
         sector_name = request.POST.get('sector')
-        sector = Sector.objects.get(Sector_Name=sector_name)
+        sector = Sector.objects.filter(Sector_Name=sector_name)
+
+        if sector.exists():
+            sectors = sector.first()
+        else:
+            return HttpResponse("Sector not found")
+        
         address = request.POST.get('address')
         city = request.POST.get('city')
         country = request.POST.get('country')
@@ -246,43 +244,46 @@ def submit_newcompany(request):
         requirement_type = request.POST.get('requirement-type')
         if requirement_type == 'Product':
             brand_name = request.POST.get('brand')
-            brand = Brand.objects.get(Brand_Name=brand_name)
+            brand = Brand.objects.filter(Brand_Name=brand_name).first()
             service = None
         elif requirement_type == 'Service':
             service_name = request.POST.get('service')
-            service = Service.objects.get(Service_Name=service_name)
+            service = Service.objects.filter(Service_Name=service_name).first()
             brand = None
         
         if via_name == 'Referral':
             referral_name = request.POST.get('referral_name')
+            partner_name = None
         elif via_name == 'Partner':
             partner_id = request.POST.get('partner')
             partner_name = Partner.objects.get(pk=partner_id)
+            referral_name = None
         else:
             referral_name = None
+            partner_name = None
 
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
 
         if requirement_type == 'Product':
-            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
         elif requirement_type == 'Service':
-            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
         
         if via_name == 'Referral':
-            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
         elif via_name == 'Partner':
-            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
         else:
-            company = Company(Company_Name=company_name, sector=sector, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status)
             
