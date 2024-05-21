@@ -67,8 +67,8 @@ class Company(models.Model):
     currency = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.SET_NULL, null=True)
-    Referral_Name = models.CharField(max_length=100)
-    Partner_Name = models.CharField(max_length=100)
+    Referral_Name = models.CharField(max_length=100, null=True)
+    Partner_Name = models.CharField(max_length=100, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):

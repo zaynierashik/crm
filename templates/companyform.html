@@ -133,8 +133,8 @@
                         <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
                         <select class="form-control form-select py-2" name="requirement-type" id="requirement-type" required>
                             <option value="">Choose a requirement</option>
-                            <option value="Product">Product</option>
-                            <option value="Service">Service</option>
+                            <option value="Product" {% if company.requirement_type == "Product" %} selected {% endif %}>Product</option>
+                            <option value="Service" {% if company.requirement_type == "Service" %} selected {% endif %}>Service</option>
                         </select>
                         <div class="invalid-feedback">Please select a requirement.</div>
                     </div>
@@ -144,7 +144,7 @@
                         <select class="form-control form-select py-2" name="service" id="service">
                             <option value="">Choose a service</option>
                             {% for service in services %}
-                            <option value="{{ service.Service_Name }}">{{ service.Service_Name }}</option>
+                            <option value="{{ service.Service_Name }}" {% if service.Service_Name == company.service.Service_Name %} selected {% endif %}>{{ service.Service_Name }}</option>
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a service.</div>
@@ -155,7 +155,7 @@
                         <select class="form-control form-select py-2" name="brand" id="brand">
                             <option value="">Choose a brand</option>
                             {% for brand in brands %}
-                            <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
+                            <option value="{{ brand.Brand_Name }}" {% if brand.Brand_Name == company.brand.Brand_Name %} selected {% endif %}>{{ brand.Brand_Name }}</option>
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a brand.</div>
@@ -198,7 +198,7 @@
 
                     <div id="referralNameInput" class="col" style="display: none;">
                         <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
-                        <input type="text" class="form-control py-2" name="referral_name" id="referral_name">
+                        <input type="text" class="form-control py-2" name="referral_name" id="referral_name" value="{{ company.Referral_Name }}">
                         <div class="invalid-feedback">Please enter a referral name.</div>
                     </div>
                     
@@ -207,7 +207,7 @@
                         <select class="form-control form-select py-2" name="partner" id="partner">
                             <option value="">Choose a partner</option>
                             {% for partner in partners %}
-                            <option value="{{ partner.id }}">{{ partner.Partner_Name }}</option>
+                            <option value="{{ partner.Partner_Name }}" {% if partner.Partner_Name == company.partner.Partner_Name %} selected {% endif %}>{{ partner.Partner_Name }}</option>
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a partner.</div>
@@ -253,7 +253,7 @@
 
             forms.forEach(function(form){
                 form.addEventListener("submit", function(event){
-                    if (!form.checkValidity()) {
+                    if(!form.checkValidity()){
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -271,13 +271,13 @@
 
             viaDropdown.addEventListener("change", function(){
                 var selectedVia = viaDropdown.value;
-                if (selectedVia === "Referral") {
+                if(selectedVia === "Referral"){
                     referralNameInput.style.display = "block";
                     partnerDropdown.style.display = "none";
-                } else if (selectedVia === "Partner") {
+                }else if(selectedVia === "Partner"){
                     referralNameInput.style.display = "none";
                     partnerDropdown.style.display = "block";
-                } else {
+                }else{
                     referralNameInput.style.display = "none";
                     partnerDropdown.style.display = "none";
                 }
@@ -287,23 +287,25 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
-            var requirementDropdown = document.getElementById("requirement-type");
-            var brandInput = document.getElementById("brandInput");
-            var serviceInput = document.getElementById("serviceInput");
+            const requirementType = document.getElementById('requirement-type');
+            const serviceInput = document.getElementById('serviceInput');
+            const brandInput = document.getElementById('brandInput');
 
-            requirementDropdown.addEventListener("change", function(){
-                var selectedRequirement = requirementDropdown.value;
-                if(selectedRequirement === "Product"){
-                    brandInput.style.display = "block";
-                    serviceInput.style.display = "none";
-                } else if(selectedRequirement === "Service"){
-                    serviceInput.style.display = "block";
-                    brandInput.style.display = "none";
-                } else {
-                    brandInput.style.display = "none";
-                    serviceInput.style.display = "none";
+            function toggleRequirementFields(){
+                const selectedRequirement = requirementType.value;
+                if(selectedRequirement === 'Service'){
+                    serviceInput.style.display = 'block';
+                    brandInput.style.display = 'none';
+                }else if(selectedRequirement === 'Product'){
+                    brandInput.style.display = 'block';
+                    serviceInput.style.display = 'none';
+                }else{
+                    brandInput.style.display = 'none';
+                    serviceInput.style.display = 'none';
                 }
-            });
+            }
+            requirementType.addEventListener('change', toggleRequirementFields);
+            toggleRequirementFields();
         });
     </script>
 

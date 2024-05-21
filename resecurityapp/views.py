@@ -71,13 +71,13 @@ def submit_company(request):
         email = request.POST.get('email')
         phone_number = request.POST.get('number')
         requirement = request.POST.get('requirement-type')
-        service_name = request.POST.get('service')
-        service = Service.objects.get(Service_Name=service_name)
         requirement_description = request.POST.get('requirement-description')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
+        referral_name = request.POST.get('referral_name')
+        partner_name = request.POST.get('partner')
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
 
@@ -91,13 +91,62 @@ def submit_company(request):
         company.email = email
         company.Phone_Number = phone_number
         company.requirement = requirement
-        company.service = service
         company.Requirement_Description = requirement_description
         company.currency = currency
         company.price = price
         company.via = via
+        company.Referral_Name = referral_name
+        company.Partner_Name = partner_name
         company.status = status
         
+        if requirement == 'Service':
+            service_name = request.POST.get('service')
+            if service_name:
+                try:
+                    service = Service.objects.filter(Service_Name=service_name).first()
+                    if service:
+                        company.service = service
+                    else:
+                        return HttpResponse("Service does not exist.")
+                except Service.DoesNotExist:
+                    return HttpResponse("Service does not exist.")
+        else:
+            company.service = None
+        
+        if requirement == 'Product':
+            brand_name = request.POST.get('brand')
+            if brand_name:
+                try:
+                    brand = Brand.objects.filter(Brand_Name=brand_name).first()
+                    if brand:
+                        company.brand = brand
+                    else:
+                        return HttpResponse("Brand does not exist.")
+                except Brand.DoesNotExist:
+                    return HttpResponse("Brand does not exist.")
+        else:
+            company.brand = None
+
+        if via_name == 'Referral':
+            referral_name = request.POST.get('referral_name')
+            company.Referral_Name = referral_name
+            company.partner = None
+        elif via_name == 'Partner':
+            partner_name = request.POST.get('partner')
+            if partner_name:
+                try:
+                    partner = Partner.objects.filter(Partner_Name=partner_name).first()
+                    if partner:
+                        company.partner = partner
+                        company.Referral_Name = None
+                    else:
+                        return HttpResponse("Partner does not exist.")
+                except Partner.DoesNotExist:
+                    return HttpResponse("Partner does not exist.")
+        else:
+            company.partner = None
+            company.Referral_Name = None
+
         company.save()
         return redirect(reverse('master') + '?selection=company')
     else:
@@ -304,6 +353,7 @@ def submit_newpartner(request):
         contact_person = request.POST.get('contact')
         email = request.POST.get('email')
         partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
+        
         partner.save()
         return redirect(reverse('master') + '?selection=partner')
     else:
