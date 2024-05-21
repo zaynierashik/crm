@@ -177,6 +177,17 @@ def submit_sector(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+def add_sector(request):
+    if request.method == 'POST':
+        sector_name = request.POST.get('sector')
+        
+        if sector_name:
+            sector = Sector(Sector_Name=sector_name)
+            sector.save()
+            return redirect(reverse('master') + '?selection=sector')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 @csrf_exempt
 def submit_service(request):
     if request.method == 'POST':
@@ -189,6 +200,17 @@ def submit_service(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+def add_service(request):
+    if request.method == 'POST':
+        service_name = request.POST.get('service')
+        
+        if service_name:
+            service = Service(Service_Name=service_name)
+            service.save()
+            return redirect(reverse('master') + '?selection=service')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 @csrf_exempt
 def submit_brand(request):
     if request.method == 'POST':
@@ -198,6 +220,17 @@ def submit_brand(request):
             brand = Brand(Brand_Name=brand_name)
             brand.save()
             return JsonResponse({'brand_name': brand_name})
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def add_brand(request):
+    if request.method == 'POST':
+        brand_name = request.POST.get('brand')
+        
+        if brand_name:
+            brand = Brand(Brand_Name=brand_name)
+            brand.save()
+            return redirect(reverse('master') + '?selection=brand')
     else:
         return HttpResponse("Form Submission Error!")
 
@@ -263,6 +296,7 @@ def newcompany(request):
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.all()
+    
     return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
 
 def submit_newcompany(request):
@@ -283,7 +317,6 @@ def submit_newcompany(request):
         designation = request.POST.get('designation')
         email = request.POST.get('email')
         phone_number = request.POST.get('number')
-        
         requirement_description = request.POST.get('requirement-description')
         currency = request.POST.get('currency')
         price = request.POST.get('price')

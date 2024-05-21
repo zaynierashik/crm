@@ -55,7 +55,7 @@
         {% if formtype == "sector" %}
         <div id="sector-content" class="sector-content container">
             <h3>Sector Master</h3>
-            <form id="sectorForm" action="{% url 'submit_sector' %}" method="POST" class="needs-validation" novalidate>
+            <form id="sectorForm" action="{% url 'add_sector' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
                     <div class="col">
@@ -76,7 +76,7 @@
         {% elif formtype == "service" %}
         <div id="service-content" class="service-content container">
             <h3>Service Master</h3>
-            <form id="serviceForm" action="{% url 'submit_service' %}" method="POST" class="needs-validation" novalidate>
+            <form id="serviceForm" action="{% url 'add_service' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
                     <div class="col">
@@ -139,7 +139,7 @@
         {% elif formtype == "brand" %}
         <div id="brand-content" class="brand-content container">
             <h3>Brand Master</h3>
-            <form id="brandForm" action="{% url 'submit_brand' %}" method="POST" class="needs-validation" novalidate>
+            <form id="brandForm" action="{% url 'add_brand' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="row g-3 mb-3">
                     <div class="col">
@@ -178,7 +178,7 @@
 
             forms.forEach(function(form){
                 form.addEventListener("submit", function(event){
-                    if (!form.checkValidity()) {
+                    if(!form.checkValidity()){
                         event.preventDefault();
                         event.stopPropagation();
                     }
