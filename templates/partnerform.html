@@ -54,7 +54,7 @@
         
         <div id="partner-content" class="partner-content container">
             <h3>Partner Master</h3>
-            <form id="partnerForm" action="{% url 'submit_partner' %}" method="POST" class="needs-validation" novalidate>
+            <form id="partnerForm" action="{% url 'add_partner' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
 
                 <input type="hidden" name="partner_id" value="{{ partner.id }}">

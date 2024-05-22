@@ -1,3 +1,4 @@
+import io
 from django.shortcuts import *
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from .models import *
@@ -7,6 +8,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from openpyxl import Workbook
 
 def index(request):
     companies = Company.objects.all()
@@ -351,6 +355,7 @@ def submit_newcompany(request):
         
         address = request.POST.get('address')
         city = request.POST.get('city')
+        state = request.POST.get('state')
         country = request.POST.get('country')
         contact_person = request.POST.get('contact')
         designation = request.POST.get('designation')
@@ -364,12 +369,14 @@ def submit_newcompany(request):
 
         requirement_type = request.POST.get('requirement-type')
         if requirement_type == 'Product':
+            product_name = request.POST.get('product')
             brand_name = request.POST.get('brand')
             brand = Brand.objects.filter(Brand_Name=brand_name).first()
             service = None
         elif requirement_type == 'Service':
             service_name = request.POST.get('service')
             service = Service.objects.filter(Service_Name=service_name).first()
+            product_name = None
             brand = None
         
         if via_name == 'Referral':
@@ -387,25 +394,25 @@ def submit_newcompany(request):
         status = Status.objects.get(Status_Name=status_name)
 
         if requirement_type == 'Product':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, brand=brand, Requirement_Description=requirement_description,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
         elif requirement_type == 'Service':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
         
         if via_name == 'Referral':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
         elif via_name == 'Partner':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
         else:
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, brand=brand, Requirement_Description=requirement_description,
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                              currency=currency, price=price, via=via, status=status)
             
         company.save()
@@ -430,3 +437,47 @@ def submit_newpartner(request):
         return redirect(reverse('master') + '?selection=partner')
     else:
         return HttpResponse("Form Submission Error!")
+    
+
+
+def export_excel(request, company_id):
+    company = Company.objects.get(pk=company_id)
+    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+    
+    # Create a workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.append(['Date', 'Action', 'Remark'])
+    for transaction in transactions:
+        ws.append([transaction.date, transaction.action, transaction.remark])
+
+    # Save the workbook to a BytesIO object
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    # Set the appropriate content type for Excel file
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.xlsx"'
+    return response
+
+def export_pdf(request, company_id):
+    company = Company.objects.get(pk=company_id)
+    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+
+    template_path = 'pdftemplate.html'
+    context = {'company': company, 'transactions': transactions}
+    # Render template with context
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Create a BytesIO object to receive the PDF data
+    result = io.BytesIO()
+    pdf = pisa.pisaDocument(io.BytesIO(html.encode("ISO-8859-1")), result)
+
+    # Check if the PDF generation was successful
+    if not pdf.err:
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.pdf"'
+        return response
+    return HttpResponse('Error generating PDF', status=500)

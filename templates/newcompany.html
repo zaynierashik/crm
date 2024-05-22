@@ -95,15 +95,21 @@
                         <input type="text" class="form-control py-2" name="city" id="city" value="{{ company.city }}" required>
                         <div class="invalid-feedback">Please enter a city.</div>
                     </div>
-    
+
                     <div class="col">
+                        <label for="state" class="form-label fw-semibold">State</label>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}" required>
+                        <div class="invalid-feedback">Please enter a state.</div>
+                    </div>
+    
+                    <div class="col-4">
                         <label for="country" class="form-label fw-semibold">Country</label>
-                        <select class="form-control form-select py-2" name="country" id="country" required>
+                        <select class="form-control form-select py-2" name="country" id="country" onchange="updatePhoneNumber()" required>
                             <option value="">Choose a country</option>
-                            <option value="Nepal">Nepal</option>
-                            <option value="USA">United States of America</option>
-                            <option value="India">India</option>
-                            <option value="Singapore">Singapore</option>
+                            <option value="Nepal" data-code="+977">Nepal</option>
+                            <option value="USA" data-code="+1">United States of America</option>
+                            <option value="India" data-code="+91">India</option>
+                            <option value="Singapore" data-code="+65">Singapore</option>
                         </select>
                         <div class="invalid-feedback">Please select a country.</div>
                     </div>
@@ -132,7 +138,7 @@
     
                     <div class="col-4">
                         <label for="number" class="form-label fw-semibold">Phone Number</label>
-                        <input type="number" class="form-control py-2" name="number" id="number" placeholder="Format: 98XXXXXXXX" value="{{ company.Phone_Number }}" required>
+                        <input type="text" class="form-control py-2" name="number" id="number" value="{{ company.Phone_Number }}" required>
                         <div class="invalid-feedback">Please enter a phone number.</div>
                     </div> 
                 </div>
@@ -166,19 +172,29 @@
                     </div>
                     
                     <div id="brandInput" class="col" style="display: none;">
-                        <label for="brand" class="form-label fw-semibold">Brand</label>
-                        <div class="input-group">
-                            <select class="form-control form-select py-2" name="brand" id="brand">
-                                <option value="">Choose a brand</option>
-                                {% for brand in brands %}
-                                <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
-                                {% endfor %}
-                            </select>
-
-                            <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
-                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
-                            </a>
-                            <div class="invalid-feedback">Please select a brand.</div>
+                        <div class="row g-3">
+                            <div class="col">
+                                <label for="product" class="form-label fw-semibold">Product Name</label>
+                                <input type="text" class="form-control py-2" name="product" id="product">
+                                <div class="invalid-feedback">Please enter a product name.</div>
+                            </div>
+                            
+                            <div class="col">
+                                <label for="brand" class="form-label fw-semibold">Brand</label>
+                                <div class="input-group">
+                                    <select class="form-control form-select py-2" name="brand" id="brand">
+                                        <option value="">Choose a brand</option>
+                                        {% for brand in brands %}
+                                        <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+        
+                                    <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
+                                        <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                    </a>
+                                    <div class="invalid-feedback">Please select a brand.</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>   
@@ -461,6 +477,25 @@
                     serviceInput.style.display = "none";
                 }
             });
+        });
+    </script>
+
+    <script>
+        function updatePhoneNumber(){
+            const countrySelect = document.getElementById('country');
+            const phoneNumberInput = document.getElementById('number');
+            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+            const countryCode = selectedOption.getAttribute('data-code');
+
+            if(countryCode){
+                phoneNumberInput.value = countryCode + ' ';
+            }else{
+                phoneNumberInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            updatePhoneNumber();
         });
     </script>
 
