@@ -28,9 +28,9 @@ def submit_transaction(request):
 
 def master(request):
     companies = Company.objects.order_by('Company_Name')
-    sectors = Sector.objects.values('Sector_Name').distinct()
-    services = Service.objects.values('Service_Name').distinct()
-    brands = Brand.objects.values('Brand_Name').distinct()
+    sectors = Sector.objects.values('Sector_Name')
+    services = Service.objects.values('Service_Name')
+    brands = Brand.objects.values('Brand_Name')
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.all()
@@ -44,9 +44,9 @@ def newform(request):
 
 def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
-    sectors = Sector.objects.values('Sector_Name').distinct()
-    services = Service.objects.values('Service_Name').distinct()
-    brands = Brand.objects.values('Brand_Name').distinct()
+    sectors = Sector.objects.values('Sector_Name')
+    services = Service.objects.values('Service_Name')
+    brands = Brand.objects.values('Brand_Name')
     vias = Via.objects.all()
     partners = Partner.objects.all()
     statuses = Status.objects.all()
@@ -177,6 +177,30 @@ def submit_sector(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+def add_sector(request):
+    if request.method == 'POST':
+        sector_name = request.POST.get('sector')
+        
+        if sector_name:
+            if not Sector.objects.filter(Sector_Name=sector_name).exists():
+                sector = Sector(Sector_Name=sector_name)
+                sector.save()
+                return redirect(reverse('master') + '?selection=sector')
+            else:
+                return render(request, 'form.html', {
+                    'error_message': 'Sector already exists!',
+                    'sector_name': sector_name,
+                    'formtype': 'sector'
+                })
+        else:
+            return render(request, 'form.html', {
+                'error_message': 'Sector name cannot be empty!',
+                'sector_name': sector_name,
+                'formtype': 'sector'
+            })
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 @csrf_exempt
 def submit_service(request):
     if request.method == 'POST':
@@ -189,6 +213,30 @@ def submit_service(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+def add_service(request):
+    if request.method == 'POST':
+        service_name = request.POST.get('service')
+        
+        if service_name:
+            if not Service.objects.filter(Service_Name=service_name).exists():
+                service = Service(Service_Name=service_name)
+                service.save()
+                return redirect(reverse('master') + '?selection=service')
+            else:
+                return render(request, 'form.html', {
+                    'error_message': 'Service already exists!',
+                    'service_name': service_name,
+                    'formtype': 'service'
+                })
+        else:
+            return render(request, 'form.html', {
+                'error_message': 'Service name cannot be empty!',
+                'service_name': service_name,
+                'formtype': 'service'
+            })
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 @csrf_exempt
 def submit_brand(request):
     if request.method == 'POST':
@@ -198,6 +246,30 @@ def submit_brand(request):
             brand = Brand(Brand_Name=brand_name)
             brand.save()
             return JsonResponse({'brand_name': brand_name})
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+def add_brand(request):
+    if request.method == 'POST':
+        brand_name = request.POST.get('brand')
+        
+        if brand_name:
+            if not Brand.objects.filter(Brand_Name=brand_name).exists():
+                brand = Brand(Brand_Name=brand_name)
+                brand.save()
+                return redirect(reverse('master') + '?selection=brand')
+            else:
+                return render(request, 'form.html', {
+                    'error_message': 'Brand already exists!',
+                    'brand_name': brand_name,
+                    'formtype': 'brand'
+                })
+        else:
+            return render(request, 'form.html', {
+                'error_message': 'Brand name cannot be empty!',
+                'brand_name': brand_name,
+                'formtype': 'brand'
+            })
     else:
         return HttpResponse("Form Submission Error!")
 
@@ -257,12 +329,13 @@ def partnerdetails(request, partner_id):
     return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})
 
 def newcompany(request):
-    sectors = Sector.objects.values('Sector_Name').distinct()
-    services = Service.objects.values('Service_Name').distinct()
-    brands = Brand.objects.values('Brand_Name').distinct()
+    sectors = Sector.objects.values('Sector_Name')
+    services = Service.objects.values('Service_Name')
+    brands = Brand.objects.values('Brand_Name')
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.all()
+    
     return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
 
 def submit_newcompany(request):
@@ -283,7 +356,6 @@ def submit_newcompany(request):
         designation = request.POST.get('designation')
         email = request.POST.get('email')
         phone_number = request.POST.get('number')
-        
         requirement_description = request.POST.get('requirement-description')
         currency = request.POST.get('currency')
         price = request.POST.get('price')

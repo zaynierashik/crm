@@ -357,6 +357,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(){
             var forms = document.querySelectorAll("form.needs-validation");
+            
             forms.forEach(function(form){
                 form.addEventListener("submit", function(event){
                     if (!form.checkValidity()) {
@@ -366,16 +367,45 @@
                     form.classList.add("was-validated");
                 }, false);
             });
-        });
-    </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            function handleFormSubmission(formId){
+            function handleFormSubmission(formId, dropdownId, modalId, responseKey){
                 var form = document.getElementById(formId);
                 if(form.checkValidity()){
                     var formData = new FormData(form);
                     var xhr = new XMLHttpRequest();
+                    
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState == XMLHttpRequest.DONE){
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                var dropdown = document.getElementById(dropdownId);
+                                var options = dropdown.options;
+                                var exists = false;
+
+                                for(var i = 0; i < options.length; i++){
+                                    if(options[i].value === response[responseKey]){
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!exists){
+                                    var option = document.createElement("option");
+                                    option.text = response[responseKey];
+                                    option.value = response[responseKey];
+                                    dropdown.add(option);
+                                }
+                                
+                                $(modalId).modal('hide');
+                            } else if(xhr.status == 400){
+                                var response = JSON.parse(xhr.responseText);
+                                alert(response.error);
+                            } else {
+                                console.error('Error:', xhr.statusText);
+                            }
+                        }
+                    };
+
                     xhr.open("POST", form.action);
                     xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
                     xhr.send(formData);
@@ -385,21 +415,17 @@
             }
 
             document.getElementById("submitSectorBtn").addEventListener("click", function(){
-                handleFormSubmission("sectorForm");
+                handleFormSubmission("sectorForm", "sector", "#sectorModal", "sector_name");
             });
 
             document.getElementById("submitServiceBtn").addEventListener("click", function(){
-                handleFormSubmission("serviceForm");
+                handleFormSubmission("serviceForm", "service", "#serviceModal", "service_name");
             });
 
             document.getElementById("submitBrandBtn").addEventListener("click", function(){
-                handleFormSubmission("brandForm");
+                handleFormSubmission("brandForm", "brand", "#brandModal", "brand_name");
             });
-        });
-    </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
             var viaDropdown = document.getElementById("via");
             var referralNameInput = document.getElementById("referralNameInput");
             var partnerDropdown = document.getElementById("partnerDropdown");
@@ -417,11 +443,7 @@
                     partnerDropdown.style.display = "none";
                 }
             });
-        });
-    </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
             var requirementDropdown = document.getElementById("requirement-type");
             var brandInput = document.getElementById("brandInput");
             var serviceInput = document.getElementById("serviceInput");
@@ -438,168 +460,6 @@
                     brandInput.style.display = "none";
                     serviceInput.style.display = "none";
                 }
-            });
-        });
-    </script>
-
-    <script>
-        function handleFormSubmission(formId){
-            var form = document.getElementById(formId);
-            if(form.checkValidity()){
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState === XMLHttpRequest.DONE){
-                        if(xhr.status === 200){
-                            window.location.reload();
-                        }else{
-                            console.error('Error:', xhr.statusText);
-                        }
-                    }
-                };
-                xhr.send(formData);
-            }else{
-                form.classList.add("was-validated");
-            }
-        }
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            document.getElementById("submitSectorBtn").addEventListener("click", function(){
-                var form = document.getElementById("sectorForm");
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState == XMLHttpRequest.DONE){
-                        if(xhr.status == 200){
-                            var response = JSON.parse(xhr.responseText);
-                            var sectorDropdown = document.getElementById("sector");
-                            var options = sectorDropdown.options;
-                            var exists = false;
-
-                            for(var i = 0; i < options.length; i++){
-                                if(options[i].value === response.sector_name){
-                                    exists = true;
-                                    break;
-                                }
-                            }
-
-                            if(!exists){
-                                var option = document.createElement("option");
-                                option.text = response.sector_name;
-                                option.value = response.sector_name;
-                                sectorDropdown.add(option);
-                            }
-                            
-                            $('#sectorModal').modal('hide');
-                        }else if(xhr.status == 400){
-                            var response = JSON.parse(xhr.responseText);
-                            alert(response.error);
-                        }else{
-                            console.error('Error:', xhr.statusText);
-                        }
-                    }
-                };
-
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                xhr.send(formData);
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            document.getElementById("submitServiceBtn").addEventListener("click", function(){
-                var form = document.getElementById("serviceForm");
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState == XMLHttpRequest.DONE){
-                        if(xhr.status == 200){
-                            var response = JSON.parse(xhr.responseText);
-                            var serviceDropdown = document.getElementById("service");
-                            var options = serviceDropdown.options;
-                            var exists = false;
-
-                            for(var i = 0; i < options.length; i++){
-                                if(options[i].value === response.service_name){
-                                    exists = true;
-                                    break;
-                                }
-                            }
-
-                            if(!exists){
-                                var option = document.createElement("option");
-                                option.text = response.service_name;
-                                option.value = response.service_name;
-                                serviceDropdown.add(option);
-                            }
-                            
-                            $('#serviceModal').modal('hide');
-                        }else if(xhr.status == 400){
-                            var response = JSON.parse(xhr.responseText);
-                            alert(response.error);
-                        }else{
-                            console.error('Error:', xhr.statusText);
-                        }
-                    }
-                };
-
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                xhr.send(formData);
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            document.getElementById("submitBrandBtn").addEventListener("click", function(){
-                var form = document.getElementById("brandForm");
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState == XMLHttpRequest.DONE){
-                        if(xhr.status == 200){
-                            var response = JSON.parse(xhr.responseText);
-                            var brandDropdown = document.getElementById("brand");
-                            var options = brandDropdown.options;
-                            var exists = false;
-
-                            for(var i = 0; i < options.length; i++){
-                                if(options[i].value === response.brand_name){
-                                    exists = true;
-                                    break;
-                                }
-                            }
-
-                            if(!exists){
-                                var option = document.createElement("option");
-                                option.text = response.brand_name;
-                                option.value = response.brand_name;
-                                brandDropdown.add(option);
-                            }
-                            
-                            $('#brandModal').modal('hide');
-                        }else if(xhr.status == 400){
-                            var response = JSON.parse(xhr.responseText);
-                            alert(response.error);
-                        }else{
-                            console.error('Error:', xhr.statusText);
-                        }
-                    }
-                };
-
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                xhr.send(formData);
             });
         });
     </script>
