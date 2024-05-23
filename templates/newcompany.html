@@ -57,13 +57,18 @@
             <h3>Company Master - Add Company</h3>
             <form id="companyForm" action="{% url 'submit_newcompany' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
-                
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
-                        <input type="text" class="form-control py-2" name="company" id="company" value="{{ company.Company_Name }}" required>
-                        <div class="invalid-feedback">Please enter a country name.</div>
-                    </div>
+                        <input type="text" class="form-control py-2 {% if request.GET.error_message %}is-invalid{% endif %}" name="company" id="company" value="{{ request.GET.company_name|default:'' }}" required>
+                        <div class="invalid-feedback">
+                            {% if request.GET.error_message %}
+                                {{ request.GET.error_message }}
+                            {% else %}
+                                Please enter a company name.
+                            {% endif %}
+                        </div>
+                    </div>                    
                 
                     <div class="col-4">
                         <label for="sector" class="form-label fw-semibold">Sector</label>

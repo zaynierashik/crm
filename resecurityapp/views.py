@@ -13,7 +13,7 @@ from xhtml2pdf import pisa
 from openpyxl import Workbook
 
 def index(request):
-    companies = Company.objects.all()
+    companies = Company.objects.order_by('Company_Name')
     success = request.GET.get('success')
     return render(request, 'index.html', {'companies': companies, 'success': success})
 
@@ -46,6 +46,98 @@ def newform(request):
     formtype = request.GET.get('formtype', None)
     return render(request, 'form.html', {'formtype': formtype})
 
+def newcompany(request):
+    sectors = Sector.objects.values('Sector_Name')
+    services = Service.objects.values('Service_Name')
+    brands = Brand.objects.values('Brand_Name')
+    vias = Via.objects.all()
+    statuses = Status.objects.all()
+    partners = Partner.objects.all()
+    
+    return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
+
+def submit_newcompany(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company')
+
+        if Company.objects.filter(Company_Name=company_name).exists():
+            return redirect(reverse('newcompany') + f'?error_message=Company with this name already exists!&company_name={company_name}')
+
+        sector_name = request.POST.get('sector')
+        sector = Sector.objects.filter(Sector_Name=sector_name)
+
+        if sector.exists():
+            sectors = sector.first()
+        else:
+            return HttpResponse("Sector not found")
+        
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('number')
+        requirement_description = request.POST.get('requirement-description')
+        currency = request.POST.get('currency')
+        price = request.POST.get('price')
+        via_name = request.POST.get('via')
+        via = Via.objects.get(Via_Name=via_name)
+
+        requirement_type = request.POST.get('requirement-type')
+        if requirement_type == 'Product':
+            product_name = request.POST.get('product')
+            brand_name = request.POST.get('brand')
+            brand = Brand.objects.filter(Brand_Name=brand_name).first()
+            service = None
+        elif requirement_type == 'Service':
+            service_name = request.POST.get('service')
+            service = Service.objects.filter(Service_Name=service_name).first()
+            product_name = None
+            brand = None
+        
+        if via_name == 'Referral':
+            referral_name = request.POST.get('referral_name')
+            partner_name = None
+        elif via_name == 'Partner':
+            partner_id = request.POST.get('partner')
+            partner_name = Partner.objects.get(pk=partner_id)
+            referral_name = None
+        else:
+            referral_name = None
+            partner_name = None
+
+        status_name = request.POST.get('status')
+        status = Status.objects.get(Status_Name=status_name)
+
+        if requirement_type == 'Product':
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
+        elif requirement_type == 'Service':
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
+        
+        if via_name == 'Referral':
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
+        elif via_name == 'Partner':
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
+        else:
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
+                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                             currency=currency, price=price, via=via, status=status)
+            
+        company.save()
+        return redirect(reverse('master') + '?selection=company')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
     sectors = Sector.objects.values('Sector_Name')
@@ -299,6 +391,24 @@ def submit_status(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+def newpartner(request):
+    return render(request, 'newpartner.html')
+
+def submit_newpartner(request):
+    if request.method == 'POST':
+        partner_name = request.POST.get('partner')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        contact_person = request.POST.get('contact')
+        email = request.POST.get('email')
+        partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
+        
+        partner.save()
+        return redirect(reverse('master') + '?selection=partner')
+    else:
+        return HttpResponse("Form Submission Error!")
+    
 def partnerform(request, partner_id):
     partner = Partner.objects.get(pk=partner_id)
     return render(request, 'partnerform.html', {'partner': partner})
@@ -331,132 +441,21 @@ def partnerdetails(request, partner_id):
     partner = Partner.objects.get(pk=partner_id)
     partners = Partner.objects.all()
     return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})
-
-def newcompany(request):
-    sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name')
-    brands = Brand.objects.values('Brand_Name')
-    vias = Via.objects.all()
-    statuses = Status.objects.all()
-    partners = Partner.objects.all()
     
-    return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
-
-def submit_newcompany(request):
-    if request.method == 'POST':
-        company_name = request.POST.get('company')
-        sector_name = request.POST.get('sector')
-        sector = Sector.objects.filter(Sector_Name=sector_name)
-
-        if sector.exists():
-            sectors = sector.first()
-        else:
-            return HttpResponse("Sector not found")
-        
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        country = request.POST.get('country')
-        contact_person = request.POST.get('contact')
-        designation = request.POST.get('designation')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('number')
-        requirement_description = request.POST.get('requirement-description')
-        currency = request.POST.get('currency')
-        price = request.POST.get('price')
-        via_name = request.POST.get('via')
-        via = Via.objects.get(Via_Name=via_name)
-
-        requirement_type = request.POST.get('requirement-type')
-        if requirement_type == 'Product':
-            product_name = request.POST.get('product')
-            brand_name = request.POST.get('brand')
-            brand = Brand.objects.filter(Brand_Name=brand_name).first()
-            service = None
-        elif requirement_type == 'Service':
-            service_name = request.POST.get('service')
-            service = Service.objects.filter(Service_Name=service_name).first()
-            product_name = None
-            brand = None
-        
-        if via_name == 'Referral':
-            referral_name = request.POST.get('referral_name')
-            partner_name = None
-        elif via_name == 'Partner':
-            partner_id = request.POST.get('partner')
-            partner_name = Partner.objects.get(pk=partner_id)
-            referral_name = None
-        else:
-            referral_name = None
-            partner_name = None
-
-        status_name = request.POST.get('status')
-        status = Status.objects.get(Status_Name=status_name)
-
-        if requirement_type == 'Product':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
-        elif requirement_type == 'Service':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
-        
-        if via_name == 'Referral':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name)
-        elif via_name == 'Partner':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name)
-        else:
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status)
-            
-        company.save()
-        return redirect(reverse('master') + '?selection=company')
-    else:
-        return HttpResponse("Form Submission Error!")
-    
-def newpartner(request):
-    return render(request, 'newpartner.html')
-
-def submit_newpartner(request):
-    if request.method == 'POST':
-        partner_name = request.POST.get('partner')
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        country = request.POST.get('country')
-        contact_person = request.POST.get('contact')
-        email = request.POST.get('email')
-        partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
-        
-        partner.save()
-        return redirect(reverse('master') + '?selection=partner')
-    else:
-        return HttpResponse("Form Submission Error!")
-    
-
-
 def export_excel(request, company_id):
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
     
-    # Create a workbook
     wb = Workbook()
     ws = wb.active
     ws.append(['Date', 'Action', 'Remark'])
     for transaction in transactions:
         ws.append([transaction.date, transaction.action, transaction.remark])
 
-    # Save the workbook to a BytesIO object
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
 
-    # Set the appropriate content type for Excel file
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.xlsx"'
     return response
@@ -467,15 +466,13 @@ def export_pdf(request, company_id):
 
     template_path = 'pdftemplate.html'
     context = {'company': company, 'transactions': transactions}
-    # Render template with context
+    
     template = get_template(template_path)
     html = template.render(context)
 
-    # Create a BytesIO object to receive the PDF data
     result = io.BytesIO()
     pdf = pisa.pisaDocument(io.BytesIO(html.encode("ISO-8859-1")), result)
 
-    # Check if the PDF generation was successful
     if not pdf.err:
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.pdf"'
