@@ -46,13 +46,47 @@ def submit_signup(request):
     else:
         return render(request, 'signup.html')
 
+def login(request):
+    return render(request, 'login.html')
 
+def submit_login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            ss = Staff.objects.get(email=email)
+            if check_password(password, ss.password):
+                request.session['fullname'] = ss.Full_Name
+                return redirect('index')
+            else:
+                return redirect(reverse('login') + '?success=False')
+        except Staff.DoesNotExist:
+            return redirect(reverse('login') + '?success=False')
+
+    return render(request, 'login.html')
+
+def logout(request):
+    request.session.flush()
+    return redirect('signup')   
+
+@login_required
 def index(request):
     companies = Company.objects.order_by('Company_Name')
     success = request.GET.get('success')
-    return render(request, 'index.html', {'companies': companies, 'success': success})
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+        
+    return render(request, 'index.html', {'companies': companies, 'success': success, 'fullname': fullname})
 
 def submit_transaction(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         company_name = request.POST.get('company')
         date = request.POST.get('date')
@@ -66,6 +100,11 @@ def submit_transaction(request):
         return HttpResponse("Form Submission Error!")
 
 def master(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     companies = Company.objects.order_by('Company_Name')
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name')
@@ -78,10 +117,20 @@ def master(request):
     return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection})
 
 def newform(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     formtype = request.GET.get('formtype', None)
     return render(request, 'form.html', {'formtype': formtype})
 
 def newcompany(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name')
     brands = Brand.objects.values('Brand_Name')
@@ -92,6 +141,11 @@ def newcompany(request):
     return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
 
 def submit_newcompany(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         company_name = request.POST.get('company')
 
@@ -149,24 +203,24 @@ def submit_newcompany(request):
         if requirement_type == 'Product':
             company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name)
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         elif requirement_type == 'Service':
             company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name)
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         
         if via_name == 'Referral':
             company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name)
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         elif via_name == 'Partner':
             company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name)
+                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
         else:
             company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
                              email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name)
+                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
             
         company.save()
         return redirect(reverse('master') + '?selection=company')
@@ -174,6 +228,11 @@ def submit_newcompany(request):
         return HttpResponse("Form Submission Error!")
     
 def companyform(request, company_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company = Company.objects.get(pk=company_id)
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name')
@@ -187,6 +246,11 @@ def companyform(request, company_id):
     return render(request, 'companyform.html', {'company': company, 'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'partners': partners, 'statuses': statuses, 'countries': countries, 'currencies': currencies})
 
 def submit_company(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         company_id = request.POST.get('company_id')
         company = get_object_or_404(Company, id=company_id)
@@ -284,6 +348,11 @@ def submit_company(request):
         return HttpResponse("Form Submission Error!")
 
 def companydetails(request, company_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
     start_date = request.GET.get('start_date')
@@ -298,6 +367,11 @@ def companydetails(request, company_id):
 
 @csrf_exempt
 def submit_sector(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         sector_name = request.POST.get('sector')
         
@@ -309,6 +383,11 @@ def submit_sector(request):
         return HttpResponse("Form Submission Error!")
     
 def add_sector(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         sector_name = request.POST.get('sector')
         
@@ -334,6 +413,11 @@ def add_sector(request):
     
 @csrf_exempt
 def submit_service(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         service_name = request.POST.get('service')
         
@@ -345,6 +429,11 @@ def submit_service(request):
         return HttpResponse("Form Submission Error!")
     
 def add_service(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         service_name = request.POST.get('service')
         
@@ -370,6 +459,11 @@ def add_service(request):
     
 @csrf_exempt
 def submit_brand(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         brand_name = request.POST.get('brand')
         
@@ -381,6 +475,11 @@ def submit_brand(request):
         return HttpResponse("Form Submission Error!")
     
 def add_brand(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         brand_name = request.POST.get('brand')
         
@@ -405,6 +504,11 @@ def add_brand(request):
         return HttpResponse("Form Submission Error!")
 
 def submit_via(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         via_name = request.POST.get('via')
 
@@ -416,6 +520,11 @@ def submit_via(request):
         return HttpResponse("Form Submission Error!")
     
 def submit_status(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         status_name = request.POST.get('status')
 
@@ -431,6 +540,11 @@ def newpartner(request):
 
 @csrf_exempt
 def submit_newpartner(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
@@ -463,6 +577,11 @@ def submit_newpartner(request):
         return HttpResponse("Form Submission Error!", status=405)
     
 def add_newpartner(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
@@ -490,10 +609,20 @@ def add_newpartner(request):
         return redirect(reverse('master') + '?selection=partner')
     
 def partnerform(request, partner_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     partner = Partner.objects.get(pk=partner_id)
     return render(request, 'partnerform.html', {'partner': partner})
     
 def submit_partner(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         partner_id = request.POST.get('partner_id')
         partner = get_object_or_404(Partner, id=partner_id)
@@ -518,11 +647,21 @@ def submit_partner(request):
         return HttpResponse("Form Submission Error!")
 
 def partnerdetails(request, partner_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     partner = Partner.objects.get(pk=partner_id)
     partners = Partner.objects.all()
     return render(request, 'partnerdetails.html', { 'partner': partner, 'partners': partners})
     
 def export_excel(request, company_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
     
@@ -541,6 +680,11 @@ def export_excel(request, company_id):
     return response
 
 def export_pdf(request, company_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
 

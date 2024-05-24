@@ -8,3 +8,12 @@ function showPassword(){
         x.type = "password";
     }
 }
+
+function showLoginPassword(){
+    var x = document.getElementById("loginpassword");
+    if(x.type == "password"){
+        x.type = "text";
+    }else{
+        x.type = "password";
+    }
+}

@@ -87,6 +87,7 @@ class Company(models.Model):
     Referral_Name = models.CharField(max_length=100, null=True)
     Partner_Name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True)
+    Created_By = models.CharField(max_length=100)
 
     def __str__(self):
         return self.Company_Name
