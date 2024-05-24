@@ -23,6 +23,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('signup/', views.signup, name='signup'),
+    path('submit_signup/', views.submit_signup, name='submit_signup'),
     path('', views.index, name='index'),
     path('master/', views.master, name='master'),
     path('newform/', views.newform, name='newform'),
@@ -45,6 +47,10 @@ urlpatterns = [
     path('submit_newcompany/', views.submit_newcompany, name='submit_newcompany'),
     path('newpartner/', views.newpartner, name='newpartner'),
     path('submit_newpartner/', views.submit_newpartner, name='submit_newpartner'),
+    path('add_newpartner/', views.add_newpartner, name='add_newpartner'),
+
+    path('export_excel/<int:company_id>/', views.export_excel, name='export_excel'),
+    path('export_pdf/<int:company_id>/', views.export_pdf, name='export_pdf'),
 ]
 
 if settings.DEBUG:

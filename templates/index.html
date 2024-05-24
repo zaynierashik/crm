@@ -112,7 +112,7 @@
         document.addEventListener("DOMContentLoaded", function(){
             var success = "{{ success }}";
             if (success === "True") {
-                showToast('Data saved successfully!', 'success');
+                showToast('Data saved successfully.', 'success');
                 window.history.replaceState({}, document.title, "{{ request.path }}");
             }
         });

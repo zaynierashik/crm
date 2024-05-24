@@ -50,18 +50,23 @@
             </nav>
         </div>        
 
-        <!-- Company Details Form -->
+        <!-- Partner Details Form -->
 
         <div id="partner-content" class="partner-content container">
             <h3>Partner Master</h3>
-            <form id="partnerForm" action="{% url 'submit_newpartner' %}" method="POST" class="needs-validation" novalidate>
+            <form id="partnerForm" action="{% url 'add_newpartner' %}" method="POST" class="needs-validation" novalidate>
                 {% csrf_token %}
-
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="partner" class="form-label fw-semibold">Partner Name</label>
-                        <input type="text" class="form-control py-2" name="partner" id="partner" value="{{ partner.Partner_Name }}" required>
-                        <div class="invalid-feedback">Please enter a partner name.</div>
+                        <input type="text" class="form-control py-2 {% if error_message %}is-invalid{% endif %}" name="partner" id="partner" value="{{ partner_name|default:'' }}" required>
+                        <div class="invalid-feedback">
+                            {% if error_message %}
+                                {{ error_message }}
+                            {% else %}
+                                Please enter a partner name.
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                                      
