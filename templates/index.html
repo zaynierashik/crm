@@ -1,0 +1,180 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Homepage</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '/favicon/favicon-32x32.png'  %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon/favicon-16x16.png'  %}">
+    <link rel="manifest" href="{% static '/favicon/site.webmanifest' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div id="navbar">
+            <nav class="navbar navbar-expand-lg justify-content-center">
+                <div class="container-fluid mt-3">
+                    <a class="navbar-brand" href="{% url 'index' %}">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
+                    </a>
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mt-3">
+                            <li class="nav-item" id="master">
+                                <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
+                                </ul>
+                            </li>
+                            
+                            <li class="nav-item active" id="transactions">
+                                <a class="nav-link fw-semibold" href="{% url 'index' %}">Transactions</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>        
+    
+        <div id="form-content">
+            <div class="content d-flex justify-content-center">
+                <form id="myForm" action="{% url 'submit_transaction' %}" method="POST" class="row g-3" novalidate>
+                    {% csrf_token %}
+                    <div class="col">
+                        <label for="company" class="form-label fw-semibold">Company Name</label>
+                        <select class="form-control form-select py-2" name="company" id="company" required>
+                            <option value=""></option>
+                            {% for company in companies %}
+                            <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a company.</div>
+                    </div>
+                
+                    <div class="col-4">
+                        <label for="date" class="form-label fw-semibold">Date</label>
+                        <input type="date" class="form-control py-2" name="date" id="date" required>
+                        <div class="invalid-feedback">Please enter a valid date.</div>
+                    </div>
+                
+                    <div>
+                        <label for="action" class="form-label fw-semibold">Action</label>
+                        <textarea class="form-control" name="action" id="action" cols="30" rows="3" required></textarea>
+                        <div class="invalid-feedback">Please enter an action.</div>
+                    </div>
+
+                    <div>
+                        <label for="remark" class="form-label fw-semibold">Remarks</label>
+                        <textarea class="form-control" name="remark" id="remark" cols="30" rows="2"></textarea>
+                        <div class="invalid-feedback">Please enter a remark.</div>
+                    </div>
+                
+                    <div class="d-flex justify-content-evenly column-gap-3 mt-4">
+                        <div class="col">
+                            <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
+                        </div>
+                
+                        <div class="col-2">
+                            <button type="button" class="btn fw-semibold w-100" name="cancel" onclick="clearForm()" style="background-color: #FE5B3E;">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+
+            <div class="toast-body"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var success = "{{ success }}";
+            if (success === "True") {
+                showToast('Data saved successfully.', 'success');
+                window.history.replaceState({}, document.title, "{{ request.path }}");
+            }
+        });
+    </script>   
+
+    <script>
+        function showToast(message, type){
+            var toastElement = document.getElementById('toast');
+            var toastBody = toastElement.querySelector('.toast-body');
+    
+            if (type === 'success') {
+                toastBody.textContent = message;
+            }
+    
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
+            
+            dropdownLinks.forEach(function(link){
+                link.addEventListener("click", function(event){
+                    event.preventDefault();
+                    var selectedValue = link.getAttribute("value");
+                    window.location.href = "{% url 'master' %}?selection=" + selectedValue;
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var form = document.getElementById("myForm");
+
+            form.addEventListener("submit", function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            }, false);
+        });
+    </script>
+    
+    <script>
+        function clearForm(){
+            document.getElementById("myForm").reset();
+        }
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
+
+    <script src="/static/js/script.js"></script>
+    <script src="https://kit.fontawesome.com/296ff2fa8f.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>
