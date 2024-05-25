@@ -14,6 +14,11 @@ from xhtml2pdf import pisa
 from openpyxl import Workbook
 
 def signup(request):
+    fullname = request.session.get('fullname')
+
+    if fullname:
+        return redirect('index')
+
     roles = Role.objects.all()
     return render(request, 'signup.html', {'roles': roles})
 
@@ -47,6 +52,11 @@ def submit_signup(request):
         return render(request, 'signup.html')
 
 def login(request):
+    fullname = request.session.get('fullname')
+
+    if fullname:
+        return redirect('index')
+    
     return render(request, 'login.html')
 
 def submit_login(request):
@@ -68,9 +78,8 @@ def submit_login(request):
 
 def logout(request):
     request.session.flush()
-    return redirect('signup')   
+    return redirect('login')   
 
-@login_required
 def index(request):
     companies = Company.objects.order_by('Company_Name')
     success = request.GET.get('success')
@@ -93,7 +102,7 @@ def submit_transaction(request):
         action = request.POST.get('action')
         remark = request.POST.get('remark')
 
-        transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark)
+        transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark, Created_By=fullname)
         transaction.save()
         return redirect(reverse('index') + '?success=True')
     else:
@@ -105,7 +114,7 @@ def master(request):
     if not fullname:
         return redirect('login')
     
-    companies = Company.objects.order_by('Company_Name')
+    companies = Company.objects.filter(Created_By=fullname).order_by('Company_Name')
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name')
     brands = Brand.objects.values('Brand_Name')
@@ -114,7 +123,7 @@ def master(request):
     partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection})
+    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
 
 def newform(request):
     fullname = request.session.get('fullname')
@@ -668,6 +677,7 @@ def export_excel(request, company_id):
     wb = Workbook()
     ws = wb.active
     ws.append(['Date', 'Action', 'Remark'])
+    
     for transaction in transactions:
         ws.append([transaction.date, transaction.action, transaction.remark])
 
@@ -701,4 +711,5 @@ def export_pdf(request, company_id):
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.pdf"'
         return response
+    
     return HttpResponse('Error generating PDF', status=500)

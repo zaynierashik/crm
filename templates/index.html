@@ -27,7 +27,7 @@
                     </button>
 
                     <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav mt-3">
+                        <ul class="navbar-nav d-flex mt-3 w-100">
                             <li class="nav-item" id="master">
                                 <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -41,23 +41,24 @@
                                 </ul>
                             </li>
                             
-                            <li class="nav-item active" id="transactions">
+                            <li class="nav-item" id="transactions">
                                 <a class="nav-link fw-semibold" href="{% url 'index' %}">Transactions</a>
+                            </li>
+                            
+                            <li class="nav-item ms-auto" id="logout">
+                                <a class="nav-link fw-semibold" href="{% url 'logout' %}">Logout</a>
                             </li>
                         </ul>
                     </div>
                 </div>
             </nav>
-        </div>        
-
-        {% if fullname %}
-        <p>Welcome, {{ fullname }}!</p>
-    {% endif %}
+        </div>
     
         <div id="form-content">
             <div class="content d-flex justify-content-center">
                 <form id="myForm" action="{% url 'submit_transaction' %}" method="POST" class="row g-3" novalidate>
                     {% csrf_token %}
+
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control form-select py-2" name="company" id="company" required>
@@ -100,8 +101,6 @@
             </div>
         </div>
     </div>
-
-    
 
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
