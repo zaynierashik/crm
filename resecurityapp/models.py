@@ -72,10 +72,6 @@ class Company(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100)
-    Contact_Person = models.CharField(max_length=100)
-    designation = models.CharField(max_length=100)
-    email = models.EmailField()
-    Phone_Number = models.CharField(max_length=20)
     requirement = models.CharField(max_length=100, default=None)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
@@ -94,6 +90,16 @@ class Company(models.Model):
     
     class Meta:
         verbose_name_plural = "companies"
+
+class ContactPerson(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='contact_persons')
+    Contact_Name = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
+    email = models.EmailField()
+    Phone_Number = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.Contact_Name
 
 class Transaction(models.Model):
     date = models.DateField()

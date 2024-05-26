@@ -173,10 +173,7 @@ def submit_newcompany(request):
         city = request.POST.get('city')
         state = request.POST.get('state')
         country = request.POST.get('country')
-        contact_person = request.POST.get('contact')
-        designation = request.POST.get('designation')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('number')
+        
         requirement_description = request.POST.get('requirement-description')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
@@ -209,30 +206,61 @@ def submit_newcompany(request):
         status_name = request.POST.get('status')
         status = Status.objects.get(Status_Name=status_name)
 
-        if requirement_type == 'Product':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-        elif requirement_type == 'Service':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-        
-        if via_name == 'Referral':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-        elif via_name == 'Partner':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
+        contact_names = request.POST.getlist('contact_name[]')
+        designations = request.POST.getlist('designation[]')
+        emails = request.POST.getlist('email[]')
+        phone_numbers = request.POST.getlist('number[]')
+
+        valid_contact_provided = any([contact_names, designations, emails, phone_numbers])
+
+        if not valid_contact_provided:
+            return render(request, 'newcompany.html', {
+                'error_message': 'At least one valid contact must be provided.',
+                'company_name': company_name,
+                'sectors': Sector.objects.all(),
+                'services': Service.objects.all(),
+                'brands': Brand.objects.all(),
+                'vias': Via.objects.all(),
+                'partners': Partner.objects.all(),
+                'statuses': Status.objects.all(),
+            })
         else:
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation,
-                             email=email, Phone_Number=phone_number, requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                             currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+            if requirement_type == 'Product':
+                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                                requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+            elif requirement_type == 'Service':
+                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
             
-        company.save()
-        return redirect(reverse('master') + '?selection=company')
+            if via_name == 'Referral':
+                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+            elif via_name == 'Partner':
+                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                                currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
+            else:
+                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
+                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+                
+            company.save()
+
+            for i in range(len(contact_names)):
+                if contact_names[i] and designations[i] and emails[i] and phone_numbers[i]:
+                    contact_person = ContactPerson(
+                        company=company,
+                        Contact_Name=contact_names[i],
+                        designation=designations[i],
+                        email=emails[i],
+                        Phone_Number=phone_numbers[i]
+                    )
+                    contact_person.save()
+                
+            return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
     
