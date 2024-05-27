@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Staff, Role, Company, Sector, Service, Via, Status, Brand, Partner, ContactPerson, Transaction
+from .models import Staff, Role, Company, Sector, Service, Via, Status, Brand, Partner, Contact, Transaction
 
 class StaffAdmin(admin.ModelAdmin):
     list_display = ('Full_Name', 'email', 'role')
@@ -7,7 +7,7 @@ class StaffAdmin(admin.ModelAdmin):
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ('Company_Name', 'sector', 'service', 'brand', 'price')
 
-class ContactPersonAdmin(admin.ModelAdmin):
+class ContactAdmin(admin.ModelAdmin):
     list_display = ('Contact_Name', 'company', 'designation')
 
 class PartnerAdmin(admin.ModelAdmin):
@@ -19,7 +19,7 @@ class TransactionAdmin(admin.ModelAdmin):
 admin.site.register(Staff, StaffAdmin)
 admin.site.register(Role)
 admin.site.register(Company, CompanyAdmin)
-admin.site.register(ContactPerson, ContactPersonAdmin)
+admin.site.register(Contact, ContactAdmin)
 admin.site.register(Sector)
 admin.site.register(Service)
 admin.site.register(Via)

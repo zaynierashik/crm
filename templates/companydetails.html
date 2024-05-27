@@ -58,13 +58,29 @@
                         <th scope="col">Company Name</th>
                         <th scope="col">City</th>
                         <th scope="col">Contact Person</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone Number</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>{{ company.Company_Name }}</td>
                         <td>{{ company.city }}</td>
-                        <td>{{ company.Contact_Person }}</td>
+                        <td>
+                            {% for contact in contacts %}
+                                <p>{{ contact.Contact_Name }}</p>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for contact in contacts %}
+                                <p>{{ contact.email }}</p>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for contact in contacts %}
+                                <p>{{ contact.Phone_Number }}</p>
+                            {% endfor %}
+                        </td>
                     </tr>
                 </tbody>
             </table>

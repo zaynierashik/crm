@@ -120,9 +120,48 @@
                         <div class="invalid-feedback">Please select a country.</div>
                     </div>
                 </div>
-                    
+
+                <div class="mb-3">
+                    <div id="contact-persons-container">
+                        <div class="contact-person-template">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
+                                    <input type="text" class="form-control py-2" name="contact_name[]" required>
+                                    <div class="invalid-feedback">Please enter a contact person.</div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="designation" class="form-label fw-semibold">Designation</label>
+                                    <input type="text" class="form-control py-2" name="designation[]" required>
+                                    <div class="invalid-feedback">Please enter a designation.</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="email" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email[]" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control py-2" name="number[]" id="contactnumber" required>
+                                        <button type="button" class="btn border rounded-end" onclick="removeContactPerson(this)" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-minus" style="color: #000000;"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn border rounded ms-2" onclick="addContactPerson()" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-plus" style="color: #000000;"></i>
+                                        </button>
+                                        <div class="invalid-feedback">Please enter a phone number.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
-                    
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
@@ -186,7 +225,7 @@
                 </div>   
                     
                 <div class="row g-3">
-                    <div class="col-2">
+                    <div class="col-3">
                         <label for="currency" class="form-label fw-semibold">Currency</label>
                         <select class="form-control form-select py-2" name="currency" id="currency" required>
                             <option value="">Choose a currency</option>
@@ -215,12 +254,12 @@
                         <div class="invalid-feedback">Please select a via.</div>
                     </div>
 
-                    <div id="referralNameInput" class="col" style="display: none;">
+                    <div id="referralNameInput" class="col-3" style="display: none;">
                         <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
                         <input type="text" class="form-control py-2" name="referral_name" id="referral_name">
                     </div>
                     
-                    <div id="partnerDropdown" class="col" style="display: none;">
+                    <div id="partnerDropdown" class="col-3" style="display: none;">
                         <label for="partner" class="form-label fw-semibold">Partner</label>
                         <div class="input-group">
                             <select class="form-control form-select py-2" name="partner" id="partner">
@@ -247,42 +286,6 @@
                         <div class="invalid-feedback">Please select a status.</div>
                     </div>
                 </div>
-
-                <div class="mt-5 mb-3">
-                    <i class="fa-solid fa-plus" onclick="addContactPerson()" style="color: #000000;"></i>
-                    <div id="contact-persons-container">
-                        <div class="contact-person-template">
-                            <div class="row g-3 mb-3">
-                                <div class="col">
-                                    <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
-                                    <input type="text" class="form-control py-2" name="contact_name[]" required>
-                                    <div class="invalid-feedback">Please enter a contact person.</div>
-                                </div>
-                                <div class="col">
-                                    <label for="designation" class="form-label fw-semibold">Designation</label>
-                                    <input type="text" class="form-control py-2" name="designation[]" required>
-                                    <div class="invalid-feedback">Please enter a designation.</div>
-                                </div>
-                                <div class="col-4">
-                                    <label for="email" class="form-label fw-semibold">Email</label>
-                                    <input type="email" class="form-control py-2" name="email[]" required>
-                                    <div class="invalid-feedback">Please enter an email.</div>
-                                </div>
-                                <div class="col">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control py-2" name="number[]" required>
-                                        <button type="button" class="btn border" onclick="removeContactPerson(this)" style="background-color: var(--bs-tertiary-bg);">
-                                            <i class="fa-solid fa-minus" style="color: #000000;"></i>
-                                        </button>
-                                    </div>
-                                    <div class="invalid-feedback">Please enter a phone number.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <i class="fa-solid fa-plus" onclick="addContactPerson()" style="color: #000000;"></i> -->
-                </div>
-                
                         
                 <div class="d-flex mt-4 mb-4">
                     <div class="col">
@@ -570,7 +573,7 @@
     <script>
         function updatePhoneNumber(){
             const countrySelect = document.getElementById('country');
-            const phoneNumberInput = document.getElementById('number');
+            const phoneNumberInput = document.getElementById('contactnumber');
             const selectedOption = countrySelect.options[countrySelect.selectedIndex];
             const countryCode = selectedOption.getAttribute('data-code');
 
@@ -586,20 +589,20 @@
         });
     </script>
 
-<script>
-    function addContactPerson() {
-        var container = document.getElementById('contact-persons-container');
-        var newContactPerson = document.querySelector('.contact-person-template').cloneNode(true);
-        newContactPerson.classList.remove('contact-person-template');
-        newContactPerson.classList.add('contact-person');
-        newContactPerson.style.display = 'block';
-        container.appendChild(newContactPerson);
-    }
+    <script>
+        function addContactPerson() {
+            var container = document.getElementById('contact-persons-container');
+            var newContactPerson = document.querySelector('.contact-person-template').cloneNode(true);
+            newContactPerson.classList.remove('contact-person-template');
+            newContactPerson.classList.add('contact-person');
+            newContactPerson.style.display = 'block';
+            container.appendChild(newContactPerson);
+        }
 
-    function removeContactPerson(element) {
-        element.closest('.contact-person').remove();
-    }
-</script>
+        function removeContactPerson(element) {
+            element.closest('.contact-person').remove();
+        }
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){

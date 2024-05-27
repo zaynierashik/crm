@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="col">
-                        <label for="state" class="form-label fw-semibold">City</label>
+                        <label for="state" class="form-label fw-semibold">State</label>
                         <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}" required>
                         <div class="invalid-feedback">Please enter a state.</div>
                     </div>
@@ -107,32 +107,35 @@
                     </div>
                 </div>
                     
-                <div class="row g-3 mb-3">
-                    <div class="col">
-                        <label for="contact" class="form-label fw-semibold">Contact Person</label>
-                        <input type="text" class="form-control py-2" name="contact" id="contact" value="{{ company.Contact_Person }}" required>
-                        <div class="invalid-feedback">Please enter a contact person.</div>
+                <div class="mb-3">
+                    <div id="contact-persons-container">
+                        {% for contact in company.contact_persons.all %}
+                        <div class="contact-person-template">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
+                                    <input type="text" class="form-control py-2" name="contact_name[]" value="{{ contact.Contact_Name }}" required>
+                                    <div class="invalid-feedback">Please enter a contact person.</div>
+                                </div>
+                                <div class="col">
+                                    <label for="designation" class="form-label fw-semibold">Designation</label>
+                                    <input type="text" class="form-control py-2" name="designation[]" value="{{ contact.designation }}" required>
+                                    <div class="invalid-feedback">Please enter a designation.</div>
+                                </div>
+                                <div class="col-4">
+                                    <label for="email" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email[]" value="{{ contact.email }}" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+                                <div class="col">
+                                    <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                    <input type="text" class="form-control py-2" name="number[]" value="{{ contact.Phone_Number }}" required>
+                                    <div class="invalid-feedback">Please enter a phone number.</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
-    
-                    <div class="col-4">
-                        <label for="designation" class="form-label fw-semibold">Designation</label>
-                        <input type="text" class="form-control py-2" name="designation" id="designation" value="{{ company.designation }}" required>
-                        <div class="invalid-feedback">Please enter a designation.</div>
-                    </div>
-                </div>
-                    
-                <div class="row g-3 mb-3">
-                    <div class="col">
-                        <label for="email" class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control py-2" name="email" id="email" value="{{ company.email }}" required>
-                        <div class="invalid-feedback">Please enter an email.</div>
-                    </div>
-    
-                    <div class="col-4">
-                        <label for="number" class="form-label fw-semibold">Phone Number</label>
-                        <input type="text" class="form-control py-2" name="number" id="number" value="{{ company.Phone_Number }}" required>
-                        <div class="invalid-feedback">Please enter a phone number.</div>
-                    </div> 
                 </div>
                     
                 <div class="row g-3 mb-3">

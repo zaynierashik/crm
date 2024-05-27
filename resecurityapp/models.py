@@ -91,7 +91,7 @@ class Company(models.Model):
     class Meta:
         verbose_name_plural = "companies"
 
-class ContactPerson(models.Model):
+class Contact(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='contact_persons')
     Contact_Name = models.CharField(max_length=100)
     designation = models.CharField(max_length=100)

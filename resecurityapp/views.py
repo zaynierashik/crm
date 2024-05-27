@@ -116,8 +116,8 @@ def master(request):
     
     companies = Company.objects.filter(Created_By=fullname).order_by('Company_Name')
     sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name')
-    brands = Brand.objects.values('Brand_Name')
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.all()
@@ -141,8 +141,8 @@ def newcompany(request):
         return redirect('login')
     
     sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name')
-    brands = Brand.objects.values('Brand_Name')
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     statuses = Status.objects.all()
     partners = Partner.objects.values('Partner_Name')
@@ -211,56 +211,42 @@ def submit_newcompany(request):
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
-        valid_contact_provided = any([contact_names, designations, emails, phone_numbers])
-
-        if not valid_contact_provided:
-            return render(request, 'newcompany.html', {
-                'error_message': 'At least one valid contact must be provided.',
-                'company_name': company_name,
-                'sectors': Sector.objects.all(),
-                'services': Service.objects.all(),
-                'brands': Brand.objects.all(),
-                'vias': Via.objects.all(),
-                'partners': Partner.objects.all(),
-                'statuses': Status.objects.all(),
-            })
-        else:
-            if requirement_type == 'Product':
+        if requirement_type == 'Product':
                 company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
                                 requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                                 currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-            elif requirement_type == 'Service':
+        elif requirement_type == 'Service':
                 company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
                                 requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                                 currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
             
-            if via_name == 'Referral':
+        if via_name == 'Referral':
                 company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
                                 requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                                 currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-            elif via_name == 'Partner':
+        elif via_name == 'Partner':
                 company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
                                 requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                                 currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
-            else:
+        else:
                 company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
                                 requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
                                 currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
                 
-            company.save()
+        company.save()
 
-            for i in range(len(contact_names)):
-                if contact_names[i] and designations[i] and emails[i] and phone_numbers[i]:
-                    contact_person = ContactPerson(
-                        company=company,
-                        Contact_Name=contact_names[i],
-                        designation=designations[i],
-                        email=emails[i],
-                        Phone_Number=phone_numbers[i]
-                    )
-                    contact_person.save()
+        for i in range(len(contact_names)):
+            if contact_names[i] and designations[i] and emails[i] and phone_numbers[i]:
+                contact_person = Contact(
+                    company=company,
+                    Contact_Name=contact_names[i],
+                    designation=designations[i],
+                    email=emails[i],
+                    Phone_Number=phone_numbers[i]
+                )
+                contact_person.save()
                 
-            return redirect(reverse('master') + '?selection=company')
+        return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -272,8 +258,8 @@ def companyform(request, company_id):
     
     company = Company.objects.get(pk=company_id)
     sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name')
-    brands = Brand.objects.values('Brand_Name')
+    services = Service.objects.values('Service_Name').distinct()
+    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     partners = Partner.objects.all()
     statuses = Status.objects.all()
@@ -395,12 +381,14 @@ def companydetails(request, company_id):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
+    contacts = Contact.objects.filter(company=company)
+
     if start_date and end_date:
         filtered_transactions = transactions.filter(date__range=[start_date, end_date])
     else:
         filtered_transactions = transactions
 
-    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions})
+    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions, 'contacts': contacts})
 
 @csrf_exempt
 def submit_sector(request):
