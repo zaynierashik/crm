@@ -109,9 +109,9 @@
         {% elif selection == "requirement" %}        
         <div id="form-content">
             <div class="content d-flex justify-content-center">
-                <form id="myForm" action="{% url 'submit_requirement' %}" method="POST" class="row g-3" novalidate>
+                <form id="myForm" action="{% url 'submit_requirement' %}" method="POST" class="row g-3 needs-validation" novalidate>
                     {% csrf_token %}
-        
+            
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control form-select py-2" name="company" id="company" required>
@@ -122,7 +122,7 @@
                         </select>
                         <div class="invalid-feedback">Please select a company.</div>
                     </div>
-
+        
                     <div class="col-4">
                         <div class="col">
                             <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
@@ -134,14 +134,14 @@
                             <div class="invalid-feedback">Please select a requirement.</div>
                         </div>
                     </div>
-                        
+                            
                     <div id="brandInput" style="display: none;">
                         <div class="col mb-3">
                             <label for="product" class="form-label fw-semibold">Product Name</label>
                             <input type="text" class="form-control py-2" name="product" id="product">
                             <div class="invalid-feedback">Please enter a product name.</div>
                         </div>
-                                
+                                    
                         <div class="col">
                             <label for="brand" class="form-label fw-semibold">Brand</label>
                             <div class="input-group">
@@ -151,7 +151,7 @@
                                     <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
                                     {% endfor %}
                                 </select>
-                    
+                        
                                 <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
                                     <i class="fa-solid fa-plus" style="color: #212529;"></i>
                                 </a>
@@ -159,7 +159,7 @@
                             </div>
                         </div>
                     </div>
-
+        
                     <div id="serviceInput" class="col-12" style="display: none;">
                         <label for="service" class="form-label fw-semibold">Service</label>
                         <div class="input-group">
@@ -169,7 +169,7 @@
                                 <option value="{{ service.Service_Name }}">{{ service.Service_Name }}</option>
                                 {% endfor %}
                             </select>
-                    
+                        
                             <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#serviceModal" style="text-decoration: none;">
                                 <i class="fa-solid fa-plus" style="color: #212529;"></i>
                             </a>
@@ -179,13 +179,12 @@
                     
                     <div class="mb-3">
                         <label for="requirement-description" class="form-label fw-semibold">Requirement Description</label>
-                        <textarea class="form-control" name="requirement-description" id="requirement-description" cols="30" rows="3" required>{{ company.Requirement_Description }}</textarea>
-                            <div class="invalid-feedback">Please enter a requirement description.</div>
-                        </div>
-                
-                        <div class="col">
-                            <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
-                        </div>
+                        <textarea class="form-control" name="requirement-description" id="requirement-description" cols="30" rows="3" required></textarea>
+                        <div class="invalid-feedback">Please enter a requirement description.</div>
+                    </div>
+            
+                    <div class="col">
+                        <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
                     </div>
                 </form>
             </div>
@@ -499,38 +498,42 @@
     </script>
 
     <script>
-        var requirementDropdown = document.getElementById("requirement-type");
-        var brandInput = document.getElementById("brandInput");
-        var serviceInput = document.getElementById("serviceInput");
-
-        requirementDropdown.addEventListener("change", function(){
-            var selectedRequirement = requirementDropdown.value;
-            if(selectedRequirement === "Product"){
-                brandInput.style.display = "block";
-                serviceInput.style.display = "none";
-            }else if(selectedRequirement === "Service"){
-                serviceInput.style.display = "block";
-                brandInput.style.display = "none";
-            }else{
-                brandInput.style.display = "none";
-                serviceInput.style.display = "none";
+        document.getElementById('requirement-type').addEventListener('change', function() {
+            var type = this.value;
+            var brandInput = document.getElementById('brandInput');
+            var serviceInput = document.getElementById('serviceInput');
+            
+            if (type === 'Product') {
+                brandInput.style.display = 'block';
+                serviceInput.style.display = 'none';
+            } else if (type === 'Service') {
+                brandInput.style.display = 'none';
+                serviceInput.style.display = 'block';
+            } else {
+                brandInput.style.display = 'none';
+                serviceInput.style.display = 'none';
             }
         });
     </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
-            var forms = document.querySelectorAll("form.needs-validation");
-            
-            forms.forEach(function(form){
-                form.addEventListener("submit", function(event){
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add("was-validated");
-                }, false);
-            });
+            (function() {
+                'use strict';
+                var forms = document.querySelectorAll('.needs-validation');
+
+                Array.prototype.slice.call(forms)
+                    .forEach(function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (!form.checkValidity()) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+            })();
 
             function handleFormSubmission(formId, dropdownId, modalId, responseKey){
                 var form = document.getElementById(formId);
