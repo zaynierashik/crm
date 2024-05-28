@@ -33,12 +33,13 @@
                                 <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
@@ -176,20 +177,6 @@
 
         {% endif %}
     </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
-            
-            dropdownLinks.forEach(function(link){
-                link.addEventListener("click", function(event){
-                    event.preventDefault();
-                    var selectedValue = link.getAttribute("value");
-                    window.location.href = "{% url 'master' %}?selection=" + selectedValue;
-                });
-            });
-        });
-    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){

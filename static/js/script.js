@@ -17,3 +17,19 @@ function showLoginPassword(){
         x.type = "password";
     }
 }
+
+// Dropdown Menu
+
+document.addEventListener("DOMContentLoaded", function(){
+    var baseUrl = "/master/";
+    var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
+
+    dropdownLinks.forEach(function(link) {
+        link.addEventListener("click", function(event) {
+            event.preventDefault();
+            var selectedValue = link.getAttribute("value");
+            var url = baseUrl + "?selection=" + selectedValue;
+            window.location.href = url;
+        });
+    });
+});

@@ -1,6 +1,6 @@
 import io
 from django.shortcuts import *
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import *
 from .models import *
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -174,23 +174,10 @@ def submit_newcompany(request):
         state = request.POST.get('state')
         country = request.POST.get('country')
         
-        requirement_description = request.POST.get('requirement-description')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
         via_name = request.POST.get('via')
         via = Via.objects.get(Via_Name=via_name)
-
-        requirement_type = request.POST.get('requirement-type')
-        if requirement_type == 'Product':
-            product_name = request.POST.get('product')
-            brand_name = request.POST.get('brand')
-            brand = Brand.objects.filter(Brand_Name=brand_name).first()
-            service = None
-        elif requirement_type == 'Service':
-            service_name = request.POST.get('service')
-            service = Service.objects.filter(Service_Name=service_name).first()
-            product_name = None
-            brand = None
         
         if via_name == 'Referral':
             referral_name = request.POST.get('referral_name')
@@ -211,27 +198,15 @@ def submit_newcompany(request):
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
-        if requirement_type == 'Product':
-                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                                requirement=requirement_type, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-        elif requirement_type == 'Service':
-                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-            
         if via_name == 'Referral':
-                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                    currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         elif via_name == 'Partner':
-                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                                currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                    currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
         else:
-                company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                                requirement=requirement_type, service=service, Product_Name=product_name, brand=brand, Requirement_Description=requirement_description,
-                                currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
+                    currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
                 
         company.save()
 
@@ -389,6 +364,38 @@ def companydetails(request, company_id):
         filtered_transactions = transactions
 
     return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions, 'contacts': contacts})
+
+def submit_requirement(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company')
+        requirement_type = request.POST.get('requirement-type')
+        product_name = request.POST.get('product')
+        brand_name = request.POST.get('brand')
+        service_name = request.POST.get('service')
+        requirement_description = request.POST.get('requirement-description')
+
+        try:
+            company = Company.objects.get(Company_Name=company_name)
+        except Company.DoesNotExist:
+            return HttpResponseBadRequest("Company does not exist.")
+
+        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, Requirement_Description=requirement_description)
+
+        if requirement_type == 'Product':
+            if brand_name:
+                brand, created = Brand.objects.get_or_create(Brand_Name=brand_name)
+                requirement.brand = brand
+
+        elif requirement_type == 'Service':
+            if service_name:
+                service, created = Service.objects.get_or_create(Service_Name=service_name)
+                requirement.service = service
+
+        requirement.save()
+
+        return redirect(reverse('master') + '?selection=requirement')
+    else:
+        return HttpResponseBadRequest("Invalid request method.")
 
 @csrf_exempt
 def submit_sector(request):

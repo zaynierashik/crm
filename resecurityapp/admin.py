@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Staff, Role, Company, Sector, Service, Via, Status, Brand, Partner, Contact, Transaction
+from .models import Staff, Role, Company, Requirement, Sector, Service, Via, Status, Brand, Partner, Contact, Transaction
 
 class StaffAdmin(admin.ModelAdmin):
     list_display = ('Full_Name', 'email', 'role')
 
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('Company_Name', 'sector', 'service', 'brand', 'price')
+class RequirementAdmin(admin.ModelAdmin):
+    list_display = ('Requirement_Type', 'company', 'brand', 'Product_Name', 'service')
 
 class ContactAdmin(admin.ModelAdmin):
     list_display = ('Contact_Name', 'company', 'designation')
@@ -18,7 +18,8 @@ class TransactionAdmin(admin.ModelAdmin):
 
 admin.site.register(Staff, StaffAdmin)
 admin.site.register(Role)
-admin.site.register(Company, CompanyAdmin)
+admin.site.register(Company)
+admin.site.register(Requirement, RequirementAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Sector)
 admin.site.register(Service)

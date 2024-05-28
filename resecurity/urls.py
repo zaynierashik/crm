@@ -31,6 +31,7 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('master/', views.master, name='master'),
     path('newform/', views.newform, name='newform'),
+    path('submit-requirement/', views.submit_requirement, name='submit_requirement'),
     path('submit_transaction/', views.submit_transaction, name='submit_transaction'),
     path('submit_company/', views.submit_company, name='submit_company'),
     path('submit_sector/', views.submit_sector, name='submit_sector'),
@@ -51,7 +52,6 @@ urlpatterns = [
     path('newpartner/', views.newpartner, name='newpartner'),
     path('submit_newpartner/', views.submit_newpartner, name='submit_newpartner'),
     path('add_newpartner/', views.add_newpartner, name='add_newpartner'),
-
     path('export_excel/<int:company_id>/', views.export_excel, name='export_excel'),
     path('export_pdf/<int:company_id>/', views.export_pdf, name='export_pdf'),
 ]

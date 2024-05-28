@@ -23,7 +23,7 @@ class Sector(models.Model):
         return self.Sector_Name
 
 class Service(models.Model):
-    Service_Name = models.CharField(max_length=100)
+    Service_Name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.Service_Name
@@ -49,7 +49,7 @@ class Via(models.Model):
         return self.Via_Name
     
 class Brand(models.Model):
-    Brand_Name = models.CharField(max_length=100)
+    Brand_Name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.Brand_Name
@@ -72,11 +72,6 @@ class Company(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100)
-    requirement = models.CharField(max_length=100, default=None)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
-    Product_Name = models.CharField(max_length=100, null=True)
-    Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.SET_NULL, null=True)
@@ -100,6 +95,17 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.Contact_Name
+    
+class Requirement(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    Requirement_Type = models.CharField(max_length=100)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True)
+    Product_Name = models.CharField(max_length=100, null=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True)
+    Requirement_Description = models.TextField()
+
+    def __str__(self):
+        return self.Requirement_Type
 
 class Transaction(models.Model):
     date = models.DateField()
