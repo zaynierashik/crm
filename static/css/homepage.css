@@ -48,11 +48,11 @@ html{
     margin-right: 0.25vw;
 }
 
-.content{
+.content, .transaction-content{
     margin-top: 7%;
 }
 
-.content .row{
+.content .row, .transaction-content form{
     width: 55%;
 }
 

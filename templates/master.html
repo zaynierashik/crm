@@ -34,9 +34,9 @@
                                 <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
@@ -458,6 +458,38 @@
         {% endif %}
     </div>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'True') {
+                showToast('Data saved successfully.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace('&success=True', '').replace('success=True', ''));
+            }
+        });
+    
+        function showToast(message, type){
+            var toastElement = document.getElementById('toast');
+            var toastBody = toastElement.querySelector('.toast-body');
+    
+            if (type === 'success') {
+                toastBody.textContent = message;
+            }
+    
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+
     <script>
         function searchTable(inputId, tableId){
             var input, filter, table, tr, td, i, txtValue;
@@ -537,6 +569,7 @@
 
             function handleFormSubmission(formId, dropdownId, modalId, responseKey){
                 var form = document.getElementById(formId);
+
                 if(form.checkValidity()){
                     var formData = new FormData(form);
                     var xhr = new XMLHttpRequest();

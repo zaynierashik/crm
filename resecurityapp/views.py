@@ -82,13 +82,35 @@ def logout(request):
 
 def index(request):
     companies = Company.objects.order_by('Company_Name')
+    requirements = Requirement.objects.all()
+    services = Service.objects.all()
+    brands = Brand.objects.all()
     success = request.GET.get('success')
     fullname = request.session.get('fullname')
 
     if not fullname:
         return redirect('login')
         
-    return render(request, 'index.html', {'companies': companies, 'success': success, 'fullname': fullname})
+    return render(request, 'index.html', {'companies': companies, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
+
+def get_companydetails(request):
+    company_name = request.GET.get('company')
+    requirement_type = request.GET.get('requirement_type')
+    brand_name = request.GET.get('brand')
+
+    company = get_object_or_404(Company, Company_Name=company_name)
+
+    if requirement_type == 'Product':
+        if brand_name:
+            products = list(Requirement.objects.filter(company=company, Requirement_Type='Product', brand__Brand_Name=brand_name).values('Product_Name'))
+        else:
+            products = list(Requirement.objects.filter(company=company, Requirement_Type='Product').values('Product_Name', 'brand__Brand_Name'))
+        return JsonResponse({'products': products})
+    elif requirement_type == 'Service':
+        services = list(Requirement.objects.filter(company=company, Requirement_Type='Service').values('service__Service_Name'))
+        return JsonResponse({'services': services})
+
+    return JsonResponse({'error': 'Invalid requirement type'}, status=400)
 
 def submit_transaction(request):
     fullname = request.session.get('fullname')
@@ -97,12 +119,25 @@ def submit_transaction(request):
         return redirect('login')
     
     if request.method == 'POST':
-        company_name = request.POST.get('company')
         date = request.POST.get('date')
+        company_name = request.POST.get('company')
+        requirement_type = request.POST.get('requirement-type')
         action = request.POST.get('action')
         remark = request.POST.get('remark')
 
-        transaction = Transaction(Company_Name=company_name, date=date, action=action, remark=remark, Created_By=fullname)
+        if requirement_type == 'Product':
+            brand = request.POST.get('brand')
+            product_name = request.POST.get('product')
+            service = None
+        elif requirement_type == 'Service':
+            service = request.POST.get('service')
+            brand = None
+            product_name = None
+        else:
+            return HttpResponse("Invalid requirement type!")
+
+        transaction = Transaction(Company_Name=company_name, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
+                                  remark=remark, Created_By=fullname)
         transaction.save()
         return redirect(reverse('index') + '?success=True')
     else:
@@ -198,16 +233,8 @@ def submit_newcompany(request):
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
-        if via_name == 'Referral':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                    currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-        elif via_name == 'Partner':
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                    currency=currency, price=price, via=via, status=status, Partner_Name=partner_name, Referral_Name=referral_name, Created_By=fullname)
-        else:
-            company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country,
-                    currency=currency, price=price, via=via, status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
-                
+        company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, currency=currency, price=price, via=via, 
+                          status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         company.save()
 
         for i in range(len(contact_names)):
@@ -221,7 +248,7 @@ def submit_newcompany(request):
                 )
                 contact_person.save()
                 
-        return redirect(reverse('master') + '?selection=company')
+        return redirect(reverse('master') + '?selection=company&success=True')
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -393,7 +420,7 @@ def submit_requirement(request):
 
         requirement.save()
 
-        return redirect(reverse('master') + '?selection=requirement')
+        return redirect(reverse('master') + '?selection=requirement&success=True')
     else:
         return HttpResponseBadRequest("Invalid request method.")
 
