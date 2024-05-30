@@ -17,7 +17,7 @@ def signup(request):
     fullname = request.session.get('fullname')
 
     if fullname:
-        return redirect('index')
+        return redirect(reverse('master') + '?selection=company')
 
     roles = Role.objects.all()
     return render(request, 'signup.html', {'roles': roles})
@@ -55,7 +55,7 @@ def login(request):
     fullname = request.session.get('fullname')
 
     if fullname:
-        return redirect('index')
+         return redirect(reverse('master') + '?selection=company')
     
     return render(request, 'login.html')
 
@@ -68,7 +68,7 @@ def submit_login(request):
             ss = Staff.objects.get(email=email)
             if check_password(password, ss.password):
                 request.session['fullname'] = ss.Full_Name
-                return redirect('index')
+                return redirect(reverse('master') + '?selection=company')
             else:
                 return redirect(reverse('login') + '?success=False')
         except Staff.DoesNotExist:
@@ -80,7 +80,7 @@ def logout(request):
     request.session.flush()
     return redirect('login')   
 
-def index(request):
+def transaction(request):
     companies = Company.objects.order_by('Company_Name')
     requirements = Requirement.objects.all()
     services = Service.objects.all()
@@ -91,7 +91,7 @@ def index(request):
     if not fullname:
         return redirect('login')
         
-    return render(request, 'index.html', {'companies': companies, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
+    return render(request, 'transaction.html', {'companies': companies, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
 
 def get_companydetails(request):
     company_name = request.GET.get('company')
@@ -139,7 +139,7 @@ def submit_transaction(request):
         transaction = Transaction(Company_Name=company_name, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
                                   remark=remark, Created_By=fullname)
         transaction.save()
-        return redirect(reverse('index') + '?success=True')
+        return redirect(reverse('transaction') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
 
@@ -259,6 +259,8 @@ def companyform(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
+    contacts = Contact.objects.filter(company=company)
+    requirements = Requirement.objects.filter(company=company)
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name').distinct()
     brands = Brand.objects.values('Brand_Name').distinct()
@@ -268,7 +270,8 @@ def companyform(request, company_id):
 
     countries = ["Nepal", "USA", "India", "Singapore"]
     currencies = ["NPR", "USD", "SGD", "Riyal"]
-    return render(request, 'companyform.html', {'company': company, 'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'partners': partners, 'statuses': statuses, 'countries': countries, 'currencies': currencies})
+    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'requirements': requirements, 'sectors': sectors, 'services': services,
+                                                'brands': brands, 'vias': vias, 'partners': partners, 'statuses': statuses, 'countries': countries, 'currencies': currencies})
 
 def submit_company(request):
     fullname = request.session.get('fullname')

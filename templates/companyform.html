@@ -19,7 +19,7 @@
         <div id="navbar">
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
-                    <a class="navbar-brand" href="{% url 'index' %}">
+                    <a class="navbar-brand" href="{% url 'master' %}?selection=company">
                         <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
@@ -43,7 +43,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
-                                <a class="nav-link fw-semibold" href="{% url 'index' %}">Transactions</a>
+                                <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
                             </li>
                         </ul>
                     </div>
@@ -129,9 +129,19 @@
                                     <div class="invalid-feedback">Please enter an email.</div>
                                 </div>
                                 <div class="col">
+
                                     <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
-                                    <input type="text" class="form-control py-2" name="number[]" value="{{ contact.Phone_Number }}" required>
-                                    <div class="invalid-feedback">Please enter a phone number.</div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control py-2" name="number[]" id="contactnumber" value="{{ contact.Phone_Number }}" required>
+                                        <button type="button" class="btn border rounded-end" onclick="removeContactPerson(this)" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-minus" style="color: #000000;"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn border rounded ms-2" onclick="addContactPerson()" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-plus" style="color: #000000;"></i>
+                                        </button>
+                                        <div class="invalid-feedback">Please enter a phone number.</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -314,6 +324,40 @@
             requirementType.addEventListener('change', toggleRequirementFields);
             toggleRequirementFields();
         });
+    </script>
+
+    <script>
+        function updatePhoneNumber(){
+            const countrySelect = document.getElementById('country');
+            const phoneNumberInput = document.getElementById('contactnumber');
+            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+            const countryCode = selectedOption.getAttribute('data-code');
+
+            if(countryCode){
+                phoneNumberInput.value = countryCode + ' ';
+            }else{
+                phoneNumberInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            updatePhoneNumber();
+        });
+    </script>
+
+    <script>
+        function addContactPerson() {
+            var container = document.getElementById('contact-persons-container');
+            var newContactPerson = document.querySelector('.contact-person-template').cloneNode(true);
+            newContactPerson.classList.remove('contact-person-template');
+            newContactPerson.classList.add('contact-person');
+            newContactPerson.style.display = 'block';
+            container.appendChild(newContactPerson);
+        }
+
+        function removeContactPerson(element) {
+            element.closest('.contact-person').remove();
+        }
     </script>
 
     <script>

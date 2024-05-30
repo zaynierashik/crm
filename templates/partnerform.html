@@ -19,7 +19,7 @@
         <div id="navbar">
             <nav class="navbar navbar-expand-lg justify-content-center">
                 <div class="container-fluid mt-3">
-                    <a class="navbar-brand" href="{% url 'index' %}">
+                    <a class="navbar-brand" href="{% url 'master' %}?selection=company">
                         <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
                     </a>
     
@@ -43,7 +43,7 @@
                                 </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
-                                <a class="nav-link fw-semibold" href="{% url 'index' %}">Transactions</a>
+                                <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
                             </li>
                         </ul>
                     </div>
