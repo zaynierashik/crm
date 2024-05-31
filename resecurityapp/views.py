@@ -260,18 +260,15 @@ def companyform(request, company_id):
     
     company = Company.objects.get(pk=company_id)
     contacts = Contact.objects.filter(company=company)
-    requirements = Requirement.objects.filter(company=company)
     sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name').distinct()
-    brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     partners = Partner.objects.all()
     statuses = Status.objects.all()
 
     countries = ["Nepal", "USA", "India", "Singapore"]
     currencies = ["NPR", "USD", "SGD", "Riyal"]
-    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'requirements': requirements, 'sectors': sectors, 'services': services,
-                                                'brands': brands, 'vias': vias, 'partners': partners, 'statuses': statuses, 'countries': countries, 'currencies': currencies})
+    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'vias': vias, 'partners': partners, 'statuses': statuses, 
+                                                'countries': countries, 'currencies': currencies})
 
 def submit_company(request):
     fullname = request.session.get('fullname')
@@ -283,94 +280,51 @@ def submit_company(request):
         company_id = request.POST.get('company_id')
         company = get_object_or_404(Company, id=company_id)
         
-        company_name = request.POST.get('company')
+        company.Company_Name = request.POST.get('company')
         sector_name = request.POST.get('sector')
-        sector = Sector.objects.get(Sector_Name=sector_name)
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        country = request.POST.get('country')
-        contact_person = request.POST.get('contact')
-        designation = request.POST.get('designation')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('number')
-        requirement = request.POST.get('requirement-type')
-        requirement_description = request.POST.get('requirement-description')
-        currency = request.POST.get('currency')
-        price = request.POST.get('price')
+        company.sector = get_object_or_404(Sector, Sector_Name=sector_name)
+        company.address = request.POST.get('address')
+        company.city = request.POST.get('city')
+        company.state = request.POST.get('state')
+        company.country = request.POST.get('country')
+        company.currency = request.POST.get('currency')
+        company.price = request.POST.get('price')
         via_name = request.POST.get('via')
-        via = Via.objects.get(Via_Name=via_name)
-        referral_name = request.POST.get('referral_name')
-        partner_name = request.POST.get('partner')
-        status_name = request.POST.get('status')
-        status = Status.objects.get(Status_Name=status_name)
-
-        company.Company_Name = company_name
-        company.sector = sector
-        company.address = address
-        company.city = city
-        company.state = state
-        company.country = country
-        company.Contact_Person = contact_person
-        company.designation = designation
-        company.email = email
-        company.Phone_Number = phone_number
-        company.requirement = requirement
-        company.Requirement_Description = requirement_description
-        company.currency = currency
-        company.price = price
-        company.via = via
-        company.status = status
-        
-        if requirement == 'Service':
-            service_name = request.POST.get('service')
-            if service_name:
-                try:
-                    service = Service.objects.filter(Service_Name=service_name).first()
-                    if service:
-                        company.service = service
-                    else:
-                        return HttpResponse("Service does not exist.")
-                except Service.DoesNotExist:
-                    return HttpResponse("Service does not exist.")
-        else:
-            company.service = None
-        
-        if requirement == 'Product':
-            brand_name = request.POST.get('brand')
-            product_name = request.POST.get('product')
-            if brand_name and product_name:
-                try:
-                    brand = Brand.objects.filter(Brand_Name=brand_name).first()
-                    if brand:
-                        company.brand = brand
-                        company.Product_Name = product_name
-                    else:
-                        return HttpResponse("Brand does not exist.")
-                except Brand.DoesNotExist:
-                    return HttpResponse("Brand does not exist.")
-        else:
-            company.brand = None
-            company.Product_Name = None
+        company.via = get_object_or_404(Via, Via_Name=via_name)
+        company.status = get_object_or_404(Status, Status_Name=request.POST.get('status'))
 
         if via_name == 'Referral':
-            company.Referral_Name = referral_name
+            company.Referral_Name = request.POST.get('referral_name')
             company.Partner_Name = None
-        elif via_name == 'Partner' and partner_name:
-            try:
-                partner = Partner.objects.filter(Partner_Name=partner_name).first()
-                if partner:
-                    company.Partner_Name = partner
-                    company.Referral_Name = None
-                else:
-                    return HttpResponse("Partner does not exist.")
-            except Partner.DoesNotExist:
+        elif via_name == 'Partner' and request.POST.get('partner'):
+            partner = Partner.objects.filter(Partner_Name=request.POST.get('partner')).first()
+            if partner:
+                company.Partner_Name = partner
+                company.Referral_Name = None
+            else:
                 return HttpResponse("Partner does not exist.")
         else:
             company.Partner_Name = None
             company.Referral_Name = None
 
         company.save()
+        company.contact_persons.all().delete()
+
+        contact_names = request.POST.getlist('contact_name[]')
+        designations = request.POST.getlist('designation[]')
+        emails = request.POST.getlist('email[]')
+        phone_numbers = request.POST.getlist('number[]')
+
+        for name, designation, email, phone_number in zip(contact_names, designations, emails, phone_numbers):
+            if name and designation and email and phone_number:
+                Contact.objects.create(
+                    company=company,
+                    Contact_Name=name,
+                    designation=designation,
+                    email=email,
+                    Phone_Number=phone_number
+                )
+
         return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
