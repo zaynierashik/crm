@@ -109,7 +109,7 @@ class Requirement(models.Model):
 
 class Transaction(models.Model):
     date = models.DateField()
-    Company_Name = models.CharField(max_length=100)
+    Company_Name = models.ForeignKey(Company, on_delete=models.CASCADE)
     Requirement_Type = models.CharField(max_length=100)
     brand = models.CharField(max_length=100, null=True)
     Product_Name = models.CharField(max_length=100, null=True)
@@ -119,4 +119,4 @@ class Transaction(models.Model):
     Created_By = models.CharField(max_length=100, default='Staff')
 
     def __str__(self):
-        return self.Company_Name
+        return f"{self.Company_Name.Company_Name}"

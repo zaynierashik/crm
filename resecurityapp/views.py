@@ -125,6 +125,11 @@ def submit_transaction(request):
         action = request.POST.get('action')
         remark = request.POST.get('remark')
 
+        try:
+            company = Company.objects.get(Company_Name=company_name)
+        except Company.DoesNotExist:
+            return HttpResponseBadRequest("Company does not exist.")
+
         if requirement_type == 'Product':
             brand = request.POST.get('brand')
             product_name = request.POST.get('product')
@@ -136,7 +141,7 @@ def submit_transaction(request):
         else:
             return HttpResponse("Invalid requirement type!")
 
-        transaction = Transaction(Company_Name=company_name, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
+        transaction = Transaction(Company_Name=company, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
                                   remark=remark, Created_By=fullname)
         transaction.save()
         return redirect(reverse('transaction') + '?success=True')
@@ -151,7 +156,7 @@ def master(request):
     
     companies = Company.objects.filter(Created_By=fullname).order_by('Company_Name')
     sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('Service_Name').distinct()
+    services = Service.objects.values('id', 'Service_Name').distinct()
     brands = Brand.objects.values('Brand_Name').distinct()
     vias = Via.objects.all()
     statuses = Status.objects.all()
@@ -472,6 +477,21 @@ def add_service(request):
             })
     else:
         return HttpResponse("Form Submission Error!")
+    
+def update_service(request):
+    if request.method == 'POST':
+        service_id = request.POST.get('serviceId')
+        service_name = request.POST.get('serviceName')
+
+        try:
+            service = Service.objects.get(id=service_id)
+            service.Service_Name = service_name
+            service.save()
+            return redirect(reverse('master') + '?selection=service')
+        except Service.DoesNotExist:
+            return redirect(reverse('master') + '?selection=service')
+
+    return redirect(reverse('master') + '?selection=service')
     
 @csrf_exempt
 def submit_brand(request):

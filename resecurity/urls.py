@@ -39,6 +39,7 @@ urlpatterns = [
     path('add_sector/', views.add_sector, name='add_sector'),
     path('submit_service/', views.submit_service, name='submit_service'),
     path('add_service/', views.add_service, name='add_service'),
+    path('update_service', views.update_service, name='update_service'),
     path('submit_via/', views.submit_via, name='submit_via'),
     path('submit_status/', views.submit_status, name='submit_status'),
     path('submit_brand/', views.submit_brand, name='submit_brand'),

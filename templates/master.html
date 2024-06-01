@@ -306,16 +306,44 @@
                 <thead>
                     <tr>
                         <th scope="col">Service Name</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for service in services %}
                     <tr>
                         <td>{{ service.Service_Name }}</td>
+                        <td>
+                            <a class="edit-service" data-id="{{ service.id }}" data-name="{{ service.Service_Name }}">
+                                <i class="fa-solid fa-pen-to-square" style="color: #212529; cursor: pointer;"></i>
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        
+        <div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editServiceForm" method="POST" action="{% url 'update_service' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="serviceName" class="form-label">Service Name</label>
+                                <input type="text" class="form-control" id="serviceName" name="serviceName">
+                            </div>
+                            <input type="hidden" id="serviceId" name="serviceId">
+                            <button type="submit" class="btn">Save changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Via Details Form -->
@@ -536,6 +564,27 @@
                     searchTable('partner-search', 'partner-detail-content');
                 });
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var editButtons = document.querySelectorAll('.edit-service');
+            var editServiceModal = new bootstrap.Modal(document.getElementById('editServiceModal'));
+            var serviceNameInput = document.getElementById('serviceName');
+            var serviceIdInput = document.getElementById('serviceId');
+        
+            editButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var serviceId = this.getAttribute('data-id');
+                    var serviceName = this.getAttribute('data-name');
+        
+                    serviceIdInput.value = serviceId;
+                    serviceNameInput.value = serviceName;
+        
+                    editServiceModal.show();
+                });
+            });
         });
     </script>
 
