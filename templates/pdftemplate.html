@@ -33,7 +33,12 @@
     <h1>Company Transactions</h1>
     <p><strong>Company Name:</strong> {{ company.Company_Name }}</p>
     <p><strong>City:</strong> {{ company.city }}</p>
-    <p><strong>Contact Person:</strong> {{ company.Contact_Person }}</p>
+
+    {% for contact in contacts %}
+        <p><strong>Contact Person:</strong> {{ contact.Contact_Name }}</p>
+        <p><strong>Contact Email:</strong> {{ contact.email }}</p>
+        <p><strong>Contact Number:</strong> {{ contact.Phone_Number }}</p>
+    {% endfor %}
 
     <table>
         <thead>

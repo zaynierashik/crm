@@ -12,6 +12,8 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from openpyxl import Workbook
+from openpyxl.styles import NamedStyle, Font
+from openpyxl.utils import get_column_letter
 
 def signup(request):
     fullname = request.session.get('fullname')
@@ -341,7 +343,7 @@ def companydetails(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
@@ -699,21 +701,29 @@ def export_excel(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
     
     wb = Workbook()
     ws = wb.active
-    ws.append(['Date', 'Action', 'Remark'])
-    
+    ws.append(['Date', 'Requirement Type', 'Brand', 'Product Name', 'Service', 'Action', 'Remark'])
+
+    column_widths = {'A': 15, 'B': 17, 'C': 15, 'D': 15, 'E': 15, 'F': 35, 'G': 35}
+    for column, width in column_widths.items():
+        ws.column_dimensions[column].width = width
+
+    date_style = NamedStyle(name='date_style', number_format='YYYY-MM-DD')
+    for cell in ws['A']:
+        cell.style = date_style
+
     for transaction in transactions:
-        ws.append([transaction.date, transaction.action, transaction.remark])
+        ws.append([transaction.date, transaction.Requirement_Type, transaction.brand, transaction.Product_Name, transaction.service, transaction.action, transaction.remark])
 
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
 
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="{company.Company_Name} Transactions.xlsx"'
     return response
 
 def export_pdf(request, company_id):
@@ -723,10 +733,11 @@ def export_pdf(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name=company.Company_Name).order_by('-date')
+    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    contacts = Contact.objects.filter(company=company)
 
     template_path = 'pdftemplate.html'
-    context = {'company': company, 'transactions': transactions}
+    context = {'company': company, 'transactions': transactions, 'contacts': contacts}
     
     template = get_template(template_path)
     html = template.render(context)
@@ -736,7 +747,7 @@ def export_pdf(request, company_id):
 
     if not pdf.err:
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{company.Company_Name}_transactions.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="{company.Company_Name} Transactions.pdf"'
         return response
     
     return HttpResponse('Error generating PDF', status=500)
