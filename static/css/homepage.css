@@ -90,6 +90,11 @@ html{
     color: #212529;
 }
 
+.company-detail-content td:nth-child(6), .company-detail-content td:nth-child(7) {
+    max-width: 200px;
+    overflow-wrap: break-word;
+}
+
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{
     -webkit-appearance: none;
     margin: 0;

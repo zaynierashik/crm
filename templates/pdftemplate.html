@@ -6,24 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Transactions</title>
     <style>
-        body {
+        body{
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 20px 0px;
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
+        
+        h1{
+            font-size: 1.75rem;
         }
-        table {
+
+        p{
+            font-size: 1.25rem;
+        }
+
+        table{
             width: 100%;
             border-collapse: collapse;
         }
-        th, td {
+
+        th, td{
             border: 1px solid #dddddd;
-            padding: 8px;
+            padding: 5.5px 5px 0px 5px;
+            font-size: 1.25rem;
             text-align: left;
         }
-        th {
+
+        th{
             background-color: #f2f2f2;
         }
     </style>
@@ -49,9 +57,9 @@
                 <th scope="col">Product Name</th>
                 <th scope="col">Service</th>
                 <th scope="col">Action</th>
-                <th scope="col">Remarks</th>
             </tr>
         </thead>
+        
         <tbody>
             {% for transaction in transactions %}
             <tr>
@@ -61,7 +69,6 @@
                 <td>{{ transaction.Product_Name }}</td>
                 <td>{{ transaction.service }}</td>
                 <td>{{ transaction.action }}</td>
-                <td>{{ transaction.remark }}</td>
             </tr>
             {% endfor %}
         </tbody>
