@@ -133,13 +133,25 @@ def submit_transaction(request):
             return HttpResponseBadRequest("Company does not exist.")
 
         if requirement_type == 'Product':
-            brand = request.POST.get('brand')
+            brand_name = request.POST.get('brand')
             product_name = request.POST.get('product')
             service = None
+
+            try:
+                brand = Brand.objects.get(Brand_Name=brand_name)
+            except Brand.DoesNotExist:
+                return HttpResponseBadRequest("Brand does not exist.")
+    
         elif requirement_type == 'Service':
-            service = request.POST.get('service')
+            service_name = request.POST.get('service')
             brand = None
             product_name = None
+
+            try:
+                service = Service.objects.get(Service_Name=service_name)
+            except Service.DoesNotExist:
+                return HttpResponseBadRequest("Service does not exist.")
+    
         else:
             return HttpResponse("Invalid requirement type!")
 
@@ -716,7 +728,17 @@ def export_excel(request, company_id):
         cell.style = date_style
 
     for transaction in transactions:
-        ws.append([transaction.date, transaction.Requirement_Type, transaction.brand, transaction.Product_Name, transaction.service, transaction.action, transaction.remark])
+        brand = transaction.brand.Brand_Name if transaction.brand else ''
+        service = transaction.service.Service_Name if transaction.service else ''
+        ws.append([
+            transaction.date,
+            transaction.Requirement_Type,
+            brand,
+            transaction.Product_Name,
+            service,
+            transaction.action,
+            transaction.remark
+        ])
 
     output = io.BytesIO()
     wb.save(output)
