@@ -169,6 +169,7 @@ def master(request):
         return redirect('login')
     
     companies = Company.objects.filter(Created_By=fullname).order_by('Company_Name')
+    contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('id', 'Service_Name').distinct()
     brands = Brand.objects.values('Brand_Name').distinct()
@@ -177,8 +178,37 @@ def master(request):
     partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
+    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
 
+def get_contacts(request):
+    company_name = request.GET.get('company', None)
+    contacts = Contact.objects.filter(company__Company_Name=company_name).values('Contact_Name')
+
+    return JsonResponse({'contacts': list(contacts)})
+
+@csrf_exempt
+def submit_contact(request):
+    if request.method == 'POST':
+        try:
+            company_name = request.POST.get('company')
+            contact_name = request.POST.get('contact_name')
+            designation = request.POST.get('designation')
+            email = request.POST.get('email')
+            phone = request.POST.get('number')
+
+            company = Company.objects.get(Company_Name=company_name)
+            contact = Contact(company=company, Contact_Name=contact_name, designation=designation, email=email, Phone_Number=phone)
+            contact.save()
+
+            return JsonResponse({
+                'Contact_Name': contact.Contact_Name,
+                'company': company_name
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
 def newform(request):
     fullname = request.session.get('fullname')
 
@@ -355,6 +385,7 @@ def companydetails(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
+    requirements = Requirement.objects.filter(company_id=company_id)
     transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -366,7 +397,7 @@ def companydetails(request, company_id):
     else:
         filtered_transactions = transactions
 
-    return render(request, 'companydetails.html', {'company': company, 'transactions': transactions, 'filtered_transactions': filtered_transactions, 'contacts': contacts})
+    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'filtered_transactions': filtered_transactions, 'contacts': contacts})
 
 def submit_requirement(request):
     if request.method == 'POST':

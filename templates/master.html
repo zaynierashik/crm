@@ -125,7 +125,7 @@
                     <div class="col">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control form-select py-2" name="company" id="company" required>
-                            <option value=""></option>
+                            <option value="">Choose a company</option>
                             {% for company in companies %}
                             <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
                             {% endfor %}
@@ -146,26 +146,28 @@
                     </div>
                             
                     <div id="brandInput" style="display: none;">
-                        <div class="col mb-3">
-                            <label for="product" class="form-label fw-semibold">Product Name</label>
-                            <input type="text" class="form-control py-2" name="product" id="product">
-                            <div class="invalid-feedback">Please enter a product name.</div>
-                        </div>
-                                    
-                        <div class="col">
-                            <label for="brand" class="form-label fw-semibold">Brand</label>
-                            <div class="input-group">
-                                <select class="form-control form-select py-2" name="brand" id="brand">
-                                    <option value="">Choose a brand</option>
-                                    {% for brand in brands %}
-                                    <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
-                                    {% endfor %}
-                                </select>
-                        
-                                <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
-                                    <i class="fa-solid fa-plus" style="color: #212529;"></i>
-                                </a>
-                                <div class="invalid-feedback">Please select a brand.</div>
+                        <div class="row g-3">
+                            <div class="col">
+                                <label for="brand" class="form-label fw-semibold">Brand</label>
+                                <div class="input-group">
+                                    <select class="form-control form-select py-2" name="brand" id="brand">
+                                        <option value="">Choose a brand</option>
+                                        {% for brand in brands %}
+                                        <option value="{{ brand.Brand_Name }}">{{ brand.Brand_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                            
+                                    <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#brandModal" style="text-decoration: none;">
+                                        <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                    </a>
+                                    <div class="invalid-feedback">Please select a brand.</div>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <label for="product" class="form-label fw-semibold">Product Name</label>
+                                <input type="text" class="form-control py-2" name="product" id="product">
+                                <div class="invalid-feedback">Please enter a product name.</div>
                             </div>
                         </div>
                     </div>
@@ -187,11 +189,30 @@
                         </div>
                     </div>
                     
-                    <div class="mb-3">
+                    <div>
                         <label for="requirement-description" class="form-label fw-semibold">Requirement Description</label>
                         <textarea class="form-control" name="requirement-description" id="requirement-description" cols="30" rows="3" required></textarea>
                         <div class="invalid-feedback">Please enter a requirement description.</div>
                     </div>
+
+                    <div class="col-12 mb-3">
+                        <div class="col">
+                            <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
+                            <div class="input-group">
+                                <select class="form-control form-select py-2" name="contact-person" id="contact-person" required>
+                                    <option value="">Choose a contact person</option>
+                                    {% for contact in contacts %}
+                                    <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
+                                    {% endfor %}
+                                </select>
+                    
+                                <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
+                                    <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                </a>
+                            </div>
+                            <div class="invalid-feedback">Please select a contact person.</div>
+                        </div>
+                    </div>                 
             
                     <div class="col">
                         <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
@@ -249,6 +270,62 @@
                     
                     <div class="modal-footer">
                         <button type="button" class="btn px-4" id="submitBrandBtn">Add Brand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="contactModalLabel">Add New Contact</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="contactForm" action="{% url 'submit_contact' %}" method="POST" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="row g-3 mb-3">
+                                <div class="col-12">
+                                    <label for="company" class="form-label fw-semibold">Company Name</label>
+                                    <select class="form-control form-select py-2" name="company" id="company" required>
+                                        <option value="">Choose a company</option>
+                                        {% for company in companies %}
+                                        <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select a company.</div>
+                                </div>
+        
+                                <div class="col-6">
+                                    <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
+                                    <input type="text" class="form-control py-2" name="contact_name" required>
+                                    <div class="invalid-feedback">Please enter a contact person.</div>
+                                </div>
+        
+                                <div class="col-6">
+                                    <label for="designation" class="form-label fw-semibold">Designation</label>
+                                    <input type="text" class="form-control py-2" name="designation" required>
+                                    <div class="invalid-feedback">Please enter a designation.</div>
+                                </div>
+        
+                                <div class="col-6">
+                                    <label for="email" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+        
+                                <div class="col-6">
+                                    <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                    <input type="text" class="form-control py-2" name="number" id="contactnumber" required>
+                                    <div class="invalid-feedback">Please enter a phone number.</div>
+                                </div>
+                            </div>                  
+                        </form>
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" class="btn px-4" id="submitContactBtn">Add Contact</button>
                     </div>
                 </div>
             </div>
@@ -679,6 +756,61 @@
 
             document.getElementById("submitBrandBtn").addEventListener("click", function(){
                 handleFormSubmission("brandForm", "brand", "#brandModal", "brand_name");
+            });
+
+            document.getElementById("submitContactBtn").addEventListener("click", function(){
+                handleFormSubmission("contactForm", "contact-person", "#contactModal", "Contact_Name");
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const companySelect = document.getElementById('company');
+            const contactPersonSelect = document.getElementById('contact-person');
+            
+            companySelect.addEventListener('change', function() {
+                const selectedCompany = companySelect.value;
+                const contactOptions = contactPersonSelect.querySelectorAll('option');
+        
+                contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>'; // Reset contact person options
+                
+                contactOptions.forEach(option => {
+                    if (option.dataset.company === selectedCompany) {
+                        contactPersonSelect.appendChild(option);
+                    }
+                });
+        
+                contactPersonSelect.value = ""; // Reset the contact person select value
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const companySelect = document.getElementById('company');
+            const contactPersonSelect = document.getElementById('contact-person');
+            
+            companySelect.addEventListener('change', function() {
+                const selectedCompany = companySelect.value;
+        
+                if (!selectedCompany) {
+                    contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                    return;
+                }
+        
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                        response.contacts.forEach(function(contact) {
+                            contactPersonSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
+                        });
+                    }
+                };
+                xhr.send();
             });
         });
     </script>

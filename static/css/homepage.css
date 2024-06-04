@@ -49,10 +49,10 @@ html{
 }
 
 .content, .transaction-content{
-    margin-top: 7%;
+    margin-top: 5%;
 }
 
-.content .row, .transaction-content form{
+.content form, .transaction-content form{
     width: 55%;
 }
 
