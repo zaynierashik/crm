@@ -410,8 +410,9 @@ def companydetails(request, company_id):
     company = Company.objects.get(pk=company_id)
     requirements = Requirement.objects.filter(company_id=company_id)
     transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions})
+    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'contacts': contacts})
 
 def submit_requirement(request):
     if request.method == 'POST':
