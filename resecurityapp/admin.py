@@ -14,7 +14,7 @@ class PartnerAdmin(admin.ModelAdmin):
     list_display = ('Partner_Name', 'Contact_Person', 'email')
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('Company_Name', 'date', 'action', 'remark')
+    list_display = ('Company_Name', 'brand', 'Product_Name', 'service')
 
 admin.site.register(Staff, StaffAdmin)
 admin.site.register(Role)

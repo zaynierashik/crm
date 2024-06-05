@@ -85,7 +85,7 @@
 
             <div id="company-detail-content" class="company-detail-content container">
                 <h3>Company Master</h3>
-                <table class="table">
+                <table class="table table-hover">
                     <thead>
                         <tr>
                             <th scope="col">Company Name</th>
@@ -608,6 +608,7 @@
     <script>
         function searchTable(inputId, tableId){
             var input, filter, table, tr, td, i, txtValue;
+            
             input = document.getElementById(inputId);
             filter = input.value.toUpperCase();
             table = document.getElementById(tableId);
@@ -773,7 +774,7 @@
                 const selectedCompany = companySelect.value;
                 const contactOptions = contactPersonSelect.querySelectorAll('option');
         
-                contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>'; // Reset contact person options
+                contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
                 
                 contactOptions.forEach(option => {
                     if (option.dataset.company === selectedCompany) {
@@ -781,7 +782,7 @@
                     }
                 });
         
-                contactPersonSelect.value = ""; // Reset the contact person select value
+                contactPersonSelect.value = "";
             });
         });
     </script>

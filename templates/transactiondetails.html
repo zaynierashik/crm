@@ -52,72 +52,52 @@
         </div>
 
         <div id="company-detail-content" class="company-detail-content container">
-            <h3>Company Information</h3>
-            <table class="table table-borderless">
+            <h3>Transactions</h3>
+            <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
+                <div class="row">
+                    <div class="col-3">
+                        <input type="date" class="form-control" name="start_date" placeholder="Start Date">
+                    </div>
+                    <div class="col-3">
+                        <input type="date" class="form-control" name="end_date" placeholder="End Date">
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn w-100 pb-1">Filter</button>
+                    </div>
+
+                    <div class="col text-end d-flex justify-content-end align-items-center">
+                        <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
+                        <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table mt-3">
                 <thead>
                     <tr>
-                        <th scope="col">Company Name</th>
-                        <th scope="col">City</th>
-                        <th scope="col">Contact Person</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Phone Number</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Requirement</th>
+                        <th scope="col">Brand</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Service</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for transaction in filtered_transactions %}
                     <tr>
-                        <td>{{ company.Company_Name }}</td>
-                        <td>{{ company.city }}</td>
-                        <td>
-                            {% for contact in contacts %}
-                                <p>{{ contact.Contact_Name }}</p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for contact in contacts %}
-                                <p>{{ contact.email }}</p>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for contact in contacts %}
-                                <p>{{ contact.Phone_Number }}</p>
-                            {% endfor %}
-                        </td>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.Requirement_Type }}</td>
+                        <td>{{ transaction.brand }}</td>
+                        <td>{{ transaction.Product_Name }}</td>
+                        <td>{{ transaction.service }}</td>
+                        <td>{{ transaction.action }}</td>
+                        <td>{{ transaction.remark }}</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
-
-            <div class="hl mt-3"></div>
-
-            <div class="mt-5">
-                <h3>Requirements</h3>
-
-                <table class="table table-hover mt-3">
-                    <thead>
-                        <tr>
-                            <th scope="col">Requirement</th>
-                            <th scope="col">Brand</th>
-                            <th scope="col">Product Name</th>
-                            <th scope="col">Service</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for requirement in requirements %}
-                        <tr>
-                            <td>{{ requirement.Requirement_Type }}</td>
-                            <td>{{ requirement.brand }}</td>
-                            <td>{{ requirement.Product_Name }}</td>
-                            <td>{{ requirement.service }}</td>
-                            <td>
-                                <a href="{% url 'transactiondetails' company.id requirement.id %}">
-                                    <i class="fa-solid fa-eye" style="color: #212529;"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>                    
-                </table>
-            </div>
         </div>
     </div>
 

@@ -161,6 +161,24 @@ def submit_transaction(request):
         return redirect(reverse('transaction') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
+    
+def transactiondetails(request, company_id, requirement_id):
+    company = get_object_or_404(Company, id=company_id)
+    requirement = get_object_or_404(Requirement, id=requirement_id)
+    transactions = Transaction.objects.filter(Company_Name=company, Requirement_Type=requirement.Requirement_Type)
+
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    contacts = Contact.objects.filter(company=company)
+
+    if start_date and end_date:
+        filtered_transactions = transactions.filter(date__range=[start_date, end_date])
+    else:
+        filtered_transactions = transactions
+
+    context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'contacts': contacts, 'filtered_transactions': filtered_transactions}
+    return render(request, 'transactiondetails.html', context)
 
 def master(request):
     fullname = request.session.get('fullname')
@@ -195,8 +213,11 @@ def submit_contact(request):
             designation = request.POST.get('designation')
             email = request.POST.get('email')
             phone = request.POST.get('number')
-
             company = Company.objects.get(Company_Name=company_name)
+
+            if Contact.objects.filter(company=company, Contact_Name=contact_name).exists():
+                return JsonResponse({'error': 'A contact with this name already exists for the given company.'}, status=400)
+
             contact = Contact(company=company, Contact_Name=contact_name, designation=designation, email=email, Phone_Number=phone)
             contact.save()
 
@@ -204,6 +225,8 @@ def submit_contact(request):
                 'Contact_Name': contact.Contact_Name,
                 'company': company_name
             })
+        except Company.DoesNotExist:
+            return JsonResponse({'error': 'Company does not exist.'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     else:
@@ -387,17 +410,8 @@ def companydetails(request, company_id):
     company = Company.objects.get(pk=company_id)
     requirements = Requirement.objects.filter(company_id=company_id)
     transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
 
-    contacts = Contact.objects.filter(company=company)
-
-    if start_date and end_date:
-        filtered_transactions = transactions.filter(date__range=[start_date, end_date])
-    else:
-        filtered_transactions = transactions
-
-    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'filtered_transactions': filtered_transactions, 'contacts': contacts})
+    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions})
 
 def submit_requirement(request):
     if request.method == 'POST':
@@ -625,7 +639,7 @@ def submit_newpartner(request):
 
     if not fullname:
         return redirect('login')
-    
+
     if request.method == 'POST':
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
@@ -635,23 +649,13 @@ def submit_newpartner(request):
         email = request.POST.get('email')
 
         if partner_name and address and city and country and contact_person and email:
-            partner = Partner(
-                Partner_Name=partner_name, 
-                address=address, 
-                city=city, 
-                country=country, 
-                Contact_Person=contact_person, 
-                email=email
-            )
+            if Partner.objects.filter(Partner_Name=partner_name).exists():
+                return JsonResponse({'error': 'A partner with this name already exists.'}, status=400)
+
+            partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
             partner.save()
-            return JsonResponse({
-                'partner_name': partner_name,
-                'address': address,
-                'city': city,
-                'country': country,
-                'contact_person': contact_person,
-                'email': email
-            })
+
+            return JsonResponse({'partner_name': partner_name, 'address': address, 'city': city, 'country': country, 'contact_person': contact_person, 'email': email})
         else:
             return JsonResponse({'error': 'Missing required fields'}, status=400)
     else:
