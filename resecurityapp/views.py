@@ -334,10 +334,18 @@ def companyform(request, company_id):
     partners = Partner.objects.all()
     statuses = Status.objects.all()
 
+    display_via = ''
+    if company.via and company.via.Via_Name == 'Direct':
+        display_via = 'Direct'
+    elif company.via and company.via.Via_Name == 'Referral' and company.Referral_Name:
+        display_via = company.Referral_Name
+    elif company.via and company.via.Via_Name == 'Partner' and company.Partner_Name:
+        display_via = company.Partner_Name.Partner_Name
+
     countries = ["Nepal", "USA", "India", "Singapore"]
     currencies = ["NPR", "USD", "SGD", "Riyal"]
     return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'vias': vias, 'partners': partners, 'statuses': statuses, 
-                                                'countries': countries, 'currencies': currencies})
+                                                'countries': countries, 'currencies': currencies, 'display_via': display_via})
 
 def submit_company(request):
     fullname = request.session.get('fullname')
@@ -358,23 +366,22 @@ def submit_company(request):
         company.country = request.POST.get('country')
         company.currency = request.POST.get('currency')
         company.price = request.POST.get('price')
-        via_name = request.POST.get('via')
-        company.via = get_object_or_404(Via, Via_Name=via_name)
-        company.status = get_object_or_404(Status, Status_Name=request.POST.get('status'))
+        # via_name = request.POST.get('via')
+        # company.via = get_object_or_404(Via, Via_Name=via_name)
 
-        if via_name == 'Referral':
-            company.Referral_Name = request.POST.get('referral_name')
-            company.Partner_Name = None
-        elif via_name == 'Partner' and request.POST.get('partner'):
-            partner = Partner.objects.filter(Partner_Name=request.POST.get('partner')).first()
-            if partner:
-                company.Partner_Name = partner
-                company.Referral_Name = None
-            else:
-                return HttpResponse("Partner does not exist.")
-        else:
-            company.Partner_Name = None
-            company.Referral_Name = None
+        # if via_name == 'Referral':
+        #     company.Referral_Name = request.POST.get('referral_name')
+        #     company.Partner_Name = None
+        # elif via_name == 'Partner' and request.POST.get('partner'):
+        #     partner = Partner.objects.filter(Partner_Name=request.POST.get('partner')).first()
+        #     if partner:
+        #         company.Partner_Name = partner
+        #         company.Referral_Name = None
+        #     else:
+        #         return HttpResponse("Partner does not exist.")
+        # else:
+        #     company.Partner_Name = None
+        #     company.Referral_Name = None
 
         company.save()
         company.contact_persons.all().delete()

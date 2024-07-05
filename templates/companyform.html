@@ -69,7 +69,6 @@
                     <div class="col-4">
                         <label for="sector" class="form-label fw-semibold">Sector</label>
                         <select class="form-control form-select py-2" name="sector" id="sector" required>
-                            <option value="">Choose a sector</option>
                             {% for sector in sectors %}
                             <option value="{{ sector.Sector_Name }}" {% if sector.Sector_Name == company.sector.Sector_Name %} selected {% endif %}>{{ sector.Sector_Name }}</option>
                             {% endfor %}
@@ -93,7 +92,7 @@
 
                     <div class="col">
                         <label for="state" class="form-label fw-semibold">State</label>
-                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}" required>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}">
                         <div class="invalid-feedback">Please enter a state.</div>
                     </div>
     
@@ -118,16 +117,19 @@
                                     <input type="text" class="form-control py-2" name="contact_name[]" id="contact_name_{{ forloop.counter }}" value="{{ contact.Contact_Name }}" required>
                                     <div class="invalid-feedback">Please enter a contact person.</div>
                                 </div>
+
                                 <div class="col">
                                     <label for="designation_{{ forloop.counter }}" class="form-label fw-semibold">Designation</label>
                                     <input type="text" class="form-control py-2" name="designation[]" id="designation_{{ forloop.counter }}" value="{{ contact.designation }}" required>
                                     <div class="invalid-feedback">Please enter a designation.</div>
                                 </div>
+
                                 <div class="col-4">
                                     <label for="email_{{ forloop.counter }}" class="form-label fw-semibold">Email</label>
                                     <input type="email" class="form-control py-2" name="email[]" id="email_{{ forloop.counter }}" value="{{ contact.email }}" required>
                                     <div class="invalid-feedback">Please enter an email.</div>
                                 </div>
+                                
                                 <div class="col">
                                     <label for="contactnumber_{{ forloop.counter }}" class="form-label fw-semibold">Phone Number</label>
                                     <div class="input-group">
@@ -159,48 +161,22 @@
                         <div class="invalid-feedback">Please select a currency.</div>
                     </div>
                     
-                    <div class="col-2">
+                    <div class="col">
                         <label for="price" class="form-label fw-semibold">Price</label>
                         <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
                         <div class="invalid-feedback">Please enter a price.</div>
                     </div> 
     
-                    <div class="col-2">
+                    <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
-                        <select class="form-control form-select py-2" name="via" id="via" required>
+                        <input type="text" class="form-control py-2" id="via_display" value="{{ display_via }}" readonly>
+                        <!-- <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
                             {% for via in vias %}
-                            <option value="{{ via.Via_Name }}">{{ via.Via_Name }}</option>
+                            <option value="{{ via }}" {% if via == company.via %} selected {% endif %}>{{ via }}</option>
                             {% endfor %}
-                        </select>
+                        </select> -->
                         <div class="invalid-feedback">Please select a via.</div>
-                    </div>
-
-                    <div id="referralNameInput" class="col" style="display: none;">
-                        <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
-                        <input type="text" class="form-control py-2" name="referral_name" id="referral_name" value="{{ company.Referral_Name }}">
-                        <div class="invalid-feedback">Please enter a referral name.</div>
-                    </div>
-                    
-                    <div id="partnerDropdown" class="col" style="display: none;">
-                        <label for="partner" class="form-label fw-semibold">Partner</label>
-                        <select class="form-control form-select py-2" name="partner" id="partner">
-                            <option value="">Choose a partner</option>
-                            {% for partner in partners %}
-                            <option value="{{ partner.Partner_Name }}" {% if partner.Partner_Name == company.partner.Partner_Name %} selected {% endif %}>{{ partner.Partner_Name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a partner.</div>
-                    </div>
-    
-                    <div class="col">
-                        <label for="status" class="form-label fw-semibold">Status</label>
-                        <select class="form-control form-select py-2" name="status" id="status" required>
-                            {% for status in statuses %}
-                            <option value="{{ status.Status_Name }}" {% if status.Status_Name == company.status.Status_Name %} selected {% endif %}>{{ status.Status_Name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a status.</div>
                     </div>
                 </div>
                         
