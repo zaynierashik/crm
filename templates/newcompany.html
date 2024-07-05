@@ -105,7 +105,7 @@
 
                     <div class="col">
                         <label for="state" class="form-label fw-semibold">State</label>
-                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}" required>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}">
                         <div class="invalid-feedback">Please enter a state.</div>
                     </div>
     
@@ -176,13 +176,13 @@
                         <div class="invalid-feedback">Please select a currency.</div>
                     </div> 
 
-                    <div class="col-2">
+                    <div class="col">
                         <label for="price" class="form-label fw-semibold">Price</label>
                         <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
                         <div class="invalid-feedback">Please enter a price.</div>
                     </div> 
     
-                    <div class="col-2">
+                    <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
@@ -193,12 +193,12 @@
                         <div class="invalid-feedback">Please select a via.</div>
                     </div>
 
-                    <div id="referralNameInput" class="col" style="display: none;">
+                    <div id="referralNameInput" class="col-4" style="display: none;">
                         <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
                         <input type="text" class="form-control py-2" name="referral_name" id="referral_name">
                     </div>
                     
-                    <div id="partnerDropdown" class="col" style="display: none;">
+                    <div id="partnerDropdown" class="col-4" style="display: none;">
                         <label for="partner" class="form-label fw-semibold">Partner</label>
                         <div class="input-group">
                             <select class="form-control form-select py-2" name="partner" id="partner">
@@ -212,17 +212,6 @@
                                 <i class="fa-solid fa-plus" style="color: #212529;"></i>
                             </a>
                         </div>
-                    </div>
-    
-                    <div class="col">
-                        <label for="status" class="form-label fw-semibold">Status</label>
-                        <select class="form-control form-select py-2" name="status" id="status" required>
-                            <option value="">Choose a status</option>
-                            {% for status in statuses %}
-                            <option value="{{ status.Status_Name }}">{{ status.Status_Name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a status.</div>
                     </div>
                 </div>
                         
@@ -271,6 +260,7 @@
                     <h5 class="modal-title" id="partnerModalLabel">Add New Partner</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
                     <form id="partnerForm" action="{% url 'submit_newpartner' %}" method="POST" class="needs-validation" novalidate>
                         {% csrf_token %}

@@ -78,7 +78,6 @@
             </form>
         </div>
         
-
         <!-- Service Details Form -->
 
         {% elif formtype == "service" %}
@@ -143,8 +142,14 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="via" class="form-label fw-semibold">Via Name</label>
-                        <input type="text" class="form-control py-2" name="via" id="via" required>
-                        <div class="invalid-feedback">Please enter a via name.</div>
+                        <input type="text" class="form-control py-2 {% if error_message %}is-invalid{% endif %}" name="via" id="via" value="{{ via_name|default:'' }}" required>
+                        <div class="invalid-feedback">
+                            {% if error_message %}
+                                {{ error_message }}
+                            {% else %}
+                                Please enter a via name.
+                            {% endif %}
+                        </div>
                     </div>  
                 </div>
                         
@@ -164,8 +169,14 @@
                 <div class="row g-3 mb-3">
                     <div class="col">
                         <label for="status" class="form-label fw-semibold">Status Name</label>
-                        <input type="text" class="form-control py-2" name="status" id="status" required>
-                        <div class="invalid-feedback">Please enter a status name.</div>
+                        <input type="text" class="form-control py-2 {% if error_message %}is-invalid{% endif %}" name="status" id="status" value="{{ status_name|default:'' }}" required>
+                        <div class="invalid-feedback">
+                            {% if error_message %}
+                                {{ error_message }}
+                            {% else %}
+                                Please enter a status name.
+                            {% endif %}
+                        </div>
                     </div>  
                 </div>
                         

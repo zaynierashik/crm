@@ -1,4 +1,4 @@
-{% load static %}
+    {% load static %}
 
 <!doctype html>
 <html lang="en">
@@ -196,24 +196,37 @@
                     </div>
 
                     <div class="col-12 mb-3">
-                        <div class="col">
-                            <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
-                            <div class="input-group">
-                                <select class="form-control form-select py-2" name="contact-person" id="contact-person" required>
-                                    <option value="">Choose a contact person</option>
-                                    {% for contact in contacts %}
-                                    <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
+                        <div class="row g-3">
+                            <div class="col">
+                                <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
+                                <div class="input-group">
+                                    <select class="form-control form-select py-2" name="contact-person" id="contact-person" required>
+                                        <option value="">Choose a contact person</option>
+                                        {% for contact in contacts %}
+                                        <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                        
+                                    <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
+                                        <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                    </a>
+                                </div>
+                                <div class="invalid-feedback">Please select a contact person.</div>
+                            </div>
+
+                            <div class="col-4">
+                                <label for="status" class="form-label fw-semibold">Status</label>
+                                <select class="form-control form-select py-2" name="status" id="status" required>
+                                    <option value="">Choose a status</option>
+                                    {% for status in statuses %}
+                                    <option value="{{ status.Status_Name }}">{{ status.Status_Name }}</option>
                                     {% endfor %}
                                 </select>
-                    
-                                <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
-                                    <i class="fa-solid fa-plus" style="color: #212529;"></i>
-                                </a>
+                                <div class="invalid-feedback">Please select a status.</div>
                             </div>
-                            <div class="invalid-feedback">Please select a contact person.</div>
                         </div>
-                    </div>                 
-            
+                    </div>
+                    
                     <div class="col">
                         <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
                     </div>

@@ -297,16 +297,13 @@ def submit_newcompany(request):
             referral_name = None
             partner_name = None
 
-        status_name = request.POST.get('status')
-        status = Status.objects.get(Status_Name=status_name)
-
         contact_names = request.POST.getlist('contact_name[]')
         designations = request.POST.getlist('designation[]')
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
         company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, currency=currency, price=price, via=via, 
-                          status=status, Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+                        Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
         company.save()
 
         for i in range(len(contact_names)):
@@ -607,10 +604,23 @@ def submit_via(request):
     if request.method == 'POST':
         via_name = request.POST.get('via')
 
-        via = Via(Via_Name=via_name)
-        via.save()
-
-        return redirect(reverse('master') + '?selection=via')
+        if via_name:
+            if not Via.objects.filter(Via_Name=via_name).exists():
+                via = Via(Via_Name=via_name)
+                via.save()
+                return redirect(reverse('master') + '?selection=via')
+            else:
+                return render(request, 'form.html', {
+                    'error_message': 'Via already exists!',
+                    'via_name': via_name,
+                    'formtype': 'via'
+                })
+        else:
+            return render(request, 'form.html', {
+                'error_message': 'Via name cannot be empty!',
+                'via_name': via_name,
+                'formtype': 'via'
+            })
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -623,10 +633,23 @@ def submit_status(request):
     if request.method == 'POST':
         status_name = request.POST.get('status')
 
-        status = Status(Status_Name=status_name)
-        status.save()
-
-        return redirect(reverse('master') + '?selection=status')
+        if status_name:
+            if not Status.objects.filter(Status_Name=status_name).exists():
+                status = Status(Status_Name=status_name)
+                status.save()
+                return redirect(reverse('master') + '?selection=status')
+            else:
+                return render(request, 'form.html', {
+                    'error_message': 'Status already exists!',
+                    'status_name': status_name,
+                    'formtype': 'status'
+                })
+        else:
+            return render(request, 'form.html', {
+                'error_message': 'Status name cannot be empty!',
+                'status_name': status_name,
+                'formtype': 'status'
+            })
     else:
         return HttpResponse("Form Submission Error!")
     
