@@ -72,8 +72,6 @@ class Company(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100)
-    currency = models.CharField(max_length=100)
-    price = models.CharField(max_length=100)
     via = models.ForeignKey(Via, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
     Referral_Name = models.CharField(max_length=100, null=True, blank=True)
     Partner_Name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
@@ -99,7 +97,7 @@ class Requirement(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='requirements')
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
-    Product_Name = models.CharField(max_length=100, null=True, blank=True, default=None)
+    Product_Name = models.CharField(max_length=100, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
 

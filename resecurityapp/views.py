@@ -343,9 +343,8 @@ def companyform(request, company_id):
         display_via = company.Partner_Name.Partner_Name
 
     countries = ["Nepal", "USA", "India", "Singapore"]
-    currencies = ["NPR", "USD", "SGD", "Riyal"]
     return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'vias': vias, 'partners': partners, 'statuses': statuses, 
-                                                'countries': countries, 'currencies': currencies, 'display_via': display_via})
+                                                'countries': countries, 'display_via': display_via})
 
 def submit_company(request):
     fullname = request.session.get('fullname')
@@ -414,8 +413,9 @@ def companydetails(request, company_id):
     company = Company.objects.get(pk=company_id)
     requirements = Requirement.objects.filter(company_id=company_id)
     transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions})
+    return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'contacts': contacts})
 
 def submit_requirement(request):
     if request.method == 'POST':
@@ -424,6 +424,8 @@ def submit_requirement(request):
         product_name = request.POST.get('product')
         brand_name = request.POST.get('brand')
         service_name = request.POST.get('service')
+        currency = request.POST.get('currency')
+        price = request.POST.get('price')
         requirement_description = request.POST.get('requirement-description')
 
         try:
@@ -431,7 +433,7 @@ def submit_requirement(request):
         except Company.DoesNotExist:
             return HttpResponseBadRequest("Company does not exist.")
 
-        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, Requirement_Description=requirement_description)
+        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, price=price, Requirement_Description=requirement_description)
 
         if requirement_type == 'Product':
             if brand_name:
@@ -442,6 +444,7 @@ def submit_requirement(request):
             if service_name:
                 service, created = Service.objects.get_or_create(Service_Name=service_name)
                 requirement.service = service
+                requirement.Product_Name = None
 
         requirement.save()
 
