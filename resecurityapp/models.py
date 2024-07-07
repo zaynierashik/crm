@@ -99,7 +99,7 @@ class Requirement(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='requirements')
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
-    Product_Name = models.CharField(max_length=100, null=True, blank=True)
+    Product_Name = models.CharField(max_length=100, null=True, blank=True, default=None)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
 

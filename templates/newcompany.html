@@ -165,24 +165,6 @@
                     
                 <div class="row g-3">
                     <div class="col">
-                        <label for="currency" class="form-label fw-semibold">Currency</label>
-                        <select class="form-control form-select py-2" name="currency" id="currency" required>
-                            <option value="">Choose a currency</option>
-                            <option value="NPR">NPR</option>
-                            <option value="USD">USD</option>
-                            <option value="SGD">Singapore Dollar</option>
-                            <option value="INR">INR</option>
-                        </select>
-                        <div class="invalid-feedback">Please select a currency.</div>
-                    </div> 
-
-                    <div class="col">
-                        <label for="price" class="form-label fw-semibold">Price</label>
-                        <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
-                        <div class="invalid-feedback">Please enter a price.</div>
-                    </div> 
-    
-                    <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
@@ -233,6 +215,7 @@
                     <h5 class="modal-title" id="sectorModalLabel">Add New Sector</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
                     <form id="sectorForm" action="{% url 'submit_sector' %}" method="POST" class="needs-validation" novalidate>
                         {% csrf_token %}

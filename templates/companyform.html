@@ -152,22 +152,6 @@
                     
                 <div class="row g-3">
                     <div class="col">
-                        <label for="currency" class="form-label fw-semibold">Currency</label>
-                        <select class="form-control form-select py-2" name="currency" id="currency" required>
-                            {% for currency_option in currencies %}
-                            <option value="{{ currency_option }}" {% if currency_option == company.currency %} selected {% endif %}>{{ currency_option }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">Please select a currency.</div>
-                    </div>
-                    
-                    <div class="col">
-                        <label for="price" class="form-label fw-semibold">Price</label>
-                        <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
-                        <div class="invalid-feedback">Please enter a price.</div>
-                    </div> 
-    
-                    <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <input type="text" class="form-control py-2" id="via_display" value="{{ display_via }}" readonly>
                         <!-- <select class="form-control form-select py-2" name="via" id="via" required>
