@@ -426,14 +426,20 @@ def submit_requirement(request):
         service_name = request.POST.get('service')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
+        status_name = request.POST.get('status')
         requirement_description = request.POST.get('requirement-description')
 
         try:
             company = Company.objects.get(Company_Name=company_name)
         except Company.DoesNotExist:
             return HttpResponseBadRequest("Company does not exist.")
+        
+        try:
+            status = Status.objects.get(Status_Name=status_name)
+        except Status.DoesNotExist:
+            return HttpResponseBadRequest("Status does not exist.")
 
-        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, price=price, Requirement_Description=requirement_description)
+        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, price=price, status=status, Requirement_Description=requirement_description)
 
         if requirement_type == 'Product':
             if brand_name:

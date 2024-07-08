@@ -100,6 +100,9 @@ class Requirement(models.Model):
     Product_Name = models.CharField(max_length=100, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
+    currency = models.CharField(max_length=100, null=True)
+    price = models.CharField(max_length=100, null=True)
+    status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.Requirement_Type
