@@ -1,17 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Role(models.Model):
-    Role_Name = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.Role_Name
-
 class Staff(models.Model):
     Full_Name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=250)
-    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    role = models.CharField(max_length=100, null=False, blank=False)
 
     def __str__(self):
         return self.Full_Name
@@ -27,26 +21,6 @@ class Service(models.Model):
 
     def __str__(self):
         return self.Service_Name
-
-class Status(models.Model):
-    Status_Name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "status"
-        verbose_name_plural = "status"
-    
-    def __str__(self):
-        return self.Status_Name
-
-class Via(models.Model):
-    Via_Name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        verbose_name = "via"
-        verbose_name_plural = "via"
-
-    def __str__(self):
-        return self.Via_Name
     
 class Brand(models.Model):
     Brand_Name = models.CharField(max_length=100, unique=True)
@@ -72,7 +46,7 @@ class Company(models.Model):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100)
-    via = models.ForeignKey(Via, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
+    via = models.CharField(max_length=100, null=False, blank=False)
     Referral_Name = models.CharField(max_length=100, null=True, blank=True)
     Partner_Name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
     Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
@@ -95,6 +69,7 @@ class Contact(models.Model):
 
 class Requirement(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='requirements')
+    Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Product_Name = models.CharField(max_length=100, null=True, blank=True)
@@ -102,21 +77,22 @@ class Requirement(models.Model):
     Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100, null=True)
     price = models.CharField(max_length=100, null=True)
-    status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=100, null=False, blank=False)
 
     def __str__(self):
         return self.Requirement_Type
 
 class Transaction(models.Model):
     date = models.DateField()
-    Company_Name = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transactions')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transactions')
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     Product_Name = models.CharField(max_length=100, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+    Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
     action = models.TextField()
     remark = models.TextField()
     Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
 
     def __str__(self):
-        return f"{self.Company_Name}"
+        return f"{self.company}"

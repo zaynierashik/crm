@@ -1,4 +1,4 @@
-    {% load static %}
+{% load static %}
 
 <!doctype html>
 <html lang="en">
@@ -44,8 +44,6 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                 </ul>
                             </li>
                             
@@ -138,7 +136,7 @@
                             <div class="col">
                                 <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
                                 <div class="input-group">
-                                    <select class="form-control form-select py-2" name="contact-person" id="contact-person" required>
+                                    <select class="form-control form-select py-2" name="contact-name" id="contact-name" required>
                                         <option value="">Choose a contact person</option>
                                         {% for contact in contacts %}
                                         <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
@@ -151,8 +149,6 @@
                                 </div>
                                 <div class="invalid-feedback">Please select a contact person.</div>
                             </div>
-
-                            
                         </div>
                     </div>
 
@@ -240,9 +236,10 @@
                                 <label for="status" class="form-label fw-semibold">Status</label>
                                 <select class="form-control form-select py-2" name="status" id="status" required>
                                     <option value="">Choose a status</option>
-                                    {% for status in statuses %}
-                                    <option value="{{ status.Status_Name }}">{{ status.Status_Name }}</option>
-                                    {% endfor %}
+                                    <option value="Initiated">Initiated</option>
+                                    <option value="Pipeline">Pipeline</option>
+                                    <option value="Closed">Closed</option>
+                                    <option value="Rejected">Rejected</option>
                                 </select>
                                 <div class="invalid-feedback">Please select a status.</div>
                             </div>
@@ -456,70 +453,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Via Details Form -->
-
-        {% elif selection == "via" %}
-        <div id="via-detail-content" class="via-detail-content container">
-            <div class="row">
-                <div class="col">
-                    <h3>Via Master</h3>
-                </div>
-                <div class="col-2">
-                    <a href="{% url 'newform' %}?formtype=via">
-                        <button type="submit" class="btn fw-semibold w-100" name="via-submit" style="background-color: #212529;">
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new via
-                        </button>
-                    </a>
-                </div>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Via Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for via in vias %}
-                    <tr>
-                        <td>{{ via.Via_Name }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Status Details Form -->
-
-        {% elif selection == "status" %}
-        <div id="status-detail-content" class="status-detail-content container">
-            <div class="row">
-                <div class="col">
-                    <h3>Status Master</h3>
-                </div>
-                <div class="col-2">
-                    <a href="{% url 'newform' %}?formtype=status">
-                        <button type="submit" class="btn fw-semibold w-100" name="status-submit" style="background-color: #212529;">
-                            <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new status
-                        </button>
-                    </a>
-                </div>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Status Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status in statuses %}
-                    <tr>
-                        <td>{{ status.Status_Name }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
 
         <!-- Brand Details Form -->

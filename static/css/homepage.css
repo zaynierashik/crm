@@ -48,12 +48,8 @@ html{
     margin-right: 0.25vw;
 }
 
-.content, .transaction-content{
-    margin-top: 5%;
-}
-
 .transaction-content form{
-    width: 55%;
+    width: 75%;
 }
 
 .form-control{
@@ -81,7 +77,7 @@ html{
     border-top: 2px solid rgb(69, 69, 69);
 }
 
-.content, .company-content, .company-detail-content, .sector-content, .sector-detail-content, .service-content, .service-detail-content, 
+.content, .transaction-content, .company-content, .company-detail-content, .sector-content, .sector-detail-content, .service-content, .service-detail-content, 
 .via-content, .via-detail-content, .status-content, .status-detail-content, .brand-content, .brand-detail-content, .partner-content, .partner-detail-content{
     margin-top: 3%;
 }

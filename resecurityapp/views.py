@@ -21,8 +21,7 @@ def signup(request):
     if fullname:
         return redirect(reverse('master') + '?selection=company')
 
-    roles = Role.objects.all()
-    return render(request, 'signup.html', {'roles': roles})
+    return render(request, 'signup.html')
 
 def submit_signup(request):
     if request.method == 'POST':
@@ -30,12 +29,7 @@ def submit_signup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         hashed_password = make_password(password)
-        role_type = request.POST.get('role-type')
-
-        try:
-            role = Role.objects.get(Role_Name=role_type)
-        except Role.DoesNotExist:
-            return render(request, 'signup.html', {'error_message': 'Role does not exist.'})
+        role = request.POST.get('role-type')
 
         name_exists = Staff.objects.filter(Full_Name=fullname).exists()
         email_exists = Staff.objects.filter(email=email).exists()
@@ -84,6 +78,7 @@ def logout(request):
 
 def transaction(request):
     companies = Company.objects.order_by('Company_Name')
+    contacts = Contact.objects.all()
     requirements = Requirement.objects.all()
     services = Service.objects.all()
     brands = Brand.objects.all()
@@ -93,7 +88,7 @@ def transaction(request):
     if not fullname:
         return redirect('login')
         
-    return render(request, 'transaction.html', {'companies': companies, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
+    return render(request, 'transaction.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
 
 def get_companydetails(request):
     company_name = request.GET.get('company')
@@ -126,11 +121,17 @@ def submit_transaction(request):
         requirement_type = request.POST.get('requirement-type')
         action = request.POST.get('action')
         remark = request.POST.get('remark')
+        contact_name = request.POST.get('contact-name')
 
         try:
             company = Company.objects.get(Company_Name=company_name)
         except Company.DoesNotExist:
             return HttpResponseBadRequest("Company does not exist.")
+        
+        try:
+            contact = Contact.objects.get(Contact_Name=contact_name)
+        except Contact.DoesNotExist:
+            return HttpResponseBadRequest("Contact does not exist.")
 
         if requirement_type == 'Product':
             brand_name = request.POST.get('brand')
@@ -155,8 +156,8 @@ def submit_transaction(request):
         else:
             return HttpResponse("Invalid requirement type!")
 
-        transaction = Transaction(Company_Name=company, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
-                                  remark=remark, Created_By=fullname)
+        transaction = Transaction(company=company, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
+                                  remark=remark, Contact_Name=contact, Created_By=fullname)
         transaction.save()
         return redirect(reverse('transaction') + '?success=True')
     else:
@@ -165,7 +166,7 @@ def submit_transaction(request):
 def transactiondetails(request, company_id, requirement_id):
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
-    transactions = Transaction.objects.filter(Company_Name=company, Requirement_Type=requirement.Requirement_Type)
+    transactions = Transaction.objects.filter(company=company, Requirement_Type=requirement.Requirement_Type).order_by('-date')
 
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -191,12 +192,10 @@ def master(request):
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('id', 'Service_Name').distinct()
     brands = Brand.objects.values('Brand_Name').distinct()
-    vias = Via.objects.all()
-    statuses = Status.objects.all()
     partners = Partner.objects.all()
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'vias': vias, 'statuses': statuses, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
+    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
 
 def get_contacts(request):
     company_name = request.GET.get('company', None)
@@ -250,11 +249,9 @@ def newcompany(request):
     sectors = Sector.objects.values('Sector_Name')
     services = Service.objects.values('Service_Name').distinct()
     brands = Brand.objects.values('Brand_Name').distinct()
-    vias = Via.objects.all()
-    statuses = Status.objects.all()
     partners = Partner.objects.values('Partner_Name')
     
-    return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'vias': vias, 'statuses': statuses, 'partners': partners})
+    return render(request, 'newcompany.html', {'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners})
 
 def submit_newcompany(request):
     fullname = request.session.get('fullname')
@@ -281,10 +278,7 @@ def submit_newcompany(request):
         state = request.POST.get('state')
         country = request.POST.get('country')
         
-        currency = request.POST.get('currency')
-        price = request.POST.get('price')
         via_name = request.POST.get('via')
-        via = Via.objects.get(Via_Name=via_name)
         
         if via_name == 'Referral':
             referral_name = request.POST.get('referral_name')
@@ -302,8 +296,8 @@ def submit_newcompany(request):
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
-        company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, currency=currency, price=price, via=via, 
-                        Referral_Name=referral_name, Partner_Name=partner_name, Created_By=fullname)
+        company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, via=via_name, Referral_Name=referral_name, Partner_Name=partner_name, 
+                          Created_By=fullname)
         company.save()
 
         for i in range(len(contact_names)):
@@ -330,21 +324,19 @@ def companyform(request, company_id):
     company = Company.objects.get(pk=company_id)
     contacts = Contact.objects.filter(company=company)
     sectors = Sector.objects.values('Sector_Name')
-    vias = Via.objects.all()
     partners = Partner.objects.all()
-    statuses = Status.objects.all()
 
     display_via = ''
-    if company.via and company.via.Via_Name == 'Direct':
+    if company.via and company.via == 'Direct':
         display_via = 'Direct'
-    elif company.via and company.via.Via_Name == 'Referral' and company.Referral_Name:
+    elif company.via and company.via == 'Referral' and company.Referral_Name:
         display_via = company.Referral_Name
-    elif company.via and company.via.Via_Name == 'Partner' and company.Partner_Name:
+    elif company.via and company.via == 'Partner' and company.Partner_Name:
         display_via = company.Partner_Name.Partner_Name
 
     countries = ["Nepal", "USA", "India", "Singapore"]
-    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'vias': vias, 'partners': partners, 'statuses': statuses, 
-                                                'countries': countries, 'display_via': display_via})
+    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 
+                                                'display_via': display_via})
 
 def submit_company(request):
     fullname = request.session.get('fullname')
@@ -363,24 +355,6 @@ def submit_company(request):
         company.city = request.POST.get('city')
         company.state = request.POST.get('state')
         company.country = request.POST.get('country')
-        company.currency = request.POST.get('currency')
-        company.price = request.POST.get('price')
-        # via_name = request.POST.get('via')
-        # company.via = get_object_or_404(Via, Via_Name=via_name)
-
-        # if via_name == 'Referral':
-        #     company.Referral_Name = request.POST.get('referral_name')
-        #     company.Partner_Name = None
-        # elif via_name == 'Partner' and request.POST.get('partner'):
-        #     partner = Partner.objects.filter(Partner_Name=request.POST.get('partner')).first()
-        #     if partner:
-        #         company.Partner_Name = partner
-        #         company.Referral_Name = None
-        #     else:
-        #         return HttpResponse("Partner does not exist.")
-        # else:
-        #     company.Partner_Name = None
-        #     company.Referral_Name = None
 
         company.save()
         company.contact_persons.all().delete()
@@ -412,7 +386,7 @@ def companydetails(request, company_id):
     
     company = Company.objects.get(pk=company_id)
     requirements = Requirement.objects.filter(company_id=company_id)
-    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    transactions = Transaction.objects.filter(company_id=company_id).order_by('-date')
     contacts = Contact.objects.filter(company=company)
 
     return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'contacts': contacts})
@@ -420,13 +394,14 @@ def companydetails(request, company_id):
 def submit_requirement(request):
     if request.method == 'POST':
         company_name = request.POST.get('company')
+        contact_name = request.POST.get('contact-name')
         requirement_type = request.POST.get('requirement-type')
         product_name = request.POST.get('product')
         brand_name = request.POST.get('brand')
         service_name = request.POST.get('service')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
-        status_name = request.POST.get('status')
+        status = request.POST.get('status')
         requirement_description = request.POST.get('requirement-description')
 
         try:
@@ -435,11 +410,12 @@ def submit_requirement(request):
             return HttpResponseBadRequest("Company does not exist.")
         
         try:
-            status = Status.objects.get(Status_Name=status_name)
-        except Status.DoesNotExist:
-            return HttpResponseBadRequest("Status does not exist.")
+            contact = Contact.objects.get(Contact_Name=contact_name)
+        except Contact.DoesNotExist:
+            return HttpResponseBadRequest("Contact does not exist.")
 
-        requirement = Requirement.objects.create(company=company, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, price=price, status=status, Requirement_Description=requirement_description)
+        requirement = Requirement.objects.create(company=company, Contact_Name=contact, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, 
+                                                 price=price, status=status, Requirement_Description=requirement_description)
 
         if requirement_type == 'Product':
             if brand_name:
@@ -610,64 +586,6 @@ def add_brand(request):
             })
     else:
         return HttpResponse("Form Submission Error!")
-
-def submit_via(request):
-    fullname = request.session.get('fullname')
-
-    if not fullname:
-        return redirect('login')
-    
-    if request.method == 'POST':
-        via_name = request.POST.get('via')
-
-        if via_name:
-            if not Via.objects.filter(Via_Name=via_name).exists():
-                via = Via(Via_Name=via_name)
-                via.save()
-                return redirect(reverse('master') + '?selection=via')
-            else:
-                return render(request, 'form.html', {
-                    'error_message': 'Via already exists!',
-                    'via_name': via_name,
-                    'formtype': 'via'
-                })
-        else:
-            return render(request, 'form.html', {
-                'error_message': 'Via name cannot be empty!',
-                'via_name': via_name,
-                'formtype': 'via'
-            })
-    else:
-        return HttpResponse("Form Submission Error!")
-    
-def submit_status(request):
-    fullname = request.session.get('fullname')
-
-    if not fullname:
-        return redirect('login')
-    
-    if request.method == 'POST':
-        status_name = request.POST.get('status')
-
-        if status_name:
-            if not Status.objects.filter(Status_Name=status_name).exists():
-                status = Status(Status_Name=status_name)
-                status.save()
-                return redirect(reverse('master') + '?selection=status')
-            else:
-                return render(request, 'form.html', {
-                    'error_message': 'Status already exists!',
-                    'status_name': status_name,
-                    'formtype': 'status'
-                })
-        else:
-            return render(request, 'form.html', {
-                'error_message': 'Status name cannot be empty!',
-                'status_name': status_name,
-                'formtype': 'status'
-            })
-    else:
-        return HttpResponse("Form Submission Error!")
     
 def newpartner(request):
     return render(request, 'newpartner.html')
@@ -787,7 +705,7 @@ def export_excel(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    transactions = Transaction.objects.filter(company_id=company_id).order_by('-date')
     
     wb = Workbook()
     ws = wb.active
@@ -829,7 +747,7 @@ def export_pdf(request, company_id):
         return redirect('login')
     
     company = Company.objects.get(pk=company_id)
-    transactions = Transaction.objects.filter(Company_Name_id=company_id).order_by('-date')
+    transactions = Transaction.objects.filter(company_id=company_id).order_by('-date')
     contacts = Contact.objects.filter(company=company)
 
     template_path = 'pdftemplate.html'

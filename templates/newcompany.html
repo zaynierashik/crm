@@ -168,9 +168,9 @@
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <select class="form-control form-select py-2" name="via" id="via" required>
                             <option value="">Choose a via</option>
-                            {% for via in vias %}
-                            <option value="{{ via.Via_Name }}">{{ via.Via_Name }}</option>
-                            {% endfor %}
+                            <option value="Direct">Direct</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Partner">Partner</option>
                         </select>
                         <div class="invalid-feedback">Please select a via.</div>
                     </div>

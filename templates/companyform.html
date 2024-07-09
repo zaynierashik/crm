@@ -154,13 +154,6 @@
                     <div class="col">
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <input type="text" class="form-control py-2" id="via_display" value="{{ display_via }}" readonly>
-                        <!-- <select class="form-control form-select py-2" name="via" id="via" required>
-                            <option value="">Choose a via</option>
-                            {% for via in vias %}
-                            <option value="{{ via }}" {% if via == company.via %} selected {% endif %}>{{ via }}</option>
-                            {% endfor %}
-                        </select> -->
-                        <div class="invalid-feedback">Please select a via.</div>
                     </div>
                 </div>
                         
@@ -185,28 +178,6 @@
                     }
                     form.classList.add("was-validated");
                 }, false);
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            var viaDropdown = document.getElementById("via");
-            var referralNameInput = document.getElementById("referralNameInput");
-            var partnerDropdown = document.getElementById("partnerDropdown");
-
-            viaDropdown.addEventListener("change", function(){
-                var selectedVia = viaDropdown.value;
-                if(selectedVia === "Referral"){
-                    referralNameInput.style.display = "block";
-                    partnerDropdown.style.display = "none";
-                }else if(selectedVia === "Partner"){
-                    referralNameInput.style.display = "none";
-                    partnerDropdown.style.display = "block";
-                }else{
-                    referralNameInput.style.display = "none";
-                    partnerDropdown.style.display = "none";
-                }
             });
         });
     </script>

@@ -43,8 +43,6 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                 </ul>
                             </li>
                             
@@ -81,6 +79,27 @@
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a company.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <div class="col">
+                                <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
+                                <div class="input-group">
+                                    <select class="form-control form-select py-2" name="contact-name" id="contact-name" required>
+                                        <option value="">Choose a contact person</option>
+                                        {% for contact in contacts %}
+                                        <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                        
+                                    <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
+                                        <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                    </a>
+                                    <div class="invalid-feedback">Please select a contact person.</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
         
                     <div class="col">
@@ -131,7 +150,7 @@
                         <div class="invalid-feedback">Please enter a remark.</div>
                     </div>
                 
-                    <div class="d-flex justify-content-evenly column-gap-3 mt-4">
+                    <div class="d-flex justify-content-evenly column-gap-3 mt-4 mb-3">
                         <div class="col">
                             <button type="submit" class="btn fw-semibold w-100 px-4" name="submit">Submit</button>
                         </div>
@@ -295,6 +314,25 @@
             };
             xhr.send();
         }
+    </script>
+
+    <script>
+        document.getElementById('company').addEventListener('change', function() {
+            var selectedCompany = this.value;
+            var contactSelect = document.getElementById('contact-name');
+            var contactOptions = contactSelect.options;
+            
+            for (var i = 0; i < contactOptions.length; i++) {
+                var option = contactOptions[i];
+                if (option.dataset.company === selectedCompany || option.value === "") {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        });
+
+        document.getElementById('company').dispatchEvent(new Event('change'));
     </script>
 
     <script>

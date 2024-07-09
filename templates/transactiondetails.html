@@ -38,8 +38,6 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
@@ -52,52 +50,54 @@
         </div>
 
         <div id="company-detail-content" class="company-detail-content container">
-            <h3>Transactions</h3>
-            <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
-                <div class="row">
-                    <div class="col-3">
-                        <input type="date" class="form-control" name="start_date" placeholder="Start Date">
-                    </div>
-                    <div class="col-3">
-                        <input type="date" class="form-control" name="end_date" placeholder="End Date">
-                    </div>
-                    <div class="col-2">
-                        <button type="submit" class="btn w-100 pb-1">Filter</button>
-                    </div>
+            <div>
+                <h3>Transactions</h3>
+                <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
+                    <div class="row">
+                        <div class="col-3">
+                            <input type="date" class="form-control" name="start_date" placeholder="Start Date">
+                        </div>
+                        <div class="col-3">
+                            <input type="date" class="form-control" name="end_date" placeholder="End Date">
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn w-100 pb-1">Filter</button>
+                        </div>
 
-                    <div class="col text-end d-flex justify-content-end align-items-center">
-                        <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
-                        <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
+                        <div class="col text-end d-flex justify-content-end align-items-center">
+                            <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
+                            <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
 
-            <table class="table mt-3">
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Requirement</th>
-                        <th scope="col">Brand</th>
-                        <th scope="col">Product Name</th>
-                        <th scope="col">Service</th>
-                        <th scope="col">Action</th>
-                        <th scope="col">Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in filtered_transactions %}
-                    <tr>
-                        <td>{{ transaction.date }}</td>
-                        <td>{{ transaction.Requirement_Type }}</td>
-                        <td>{{ transaction.brand }}</td>
-                        <td>{{ transaction.Product_Name }}</td>
-                        <td>{{ transaction.service }}</td>
-                        <td>{{ transaction.action }}</td>
-                        <td>{{ transaction.remark }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <table class="table mt-3">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Requirement</th>
+                            <th scope="col">Brand</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Service</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in filtered_transactions %}
+                        <tr>
+                            <td>{{ transaction.date }}</td>
+                            <td>{{ transaction.Requirement_Type }}</td>
+                            <td>{{ transaction.brand }}</td>
+                            <td>{{ transaction.Product_Name }}</td>
+                            <td>{{ transaction.service }}</td>
+                            <td>{{ transaction.action }}</td>
+                            <td>{{ transaction.remark }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
