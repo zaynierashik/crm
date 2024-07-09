@@ -91,6 +91,12 @@ html{
     overflow-wrap: break-word;
 }
 
+.modal-content{
+    width: 175%;
+    margin-top: 15vh;
+    margin-left: -12.2vw;
+}
+
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button{
     -webkit-appearance: none;
     margin: 0;

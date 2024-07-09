@@ -164,6 +164,62 @@
         </div>
     </div>
 
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contactModalLabel">Add New Contact</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contactForm" action="{% url 'submit_contact' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <label for="company" class="form-label fw-semibold">Company Name</label>
+                                <select class="form-control form-select py-2" name="company" id="company" required>
+                                    <option value="">Choose a company</option>
+                                    {% for company in companies %}
+                                    <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a company.</div>
+                            </div>
+
+                            <div class="col-3">
+                                <label for="designation" class="form-label fw-semibold">Designation</label>
+                                <input type="text" class="form-control py-2" name="designation" required>
+                                <div class="invalid-feedback">Please enter a designation.</div>
+                            </div>
+    
+                            <div class="col-9">
+                                <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
+                                <input type="text" class="form-control py-2" name="contact_name" required>
+                                <div class="invalid-feedback">Please enter a contact person.</div>
+                            </div>
+
+                            <div class="col-3">
+                                <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" class="form-control py-2" name="number" id="contactnumber" required>
+                                <div class="invalid-feedback">Please enter a phone number.</div>
+                            </div>
+    
+                            <div class="col-9">
+                                <label for="email" class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control py-2" name="email" required>
+                                <div class="invalid-feedback">Please enter an email.</div>
+                            </div>
+                        </div>                  
+                    </form>
+                </div>
+    
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitContactBtn">Add Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
