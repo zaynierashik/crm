@@ -391,6 +391,61 @@
         document.getElementById('company').dispatchEvent(new Event('change'));
     </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        function handleFormSubmission(formId, dropdownId, modalId, responseKey){
+            var form = document.getElementById(formId);
+
+            if(form.checkValidity()){
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function(){
+                    if(xhr.readyState == XMLHttpRequest.DONE){
+                        if(xhr.status == 200){
+                            var response = JSON.parse(xhr.responseText);
+                            var dropdown = document.getElementById(dropdownId);
+                            var options = dropdown.options;
+                            var exists = false;
+
+                            for(var i = 0; i < options.length; i++){
+                                if(options[i].value === response[responseKey]){
+                                    exists = true;
+                                    break;
+                                }
+                            }
+
+                            if(!exists){
+                                var option = document.createElement("option");
+                                option.text = response[responseKey];
+                                option.value = response[responseKey];
+                                dropdown.add(option);
+                            }
+                            
+                            $(modalId).modal('hide');
+                        } else if(xhr.status == 400){
+                            var response = JSON.parse(xhr.responseText);
+                            alert(response.error);
+                        } else {
+                            console.error('Error:', xhr.statusText);
+                        }
+                    }
+                };
+
+                xhr.open("POST", form.action);
+                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                xhr.send(formData);
+            }else{
+                form.classList.add("was-validated");
+            }
+        }
+
+        document.getElementById("submitContactBtn").addEventListener("click", function(){
+            handleFormSubmission("contactForm", "contact-person", "#contactModal", "Contact_Name");
+        });
+    });
+</script>
+
     <script>
         if( window.history.replaceState ){
             window.history.replaceState( null, null, window.location.href );
