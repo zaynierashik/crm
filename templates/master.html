@@ -134,7 +134,7 @@
                     <div class="col-12">
                         <div class="row g-3">
                             <div class="col">
-                                <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
+                                <label for="contact-name" class="form-label fw-semibold">Contact Person</label>
                                 <div class="input-group">
                                     <select class="form-control form-select py-2" name="contact-name" id="contact-name" required>
                                         <option value="">Choose a contact person</option>
@@ -146,8 +146,8 @@
                                     <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
                                         <i class="fa-solid fa-plus" style="color: #212529;"></i>
                                     </a>
+                                    <div class="invalid-feedback">Please select a contact person.</div>
                                 </div>
-                                <div class="invalid-feedback">Please select a contact person.</div>
                             </div>
                         </div>
                     </div>
@@ -728,7 +728,7 @@
             });
 
             document.getElementById("submitContactBtn").addEventListener("click", function(){
-                handleFormSubmission("contactForm", "contact-person", "#contactModal", "Contact_Name");
+                handleFormSubmission("contactForm", "contact-name", "#contactModal", "Contact_Name");
             });
         });
     </script>
@@ -736,7 +736,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const companySelect = document.getElementById('company');
-            const contactPersonSelect = document.getElementById('contact-person');
+            const contactPersonSelect = document.getElementById('contact-name');
             
             companySelect.addEventListener('change', function() {
                 const selectedCompany = companySelect.value;
@@ -756,9 +756,28 @@
     </script>
 
     <script>
+        document.getElementById('company').addEventListener('change', function() {
+            var selectedCompany = this.value;
+            var contactSelect = document.getElementById('contact-name');
+            var contactOptions = contactSelect.options;
+            
+            for (var i = 0; i < contactOptions.length; i++) {
+                var option = contactOptions[i];
+                if (option.dataset.company === selectedCompany || option.value === "") {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        });
+
+        document.getElementById('company').dispatchEvent(new Event('change'));
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const companySelect = document.getElementById('company');
-            const contactPersonSelect = document.getElementById('contact-person');
+            const contactPersonSelect = document.getElementById('contact-name');
             
             companySelect.addEventListener('change', function() {
                 const selectedCompany = companySelect.value;

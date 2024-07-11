@@ -84,7 +84,7 @@
                     <div class="col-12">
                         <div class="row g-3">
                             <div class="col">
-                                <label for="contact-person" class="form-label fw-semibold">Contact Person</label>
+                                <label for="contact-name" class="form-label fw-semibold">Contact Person</label>
                                 <div class="input-group">
                                     <select class="form-control form-select py-2" name="contact-name" id="contact-name" required>
                                         <option value="">Choose a contact person</option>
@@ -391,60 +391,89 @@
         document.getElementById('company').dispatchEvent(new Event('change'));
     </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function(){
-        function handleFormSubmission(formId, dropdownId, modalId, responseKey){
-            var form = document.getElementById(formId);
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            function handleFormSubmission(formId, dropdownId, modalId, responseKey){
+                var form = document.getElementById(formId);
 
-            if(form.checkValidity()){
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                
-                xhr.onreadystatechange = function(){
-                    if(xhr.readyState == XMLHttpRequest.DONE){
-                        if(xhr.status == 200){
-                            var response = JSON.parse(xhr.responseText);
-                            var dropdown = document.getElementById(dropdownId);
-                            var options = dropdown.options;
-                            var exists = false;
+                if(form.checkValidity()){
+                    var formData = new FormData(form);
+                    var xhr = new XMLHttpRequest();
+                    
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState == XMLHttpRequest.DONE){
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                var dropdown = document.getElementById(dropdownId);
+                                var options = dropdown.options;
+                                var exists = false;
 
-                            for(var i = 0; i < options.length; i++){
-                                if(options[i].value === response[responseKey]){
-                                    exists = true;
-                                    break;
+                                for(var i = 0; i < options.length; i++){
+                                    if(options[i].value === response[responseKey]){
+                                        exists = true;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if(!exists){
-                                var option = document.createElement("option");
-                                option.text = response[responseKey];
-                                option.value = response[responseKey];
-                                dropdown.add(option);
+                                if(!exists){
+                                    var option = document.createElement("option");
+                                    option.text = response[responseKey];
+                                    option.value = response[responseKey];
+                                    dropdown.add(option);
+                                }
+                                
+                                $(modalId).modal('hide');
+                            } else if(xhr.status == 400){
+                                var response = JSON.parse(xhr.responseText);
+                                alert(response.error);
+                            } else {
+                                console.error('Error:', xhr.statusText);
                             }
-                            
-                            $(modalId).modal('hide');
-                        } else if(xhr.status == 400){
-                            var response = JSON.parse(xhr.responseText);
-                            alert(response.error);
-                        } else {
-                            console.error('Error:', xhr.statusText);
                         }
+                    };
+
+                    xhr.open("POST", form.action);
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    xhr.send(formData);
+                }else{
+                    form.classList.add("was-validated");
+                }
+            }
+
+            document.getElementById("submitContactBtn").addEventListener("click", function(){
+                handleFormSubmission("contactForm", "contact-name", "#contactModal", "Contact_Name");
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const companySelect = document.getElementById('company');
+            const contactPersonSelect = document.getElementById('contact-name');
+            
+            companySelect.addEventListener('change', function() {
+                const selectedCompany = companySelect.value;
+        
+                if (!selectedCompany) {
+                    contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                    return;
+                }
+        
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                        response.contacts.forEach(function(contact) {
+                            contactPersonSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
+                        });
                     }
                 };
-
-                xhr.open("POST", form.action);
-                xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-                xhr.send(formData);
-            }else{
-                form.classList.add("was-validated");
-            }
-        }
-
-        document.getElementById("submitContactBtn").addEventListener("click", function(){
-            handleFormSubmission("contactForm", "contact-person", "#contactModal", "Contact_Name");
+                xhr.send();
+            });
         });
-    });
-</script>
+    </script>
 
     <script>
         if( window.history.replaceState ){

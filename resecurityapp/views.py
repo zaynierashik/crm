@@ -12,8 +12,8 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from openpyxl import Workbook
-from openpyxl.styles import NamedStyle, Font
-from openpyxl.utils import get_column_letter
+from openpyxl.styles import *
+from openpyxl.utils import *
 
 def signup(request):
     fullname = request.session.get('fullname')
@@ -711,7 +711,7 @@ def export_excel(request, company_id):
     ws = wb.active
     ws.append(['Date', 'Requirement Type', 'Brand', 'Product Name', 'Service', 'Action', 'Remark'])
 
-    column_widths = {'A': 15, 'B': 17, 'C': 15, 'D': 15, 'E': 15, 'F': 35, 'G': 35}
+    column_widths = {'A': 15, 'B': 17, 'C': 25, 'D': 25, 'E': 35, 'F': 35, 'G': 35}
     for column, width in column_widths.items():
         ws.column_dimensions[column].width = width
 
@@ -719,7 +719,13 @@ def export_excel(request, company_id):
     for cell in ws['A']:
         cell.style = date_style
 
-    for transaction in transactions:
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    wrap_text_alignment = Alignment(wrap_text=True, vertical='center')
+    
+    for cell in ws[1]:
+        cell.alignment = center_alignment
+
+    for row_num, transaction in enumerate(transactions, start=2):
         brand = transaction.brand.Brand_Name if transaction.brand else ''
         service = transaction.service.Service_Name if transaction.service else ''
         ws.append([
@@ -731,6 +737,12 @@ def export_excel(request, company_id):
             transaction.action,
             transaction.remark
         ])
+
+        for col in ['E', 'F', 'G']:
+            ws[f'{col}{row_num}'].alignment = wrap_text_alignment
+        
+        for col in ['A', 'B', 'C', 'D']:
+            ws[f'{col}{row_num}'].alignment = center_alignment
 
     output = io.BytesIO()
     wb.save(output)
