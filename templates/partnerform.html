@@ -38,8 +38,6 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=via" value="via">Via</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=status" value="status">Status</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item active" id="transactions">
@@ -72,13 +70,19 @@
                         <div class="invalid-feedback">Please enter an address.</div>
                     </div>
 
-                    <div class="col-3">
+                    <div class="col">
                         <label for="city" class="form-label fw-semibold">City</label>
                         <input type="text" class="form-control py-2" name="city" id="city" value="{{ partner.city }}" required>
                         <div class="invalid-feedback">Please enter a city.</div>
                     </div>
+
+                    <div class="col">
+                        <label for="state" class="form-label fw-semibold">State</label>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ partner.state }}">
+                        <div class="invalid-feedback">Please enter a state.</div>
+                    </div>
     
-                    <div class="col-3">
+                    <div class="col">
                         <label for="country" class="form-label fw-semibold">Country</label>
                         <input type="text" class="form-control py-2" name="country" id="country" value="{{ partner.country }}" required>
                         <div class="invalid-feedback">Please enter a country.</div>
@@ -91,11 +95,23 @@
                         <input type="text" class="form-control py-2" name="contact" id="contact" value="{{ partner.Contact_Person }}" required>
                         <div class="invalid-feedback">Please enter a contact person.</div>
                     </div>
+
+                    <div class="col">
+                        <label for="designation" class="form-label fw-semibold">Designation</label>
+                        <input type="text" class="form-control py-2" name="designation" id="designation" value="{{ partner.designation }}" required>
+                        <div class="invalid-feedback">Please enter a designation.</div>
+                    </div>
     
                     <div class="col">
                         <label for="email" class="form-label fw-semibold">Email</label>
                         <input type="email" class="form-control py-2" name="email" id="email" value="{{ partner.email }}" required>
                         <div class="invalid-feedback">Please enter an email.</div>
+                    </div>
+
+                    <div class="col">
+                        <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                        <input type="text" class="form-control py-2" name="number" id="contactnumber" value="{{ partner.Phone_Number }}" required>
+                        <div class="invalid-feedback">Please enter a phone number.</div>
                     </div>
                 </div>
                         

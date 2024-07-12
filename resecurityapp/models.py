@@ -32,9 +32,12 @@ class Partner(models.Model):
     Partner_Name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100, null=True, blank=True)
     country = models.CharField(max_length=100)
     Contact_Person = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100, null=True, blank=False)
     email = models.EmailField(unique=True)
+    Phone_Number = models.CharField(max_length=20, null=True, blank=False)
 
     def __str__(self):
         return self.Partner_Name

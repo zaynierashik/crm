@@ -189,10 +189,10 @@ def master(request):
     
     companies = Company.objects.filter(Created_By=fullname).order_by('Company_Name')
     contacts = Contact.objects.select_related('company').all()
-    sectors = Sector.objects.values('Sector_Name')
-    services = Service.objects.values('id', 'Service_Name').distinct()
-    brands = Brand.objects.values('Brand_Name').distinct()
-    partners = Partner.objects.all()
+    sectors = Sector.objects.values('Sector_Name').order_by('Sector_Name')
+    services = Service.objects.values('id', 'Service_Name').distinct().order_by('Service_Name')
+    brands = Brand.objects.values('Brand_Name').distinct().order_by('Brand_Name')
+    partners = Partner.objects.all().order_by('Partner_Name')
 
     selection = request.GET.get('selection', None)
     return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
@@ -601,18 +601,21 @@ def submit_newpartner(request):
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
         city = request.POST.get('city')
+        state = request.POST.get('state')
         country = request.POST.get('country')
         contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
         email = request.POST.get('email')
+        number = request.POST.get('number')
 
-        if partner_name and address and city and country and contact_person and email:
+        if partner_name and address and city and country and contact_person and designation and email and number:
             if Partner.objects.filter(Partner_Name=partner_name).exists():
                 return JsonResponse({'error': 'A partner with this name already exists.'}, status=400)
 
-            partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
+            partner = Partner(Partner_Name=partner_name, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation, email=email, Phone_Number=number)
             partner.save()
 
-            return JsonResponse({'partner_name': partner_name, 'address': address, 'city': city, 'country': country, 'contact_person': contact_person, 'email': email})
+            return JsonResponse({'partner_name': partner_name, 'address': address, 'city': city, 'state':state, 'country': country, 'contact_person': contact_person, 'designation': designation, 'email': email, 'number': number})
         else:
             return JsonResponse({'error': 'Missing required fields'}, status=400)
     else:
@@ -628,13 +631,16 @@ def add_newpartner(request):
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
         city = request.POST.get('city')
+        state = request.POST.get('state')
         country = request.POST.get('country')
         contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
         email = request.POST.get('email')
+        number = request.POST.get('number')
 
         if partner_name:
             if not Partner.objects.filter(Partner_Name=partner_name).exists():
-                partner = Partner(Partner_Name=partner_name, address=address, city=city, country=country, Contact_Person=contact_person, email=email)
+                partner = Partner(Partner_Name=partner_name, address=address, city=city, state=state, country=country, Contact_Person=contact_person, designation=designation, email=email, Phone_Number=number)
                 partner.save()
                 return redirect(reverse('master') + '?selection=partner')
             else:
@@ -672,16 +678,22 @@ def submit_partner(request):
         partner_name = request.POST.get('partner')
         address = request.POST.get('address')
         city = request.POST.get('city')
+        state = request.POST.get('state')
         country = request.POST.get('country')
         contact_person = request.POST.get('contact')
+        designation = request.POST.get('designation')
         email = request.POST.get('email')
+        number = request.POST.get('number')
 
         partner.Partner_Name = partner_name
         partner.address = address
         partner.city = city
+        partner.state = state
         partner.country = country
         partner.Contact_Person = contact_person
+        partner.designation = designation
         partner.email = email
+        partner.Phone_Number = number
 
         partner.save()
         return redirect(reverse('master') + '?selection=partner')
@@ -764,7 +776,6 @@ def export_pdf(request, company_id):
 
     template_path = 'pdftemplate.html'
     context = {'company': company, 'transactions': transactions, 'contacts': contacts}
-    
     template = get_template(template_path)
     html = template.render(context)
 
