@@ -49,55 +49,83 @@
             </nav>
         </div>
 
-        <div id="company-detail-content" class="company-detail-content container">
-            <div>
-                <h3>Transactions</h3>
-                <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
-                    <div class="row">
-                        <div class="col-3">
-                            <input type="date" class="form-control" name="start_date" placeholder="Start Date">
-                        </div>
-                        <div class="col-3">
-                            <input type="date" class="form-control" name="end_date" placeholder="End Date">
-                        </div>
-                        <div class="col-2">
-                            <button type="submit" class="btn w-100 pb-1">Filter</button>
-                        </div>
-
-                        <div class="col text-end d-flex justify-content-end align-items-center">
-                            <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
-                            <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
-                        </div>
-                    </div>
-                </form>
-
-                <table class="table mt-3">
-                    <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Requirement</th>
-                            <th scope="col">Brand</th>
-                            <th scope="col">Product Name</th>
+        <div id="requirement-detail-content" class="requirement-detail-content container">
+            <h3>Requirement Information</h3>
+            <table class="table table-borderless">
+                <thead>
+                    <tr>
+                        <th scope="col">Requirement Type</th>
+                        {% if requirement.Requirement_Type == 'Service' %}
                             <th scope="col">Service</th>
-                            <th scope="col">Action</th>
-                            <th scope="col">Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in filtered_transactions %}
-                        <tr>
-                            <td>{{ transaction.date }}</td>
-                            <td>{{ transaction.Requirement_Type }}</td>
-                            <td>{{ transaction.brand }}</td>
-                            <td>{{ transaction.Product_Name }}</td>
-                            <td>{{ transaction.service }}</td>
-                            <td>{{ transaction.action }}</td>
-                            <td>{{ transaction.remark }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        {% elif requirement.Requirement_Type == 'Product' %}
+                            <th scope="col">Product</th>
+                            <th scope="col">Brand</th>
+                        {% endif %}
+                        <th scope="col">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ requirement.Requirement_Type }}</td>
+                        {% if requirement.Requirement_Type == 'Service' %}
+                            <td>{{ requirement.service }}</td>
+                        {% elif requirement.Requirement_Type == 'Product' %}
+                            <td>{{ requirement.Product_Name }}</td>
+                            <td>{{ requirement.brand }}</td>
+                        {% endif %}
+                        <td>{{ requirement.currency }} {{ requirement.price }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="hl mt-3"></div>
+
+            <h3 class="mt-5">Transactions</h3>
+            <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
+                <div class="row">
+                    <div class="col-3">
+                        <input type="date" class="form-control" name="start_date" placeholder="Start Date">
+                    </div>
+                    <div class="col-3">
+                        <input type="date" class="form-control" name="end_date" placeholder="End Date">
+                    </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn w-100 pb-1">Filter</button>
+                    </div>
+
+                    <div class="col text-end d-flex justify-content-end align-items-center">
+                        <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
+                        <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Requirement</th>
+                        <th scope="col">Brand</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Service</th>
+                        <th scope="col">Action</th>
+                        <th scope="col">Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in filtered_transactions %}
+                    <tr>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.Requirement_Type }}</td>
+                        <td>{{ transaction.brand }}</td>
+                        <td>{{ transaction.Product_Name }}</td>
+                        <td>{{ transaction.service }}</td>
+                        <td>{{ transaction.action }}</td>
+                        <td>{{ transaction.remark }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
