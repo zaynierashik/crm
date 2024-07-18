@@ -57,6 +57,8 @@ urlpatterns = [
     path('add_newpartner/', views.add_newpartner, name='add_newpartner'),
     path('export_excel/<int:company_id>/', views.export_excel, name='export_excel'),
     path('export_pdf/<int:company_id>/', views.export_pdf, name='export_pdf'),
+
+    path('add_transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
 ]
 
 if settings.DEBUG:
