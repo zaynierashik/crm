@@ -103,16 +103,23 @@
                     </div>
         
                     <div class="col">
-                        <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
-                        <select class="form-control form-select py-2" name="requirement-type" id="requirement-type" required>
+                        <label for="requirement" class="form-label fw-semibold">Requirement</label>
+                        <select class="form-control form-select py-2" name="requirement" id="requirement" required>
                             <option value="">Choose a requirement</option>
-                            <option value="Product">Product</option>
-                            <option value="Service">Service</option>
+                            {% for requirement in requirements %}
+                                <option value="{{ requirement.id }}">
+                                    {% if requirement.Requirement_Type == 'Product' %}
+                                        {{ requirement.brand }} - {{ requirement.Product_Name }}
+                                    {% elif requirement.Requirement_Type == 'Service' %}
+                                        {{ requirement.service }}
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a requirement.</div>
                     </div>
                 
-                    <div id="brandInput" class="col-8" style="display: none;">
+                    <!-- <div id="brandInput" class="col-8" style="display: none;">
                         <div class="row g-3">
                             <div class="col">
                                 <label for="brand" class="form-label fw-semibold">Brand</label>
@@ -136,7 +143,7 @@
                             <option value="">Choose a service</option>
                         </select>
                         <div class="invalid-feedback">Please select a service.</div>
-                    </div>
+                    </div> -->
                 
                     <div>
                         <label for="action" class="form-label fw-semibold">Action</label>

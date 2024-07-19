@@ -64,7 +64,7 @@ class Contact(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='contact_persons')
     Contact_Name = models.CharField(max_length=100)
     designation = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     Phone_Number = models.CharField(max_length=20)
 
     def __str__(self):
@@ -88,13 +88,13 @@ class Requirement(models.Model):
 class Transaction(models.Model):
     date = models.DateField()
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transactions')
-    requirement = models.CharField(max_length=250, null=True, blank=False)
-    # brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
-    # Product_Name = models.CharField(max_length=100, null=True, blank=True)
-    # service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+    Requirement_Type = models.CharField(max_length=100)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+    Product_Name = models.CharField(max_length=100, null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
     Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
     action = models.TextField()
-    remark = models.TextField(null=True, blank=True)
+    remark = models.TextField(blank=True)
     Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
 
     def __str__(self):

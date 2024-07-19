@@ -118,7 +118,7 @@ def submit_transaction(request):
     if request.method == 'POST':
         date = request.POST.get('date')
         company_name = request.POST.get('company')
-        requirement = request.POST.get('requirement')
+        requirement_type = request.POST.get('requirement-type')
         action = request.POST.get('action')
         remark = request.POST.get('remark')
         contact_name = request.POST.get('contact-name')
@@ -133,45 +133,40 @@ def submit_transaction(request):
         except Contact.DoesNotExist:
             return HttpResponseBadRequest("Contact does not exist.")
 
-        # if requirement_type == 'Product':
-        #     brand_name = request.POST.get('brand')
-        #     product_name = request.POST.get('product')
-        #     service = None
+        if requirement_type == 'Product':
+            brand_name = request.POST.get('brand')
+            product_name = request.POST.get('product')
+            service = None
 
-        #     try:
-        #         brand = Brand.objects.get(Brand_Name=brand_name)
-        #     except Brand.DoesNotExist:
-        #         return HttpResponseBadRequest("Brand does not exist.")
+            try:
+                brand = Brand.objects.get(Brand_Name=brand_name)
+            except Brand.DoesNotExist:
+                return HttpResponseBadRequest("Brand does not exist.")
     
-        # elif requirement_type == 'Service':
-        #     service_name = request.POST.get('service')
-        #     brand = None
-        #     product_name = None
+        elif requirement_type == 'Service':
+            service_name = request.POST.get('service')
+            brand = None
+            product_name = None
 
-        #     try:
-        #         service = Service.objects.get(Service_Name=service_name)
-        #     except Service.DoesNotExist:
-        #         return HttpResponseBadRequest("Service does not exist.")
+            try:
+                service = Service.objects.get(Service_Name=service_name)
+            except Service.DoesNotExist:
+                return HttpResponseBadRequest("Service does not exist.")
     
-        # else:
-        #     return HttpResponse("Invalid requirement type!")
+        else:
+            return HttpResponse("Invalid requirement type!")
 
-        transaction = Transaction(company=company, date=date, requirement=requirement, action=action, remark=remark, Contact_Name=contact, Created_By=fullname)
+        transaction = Transaction(company=company, date=date, Requirement_Type=requirement_type, brand=brand, Product_Name=product_name, service=service, action=action, 
+                                  remark=remark, Contact_Name=contact, Created_By=fullname)
         transaction.save()
         return redirect(reverse('transaction') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
     
 def transactiondetails(request, company_id, requirement_id):
-    # companies = Company.objects.order_by('Company_Name')
-    # requirements = Requirement.objects.all()
-    services = Service.objects.all()
-    brands = Brand.objects.all()
-    fullname = request.session.get('fullname')
-
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
-    transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
+    transactions = Transaction.objects.filter(company=company, Requirement_Type=requirement.Requirement_Type).order_by('-date')
 
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -183,7 +178,7 @@ def transactiondetails(request, company_id, requirement_id):
     else:
         filtered_transactions = transactions
 
-    context = {'company': company, 'services': services, 'brands': brands, 'fullname': fullname, 'requirement': requirement, 'transactions': transactions, 'contacts': contacts, 'filtered_transactions': filtered_transactions}
+    context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'contacts': contacts, 'filtered_transactions': filtered_transactions}
     return render(request, 'transactiondetails.html', context)
 
 def master(request):
@@ -198,9 +193,14 @@ def master(request):
     services = Service.objects.values('id', 'Service_Name').distinct().order_by('Service_Name')
     brands = Brand.objects.values('Brand_Name').distinct().order_by('Brand_Name')
     partners = Partner.objects.all().order_by('Partner_Name')
+    cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
+
+    city_filter = request.GET.get('city', None)
+    if city_filter:
+        companies = companies.filter(city=city_filter)
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'selection': selection, 'fullname': fullname})
+    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
 
 def get_contacts(request):
     company_name = request.GET.get('company', None)
@@ -793,40 +793,3 @@ def export_pdf(request, company_id):
         return response
     
     return HttpResponse('Error generating PDF', status=500)
-
-
-
-
-
-
-
-@csrf_exempt
-def add_transaction(request, company_id, requirement_id):
-    if request.method == 'POST':
-        company = get_object_or_404(Company, id=company_id)
-        requirement = get_object_or_404(Requirement, id=requirement_id)
-        contact = get_object_or_404(Contact, id=request.POST.get('contact_id'))
-        
-        transaction = Transaction.objects.create(
-            date=request.POST.get('date'),
-            contact=contact,
-            company=company,
-            Requirement_Type=requirement.Requirement_Type,
-            action=request.POST.get('action'),
-            remark=request.POST.get('remarks')
-        )
-        
-        response_data = {
-            'transaction': {
-                'date': transaction.date,
-                'Requirement_Type': transaction.Requirement_Type,
-                'brand': transaction.brand,
-                'Product_Name': transaction.Product_Name,
-                'service': transaction.service,
-                'action': transaction.action,
-                'remark': transaction.remark
-            }
-        }
-        return JsonResponse(response_data)
-    
-    # return JsonResponse({'success': False})

@@ -49,7 +49,7 @@
             </nav>
         </div>
 
-        <div id="requirement-detail-content" class="requirement-detail-content container">
+        <div id="company-detail-content" class="company-detail-content container">
             <h3>Requirement Information</h3>
             <table class="table table-borderless">
                 <thead>
@@ -79,7 +79,7 @@
             </table>
 
             <div class="hl mt-3"></div>
-
+            
             <h3 class="mt-5">Transactions</h3>
             <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
                 <div class="row">
@@ -104,7 +104,6 @@
                 <thead>
                     <tr>
                         <th scope="col">Date</th>
-                        <th scope="col">Requirement</th>
                         <th scope="col">Action</th>
                         <th scope="col">Remarks</th>
                     </tr>
@@ -113,57 +112,12 @@
                     {% for transaction in filtered_transactions %}
                     <tr>
                         <td>{{ transaction.date }}</td>
-                        <td>{{ transaction.requirement }}</td>
                         <td>{{ transaction.action }}</td>
                         <td>{{ transaction.remark }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addTransactionModalLabel">Add Transaction</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="addTransactionForm" method="post" action="{% url 'add_transaction' company.id requirement.id %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label for="transactionDate" class="form-label">Date</label>
-                                    <input type="date" class="form-control" id="transactionDate" name="date" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="transactionContact" class="form-label">Contact Person</label>
-                                    <select class="form-select" id="transactionContact" name="contact_id" required>
-                                        <option value="">Select a contact person</option>
-                                        {% for contact in contacts %}
-                                        <option value="{{ contact.id }}">{{ contact.Contact_Name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="transactionAction" class="form-label">Action</label>
-                                    <input type="text" class="form-control" id="transactionAction" name="action" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="transactionRemarks" class="form-label">Remarks</label>
-                                    <textarea class="form-control" id="transactionRemarks" name="remarks" rows="3"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Add Transaction</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Add a button to trigger the modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-                Add Transaction
-            </button>
-            
         </div>
     </div>
 
@@ -172,47 +126,6 @@
             window.history.replaceState( null, null, window.location.href );
         }
     </script>
-
-<script>
-    document.getElementById('addTransactionForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
-        
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Add the new transaction to the table
-                const table = document.querySelector('table tbody');
-                const row = table.insertRow(0);
-                row.innerHTML = `
-                    <td>${data.transaction.date}</td>
-                    <td>${data.transaction.Requirement_Type}</td>
-                    <td>${data.transaction.brand}</td>
-                    <td>${data.transaction.Product_Name}</td>
-                    <td>${data.transaction.service}</td>
-                    <td>${data.transaction.action}</td>
-                    <td>${data.transaction.remark}</td>
-                `;
-                // Close the modal
-                document.querySelector('#addTransactionModal .btn-close').click();
-            } else {
-                alert('There was an error adding the transaction. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('There was an error adding the transaction. Please try again.');
-        });
-    });
-</script>
-
 
     <script src="/static/js/script.js"></script>
     <script src="https://kit.fontawesome.com/296ff2fa8f.js" crossorigin="anonymous"></script>
