@@ -32,6 +32,7 @@ urlpatterns = [
     path('transactiondetails/<int:company_id>/<int:requirement_id>/', views.transactiondetails, name='transactiondetails'),
     path('get_companydetails/', views.get_companydetails, name='get_companydetails'),
     path('get_contacts/', views.get_contacts, name='get_contacts'),
+    path('get_requirements/', views.get_requirements, name='get_requirements'),
     path('submit_contact/', views.submit_contact, name='submit_contact'),
     path('master/', views.master, name='master'),
     path('newform/', views.newform, name='newform'),

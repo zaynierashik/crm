@@ -77,9 +77,9 @@
                     </tr>
                 </tbody>
             </table>
-
+    
             <div class="hl mt-3"></div>
-            
+    
             <h3 class="mt-5">Transactions</h3>
             <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
                 <div class="row">
@@ -92,14 +92,14 @@
                     <div class="col-2">
                         <button type="submit" class="btn w-100 pb-1">Filter</button>
                     </div>
-
+    
                     <div class="col text-end d-flex justify-content-end align-items-center">
                         <a href="{% url 'export_pdf' company.id %}" class="me-3"><i class="fa-solid fa-lg fa-file-pdf" style="color: black"></i></a>
                         <a href="{% url 'export_excel' company.id %}"><i class="fa-solid fa-lg fa-file-excel" style="color: black"></i></a>
                     </div>
                 </div>
             </form>
-
+    
             <table class="table mt-3">
                 <thead>
                     <tr>
@@ -109,11 +109,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for transaction in filtered_transactions %}
+                    {% for transaction in transactions %}
                     <tr>
                         <td>{{ transaction.date }}</td>
                         <td>{{ transaction.action }}</td>
                         <td>{{ transaction.remark }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No transactions found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

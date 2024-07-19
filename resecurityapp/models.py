@@ -85,17 +85,27 @@ class Requirement(models.Model):
     def __str__(self):
         return self.Requirement_Type
 
+# class Transaction(models.Model):
+#     date = models.DateField()
+#     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transactions')
+#     Requirement_Type = models.CharField(max_length=100)
+#     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+#     Product_Name = models.CharField(max_length=100, null=True, blank=True)
+#     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+#     Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
+#     action = models.TextField()
+#     remark = models.TextField(blank=True)
+#     Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
+
+#     def __str__(self):
+#         return f"{self.company}"
+    
 class Transaction(models.Model):
-    date = models.DateField()
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transactions')
-    Requirement_Type = models.CharField(max_length=100)
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
-    Product_Name = models.CharField(max_length=100, null=True, blank=True)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
-    Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
+    requirement = models.ForeignKey(Requirement, on_delete=models.SET_NULL, null=True, blank=True, related_name='transactions')
+    date = models.DateField()
     action = models.TextField()
-    remark = models.TextField(blank=True)
-    Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
+    remark = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.company}"
+        return f"Transaction for {self.company} on {self.date}"

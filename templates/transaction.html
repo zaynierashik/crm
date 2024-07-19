@@ -63,13 +63,13 @@
             <div class="transaction-content d-flex justify-content-center">
                 <form id="myForm" action="{% url 'submit_transaction' %}" method="POST" class="row g-3" novalidate>
                     {% csrf_token %}
-        
+            
                     <div class="col-4">
                         <label for="date" class="form-label fw-semibold">Date</label>
                         <input type="date" class="form-control py-2" name="date" id="date" required>
                         <div class="invalid-feedback">Please enter a valid date.</div>
                     </div>
-        
+            
                     <div class="col-8">
                         <label for="company" class="form-label fw-semibold">Company Name</label>
                         <select class="form-control form-select py-2" name="company" id="company" required>
@@ -80,7 +80,7 @@
                         </select>
                         <div class="invalid-feedback">Please select a company.</div>
                     </div>
-
+        
                     <div class="col-12">
                         <div class="row g-3">
                             <div class="col">
@@ -88,11 +88,7 @@
                                 <div class="input-group">
                                     <select class="form-control form-select py-2" name="contact-name" id="contact-name" required>
                                         <option value="">Choose a contact person</option>
-                                        {% for contact in contacts %}
-                                        <option value="{{ contact.Contact_Name }}" data-company="{{ contact.company.Company_Name }}">{{ contact.Contact_Name }}</option>
-                                        {% endfor %}
                                     </select>
-                        
                                     <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#contactModal" style="text-decoration: none;">
                                         <i class="fa-solid fa-plus" style="color: #212529;"></i>
                                     </a>
@@ -101,41 +97,13 @@
                             </div>
                         </div>
                     </div>
-        
+            
                     <div class="col">
-                        <label for="requirement-type" class="form-label fw-semibold">Requirement</label>
-                        <select class="form-control form-select py-2" name="requirement-type" id="requirement-type" required>
+                        <label for="requirement" class="form-label fw-semibold">Requirement</label>
+                        <select class="form-control form-select py-2" name="requirement" id="requirement" required>
                             <option value="">Choose a requirement</option>
-                            <option value="Product">Product</option>
-                            <option value="Service">Service</option>
                         </select>
                         <div class="invalid-feedback">Please select a requirement.</div>
-                    </div>
-                
-                    <div id="brandInput" class="col-8" style="display: none;">
-                        <div class="row g-3">
-                            <div class="col">
-                                <label for="brand" class="form-label fw-semibold">Brand</label>
-                                <select class="form-control form-select py-2" name="brand" id="brand">
-                                    <option value="">Choose a brand</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a brand.</div>
-                            </div>
-        
-                            <div class="col">
-                                <label for="product" class="form-label fw-semibold">Product Name</label>
-                                <select class="form-control form-select py-2" name="product" id="product"></select>
-                                <div class="invalid-feedback">Please select a product.</div>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <div id="serviceInput" class="col-8" style="display: none;">
-                        <label for="service" class="form-label fw-semibold">Service</label>
-                        <select class="form-control form-select py-2" name="service" id="service">
-                            <option value="">Choose a service</option>
-                        </select>
-                        <div class="invalid-feedback">Please select a service.</div>
                     </div>
                 
                     <div>
@@ -143,7 +111,7 @@
                         <textarea class="form-control" name="action" id="action" cols="30" rows="3" required></textarea>
                         <div class="invalid-feedback">Please enter an action.</div>
                     </div>
-        
+            
                     <div>
                         <label for="remark" class="form-label fw-semibold">Remarks</label>
                         <textarea class="form-control" name="remark" id="remark" cols="30" rows="2"></textarea>
@@ -162,6 +130,7 @@
                 </form>
             </div>
         </div>
+        
     </div>
 
     <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
@@ -268,7 +237,7 @@
     </script>
 
     <script>
-        document.getElementById('requirement-type').addEventListener('change', function() {
+        document.getElementById('requirement').addEventListener('change', function() {
             var type = this.value;
             var brandInput = document.getElementById('brandInput');
             var serviceInput = document.getElementById('serviceInput');
@@ -287,92 +256,6 @@
     </script>
 
     <script>
-        document.getElementById('requirement-type').addEventListener('change', function() {
-            updateFields();
-        });
-
-        document.getElementById('company').addEventListener('change', function() {
-            updateFields();
-        });
-
-        document.getElementById('brand').addEventListener('change', function() {
-            updateProducts();
-        });
-
-        function updateFields() {
-            var company = document.getElementById('company').value;
-            var requirementType = document.getElementById('requirement-type').value;
-
-            if (!company || !requirementType) {
-                document.getElementById('brandInput').style.display = 'none';
-                document.getElementById('serviceInput').style.display = 'none';
-                return;
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '{% url "get_companydetails" %}?company=' + company + '&requirement_type=' + requirementType, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (requirementType === 'Product') {
-                        document.getElementById('brandInput').style.display = 'block';
-                        document.getElementById('serviceInput').style.display = 'none';
-
-                        var brandSelect = document.getElementById('brand');
-
-                        var brands = new Set();
-                        response.products.forEach(function(product) {
-                            brands.add(product.brand__Brand_Name);
-                        });
-
-                        brands.forEach(function(brand) {
-                            brandSelect.innerHTML += '<option value="' + brand + '">' + brand + '</option>';
-                        });
-                        
-                    } else if (requirementType === 'Service') {
-                        document.getElementById('brandInput').style.display = 'none';
-                        document.getElementById('serviceInput').style.display = 'block';
-
-                        var serviceSelect = document.getElementById('service');
-                        serviceSelect.innerHTML = '<option value="">Choose a service</option>';
-
-                        response.services.forEach(function(service) {
-                            serviceSelect.innerHTML += '<option value="' + service.service__Service_Name + '">' + service.service__Service_Name + '</option>';
-                        });
-                    }
-                }
-            };
-            xhr.send();
-        }
-
-        function updateProducts() {
-            var company = document.getElementById('company').value;
-            var requirementType = document.getElementById('requirement-type').value;
-            var brand = document.getElementById('brand').value;
-
-            if (!company || !requirementType || !brand) {
-                return;
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '{% url "get_companydetails" %}?company=' + company + '&requirement_type=' + requirementType + '&brand=' + brand, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-
-                    var productSelect = document.getElementById('product');
-                    productSelect.innerHTML = '<option value="">Choose a product</option>';
-
-                    response.products.forEach(function(product) {
-                        productSelect.innerHTML += '<option value="' + product.Product_Name + '">' + product.Product_Name + '</option>';
-                    });
-                }
-            };
-            xhr.send();
-        }
-    </script>
-
-    <script>
         document.getElementById('company').addEventListener('change', function() {
             var selectedCompany = this.value;
             var contactSelect = document.getElementById('contact-name');
@@ -380,6 +263,25 @@
             
             for (var i = 0; i < contactOptions.length; i++) {
                 var option = contactOptions[i];
+                if (option.dataset.company === selectedCompany || option.value === "") {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        });
+
+        document.getElementById('company').dispatchEvent(new Event('change'));
+    </script>
+
+    <script>
+        document.getElementById('company').addEventListener('change', function() {
+            var selectedCompany = this.value;
+            var requirementSelect = document.getElementById('requirement');
+            var requirementOptions = requirementSelect.options;
+            
+            for (var i = 0; i < requirementOptions.length; i++) {
+                var option = requirementOptions[i];
                 if (option.dataset.company === selectedCompany || option.value === "") {
                     option.style.display = "block";
                 } else {
@@ -446,7 +348,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const companySelect = document.getElementById('company');
             const contactPersonSelect = document.getElementById('contact-name');
@@ -474,6 +376,93 @@
             });
         });
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const companySelect = document.getElementById('company');
+        const requirementSelect = document.getElementById('requirement');
+
+        companySelect.addEventListener('change', function() {
+            const selectedCompany = companySelect.value;
+
+            if (!selectedCompany) {
+                requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                return;
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '{% url "get_requirements" %}?company=' + selectedCompany, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                    response.requirements.forEach(function(requirement) {
+                        requirementSelect.innerHTML += '<option value="' + requirement.id + '">' + requirement.description + '</option>';
+                    });
+                }
+            };
+            xhr.send();
+        });
+    });
+</script> -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const companySelect = document.getElementById('company');
+        const requirementSelect = document.getElementById('requirement');
+        const contactSelect = document.getElementById('contact-name');
+
+        companySelect.addEventListener('change', function() {
+            const selectedCompany = companySelect.value;
+
+            if (!selectedCompany) {
+                requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                return;
+            }
+
+            // Load requirements
+            var xhrRequirements = new XMLHttpRequest();
+            xhrRequirements.open('GET', '{% url "get_requirements" %}?company=' + selectedCompany, true);
+            xhrRequirements.onreadystatechange = function() {
+                if (xhrRequirements.readyState == 4 && xhrRequirements.status == 200) {
+                    var response = JSON.parse(xhrRequirements.responseText);
+                    requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                    response.requirements.forEach(function(requirement) {
+    let displayText = '';
+    if (requirement.Requirement_Type === 'Product') {
+        displayText = requirement.brand__Brand_Name + ' - ' + requirement.Product_Name;
+    } else if (requirement.Requirement_Type === 'Service') {
+        displayText = requirement.service__Service_Name || 'No Service Name';
+    }
+
+    // Append the option to the select element
+    requirementSelect.innerHTML += '<option value="' + requirement.id + '">' + displayText + '</option>';
+});
+
+                }
+            };
+            xhrRequirements.send();
+
+            // Load contacts
+            var xhrContacts = new XMLHttpRequest();
+            xhrContacts.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
+            xhrContacts.onreadystatechange = function() {
+                if (xhrContacts.readyState == 4 && xhrContacts.status == 200) {
+                    var response = JSON.parse(xhrContacts.responseText);
+                    contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                    response.contacts.forEach(function(contact) {
+                        contactSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
+                    });
+                }
+            };
+            xhrContacts.send();
+        });
+    });
+</script>
+
+
+
 
     <script>
         if( window.history.replaceState ){
