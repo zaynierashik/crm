@@ -82,7 +82,7 @@
     
             <h3 class="mt-5">Transactions</h3>
             <form method="GET" action="{% url 'transactiondetails' company.id requirement.id %}">
-                <div class="row">
+                <div class="row g-3">
                     <div class="col-3">
                         <input type="date" class="form-control py-2" name="start_date" placeholder="Start Date">
                     </div>
@@ -91,6 +91,11 @@
                     </div>
                     <div class="col-2">
                         <button type="submit" class="btn w-100">Filter</button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn w-100" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                            Add Transaction
+                        </button>
                     </div>
     
                     <div class="col text-end d-flex justify-content-end align-items-center">
@@ -125,10 +130,78 @@
         </div>
     </div>
 
+    <div class="modal fade" id="addTransactionModal" tabindex="-1" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTransactionModalLabel">Add Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="addTransactionForm" method="post" action="{% url 'add_transaction' company.id requirement.id %}" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    <label for="transactionDate" class="form-label">Date</label>
+                                    <input type="date" class="form-control py-2" id="transactionDate" name="date" required>
+                                    <div class="invalid-feedback">Please enter a valid date.</div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="transactionContact" class="form-label">Contact Person</label>
+                                    <select class="form-control form-select py-2" id="transactionContact" name="contact" required>
+                                        <option value="">Choose a contact person</option>
+                                        {% for contact in contacts %}
+                                            <option value="{{ contact.id }}">{{ contact.Contact_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Please select a contact person.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="transactionAction" class="form-label">Action</label>
+                            <textarea class="form-control" name="action" id="transactionAction" cols="30" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please enter an action.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="transactionRemark" class="form-label">Remarks</label>
+                            <textarea class="form-control py-2" id="transactionRemark" name="remark"></textarea>
+                            <div class="invalid-feedback">Please enter a remark.</div>
+                        </div>
+
+                        <button type="submit" class="btn w-100">Add Transaction</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         if( window.history.replaceState ){
             window.history.replaceState( null, null, window.location.href );
         }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var form = document.getElementById("addTransactionForm");
+
+            form.addEventListener("submit", function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add("was-validated");
+            }, false);
+        });
     </script>
 
     <script src="/static/js/script.js"></script>

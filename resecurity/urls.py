@@ -38,6 +38,7 @@ urlpatterns = [
     path('newform/', views.newform, name='newform'),
     path('submit_requirement/', views.submit_requirement, name='submit_requirement'),
     path('submit_transaction/', views.submit_transaction, name='submit_transaction'),
+    path('transactions/<int:company_id>/<int:requirement_id>/add/', views.add_transaction, name='add_transaction'),
     path('submit_company/', views.submit_company, name='submit_company'),
     path('submit_sector/', views.submit_sector, name='submit_sector'),
     path('add_sector/', views.add_sector, name='add_sector'),

@@ -77,6 +77,11 @@ def logout(request):
     return redirect('login')   
 
 def transaction(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     companies = Company.objects.order_by('Company_Name')
     contacts = Contact.objects.all()
     requirements = Requirement.objects.all()
@@ -91,10 +96,14 @@ def transaction(request):
     return render(request, 'transaction.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
 
 def get_companydetails(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company_name = request.GET.get('company')
     requirement_type = request.GET.get('requirement_type')
     brand_name = request.GET.get('brand')
-
     company = get_object_or_404(Company, Company_Name=company_name)
 
     if requirement_type == 'Product':
@@ -146,6 +155,11 @@ def submit_transaction(request):
         return HttpResponse("Form Submission Error!")
 
 def transactiondetails(request, company_id, requirement_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
     transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
@@ -182,17 +196,32 @@ def master(request):
     return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
 
 def get_requirements(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company_name = request.GET.get('company', None)
     requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'service').values('id', 'Requirement_Type', 'Product_Name', 'service__Service_Name', 'brand__Brand_Name')
     return JsonResponse({'requirements': list(requirements)})
 
 def get_contacts(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     company_name = request.GET.get('company', None)
     contacts = Contact.objects.filter(company__Company_Name=company_name).values('Contact_Name')
     return JsonResponse({'contacts': list(contacts)})
 
 @csrf_exempt
 def submit_contact(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         try:
             company_name = request.POST.get('company')
@@ -380,6 +409,11 @@ def companydetails(request, company_id):
     return render(request, 'companydetails.html', {'company': company, 'requirements': requirements, 'transactions': transactions, 'contacts': contacts})
 
 def submit_requirement(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         company_name = request.POST.get('company')
         contact_name = request.POST.get('contact-name')
@@ -515,6 +549,11 @@ def add_service(request):
         return HttpResponse("Form Submission Error!")
     
 def update_service(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     if request.method == 'POST':
         service_id = request.POST.get('serviceId')
         service_name = request.POST.get('serviceName')
@@ -576,6 +615,11 @@ def add_brand(request):
         return HttpResponse("Form Submission Error!")
     
 def newpartner(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
     return render(request, 'newpartner.html')
 
 @csrf_exempt
@@ -776,3 +820,21 @@ def export_pdf(request, company_id):
         return response
     
     return HttpResponse('Error generating PDF', status=500)
+
+def add_transaction(request, company_id, requirement_id):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+
+    if request.method == 'POST':
+        company = get_object_or_404(Company, id=company_id)
+        requirement = get_object_or_404(Requirement, id=requirement_id)
+        date = request.POST['date']
+        contact_id = request.POST['contact']
+        contact = get_object_or_404(Contact, id=contact_id)
+        action = request.POST['action']
+        remark = request.POST.get('remark', '')
+
+        Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
+        return redirect('transactiondetails', company_id=company_id, requirement_id=requirement_id)
