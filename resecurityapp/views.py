@@ -119,6 +119,7 @@ def submit_transaction(request):
         date = request.POST.get('date')
         company_name = request.POST.get('company')
         requirement_id = request.POST.get('requirement')
+        contact_name = request.POST.get('contact-name')
         action = request.POST.get('action')
         remark = request.POST.get('remark')
         contact_name = request.POST.get('contact-name')
@@ -138,62 +139,26 @@ def submit_transaction(request):
         except Requirement.DoesNotExist:
             return HttpResponseBadRequest("Requirement does not exist.")
 
-        transaction = Transaction(
-            company=company, 
-            date=date, 
-            requirement=requirement,
-            action=action, 
-            remark=remark
-        )
+        transaction = Transaction(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark)
         transaction.save()
         return redirect(reverse('transaction') + '?success=True')
     else:
         return HttpResponse("Form Submission Error!")
 
-    
-# def transactiondetails(request, company_id, requirement_id):
-#     company = get_object_or_404(Company, id=company_id)
-#     requirement = get_object_or_404(Requirement, id=requirement_id)
-#     transactions = Transaction.objects.filter(company=company, Requirement_Type=requirement.Requirement_Type).order_by('-date')
-
-#     start_date = request.GET.get('start_date')
-#     end_date = request.GET.get('end_date')
-
-#     contacts = Contact.objects.filter(company=company)
-
-#     if start_date and end_date:
-#         filtered_transactions = transactions.filter(date__range=[start_date, end_date])
-#     else:
-#         filtered_transactions = transactions
-
-#     context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'contacts': contacts, 'filtered_transactions': filtered_transactions}
-#     return render(request, 'transactiondetails.html', context)
-
 def transactiondetails(request, company_id, requirement_id):
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
-
-    # Filter transactions for the specific company and requirement
     transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
 
-    # Filter transactions based on start and end date if provided
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
     if start_date and end_date:
         transactions = transactions.filter(date__range=[start_date, end_date])
 
-    # Retrieve contacts related to the company
     contacts = Contact.objects.filter(company=company)
-
-    context = {
-        'company': company,
-        'requirement': requirement,
-        'transactions': transactions,
-        'contacts': contacts
-    }
+    context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'contacts': contacts}
     return render(request, 'transactiondetails.html', context)
-
 
 def master(request):
     fullname = request.session.get('fullname')
@@ -216,34 +181,15 @@ def master(request):
     selection = request.GET.get('selection', None)
     return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
 
-# def get_contacts(request):
-#     company_name = request.GET.get('company', None)
-#     contacts = Contact.objects.filter(company__Company_Name=company_name).values('Contact_Name')
-
-#     return JsonResponse({'contacts': list(contacts)})
-
-# def get_requirements(request):
-#     company_name = request.GET.get('company', None)
-#     requirements = Requirement.objects.filter(company__Company_Name=company_name).values('Requirement_Type')
-
-#     return JsonResponse({'requirements': list(requirements)})
-
 def get_requirements(request):
     company_name = request.GET.get('company', None)
     requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'service').values('id', 'Requirement_Type', 'Product_Name', 'service__Service_Name', 'brand__Brand_Name')
-
     return JsonResponse({'requirements': list(requirements)})
-
-
-
-
-
 
 def get_contacts(request):
     company_name = request.GET.get('company', None)
     contacts = Contact.objects.filter(company__Company_Name=company_name).values('Contact_Name')
     return JsonResponse({'contacts': list(contacts)})
-
 
 @csrf_exempt
 def submit_contact(request):

@@ -130,7 +130,6 @@
                 </form>
             </div>
         </div>
-        
     </div>
 
     <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
@@ -348,121 +347,55 @@
         });
     </script>
 
-    <!-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const companySelect = document.getElementById('company');
-            const contactPersonSelect = document.getElementById('contact-name');
-            
+            const requirementSelect = document.getElementById('requirement');
+            const contactSelect = document.getElementById('contact-name');
+
             companySelect.addEventListener('change', function() {
                 const selectedCompany = companySelect.value;
-        
                 if (!selectedCompany) {
-                    contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                    requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                    contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
                     return;
                 }
-        
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
-                        response.contacts.forEach(function(contact) {
-                            contactPersonSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
+
+                var xhrRequirements = new XMLHttpRequest();
+                xhrRequirements.open('GET', '{% url "get_requirements" %}?company=' + selectedCompany, true);
+                xhrRequirements.onreadystatechange = function() {
+                    if (xhrRequirements.readyState == 4 && xhrRequirements.status == 200) {
+                        var response = JSON.parse(xhrRequirements.responseText);
+                        requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
+                        response.requirements.forEach(function(requirement) {
+                            let displayText = '';
+                            if (requirement.Requirement_Type === 'Product') {
+                                displayText = requirement.brand__Brand_Name + ' - ' + requirement.Product_Name;
+                            } else if (requirement.Requirement_Type === 'Service') {
+                                displayText = requirement.service__Service_Name || 'No Service Name';
+                            }
+
+                            requirementSelect.innerHTML += '<option value="' + requirement.id + '">' + displayText + '</option>';
                         });
                     }
                 };
-                xhr.send();
+                xhrRequirements.send();
+
+                var xhrContacts = new XMLHttpRequest();
+                xhrContacts.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
+                xhrContacts.onreadystatechange = function() {
+                    if (xhrContacts.readyState == 4 && xhrContacts.status == 200) {
+                        var response = JSON.parse(xhrContacts.responseText);
+                        contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
+                        response.contacts.forEach(function(contact) {
+                            contactSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
+                        });
+                    }
+                };
+                xhrContacts.send();
             });
         });
     </script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const companySelect = document.getElementById('company');
-        const requirementSelect = document.getElementById('requirement');
-
-        companySelect.addEventListener('change', function() {
-            const selectedCompany = companySelect.value;
-
-            if (!selectedCompany) {
-                requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
-                return;
-            }
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '{% url "get_requirements" %}?company=' + selectedCompany, true);
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
-                    response.requirements.forEach(function(requirement) {
-                        requirementSelect.innerHTML += '<option value="' + requirement.id + '">' + requirement.description + '</option>';
-                    });
-                }
-            };
-            xhr.send();
-        });
-    });
-</script> -->
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const companySelect = document.getElementById('company');
-        const requirementSelect = document.getElementById('requirement');
-        const contactSelect = document.getElementById('contact-name');
-
-        companySelect.addEventListener('change', function() {
-            const selectedCompany = companySelect.value;
-
-            if (!selectedCompany) {
-                requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
-                contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
-                return;
-            }
-
-            // Load requirements
-            var xhrRequirements = new XMLHttpRequest();
-            xhrRequirements.open('GET', '{% url "get_requirements" %}?company=' + selectedCompany, true);
-            xhrRequirements.onreadystatechange = function() {
-                if (xhrRequirements.readyState == 4 && xhrRequirements.status == 200) {
-                    var response = JSON.parse(xhrRequirements.responseText);
-                    requirementSelect.innerHTML = '<option value="">Choose a requirement</option>';
-                    response.requirements.forEach(function(requirement) {
-    let displayText = '';
-    if (requirement.Requirement_Type === 'Product') {
-        displayText = requirement.brand__Brand_Name + ' - ' + requirement.Product_Name;
-    } else if (requirement.Requirement_Type === 'Service') {
-        displayText = requirement.service__Service_Name || 'No Service Name';
-    }
-
-    // Append the option to the select element
-    requirementSelect.innerHTML += '<option value="' + requirement.id + '">' + displayText + '</option>';
-});
-
-                }
-            };
-            xhrRequirements.send();
-
-            // Load contacts
-            var xhrContacts = new XMLHttpRequest();
-            xhrContacts.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
-            xhrContacts.onreadystatechange = function() {
-                if (xhrContacts.readyState == 4 && xhrContacts.status == 200) {
-                    var response = JSON.parse(xhrContacts.responseText);
-                    contactSelect.innerHTML = '<option value="">Choose a contact person</option>';
-                    response.contacts.forEach(function(contact) {
-                        contactSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
-                    });
-                }
-            };
-            xhrContacts.send();
-        });
-    });
-</script>
-
-
-
 
     <script>
         if( window.history.replaceState ){
