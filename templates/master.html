@@ -70,7 +70,7 @@
                         <input class="form-control me-2 py-2" type="search" id="company-search" placeholder="Search" aria-label="Search">
                     </div>
 
-                    <div class="col-3">
+                    <div class="col-2">
                         <select id="city-filter" class="form-control form-select py-2">
                             <option value="">Select a city</option>
                             {% for city in cities %}
@@ -78,6 +78,13 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div class="col-2">
+                        <select id="status-filter" class="form-control form-select py-2" name="status">
+                            <option value="active" {% if request.GET.status == 'active' or not request.GET.status %}selected{% endif %}>Status : Active</option>
+                            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Status : Inactive</option>
+                        </select>
+                    </div>                    
                     
                     <div class="col-3">
                         <a href="{% url 'newcompany' %}">
@@ -195,8 +202,22 @@
 
                             <div class="col">
                                 <label for="product" class="form-label fw-semibold">Product Name</label>
-                                <input type="text" class="form-control py-2" name="product" id="product">
-                                <div class="invalid-feedback">Please enter a product name.</div>
+                                <!-- <input type="text" class="form-control py-2" name="product" id="product">
+                                <div class="invalid-feedback">Please enter a product name.</div> -->
+
+                                <div class="input-group">
+                                    <select class="form-control form-select py-2" name="product" id="product">
+                                        <option value="">Choose a product</option>
+                                        {% for product in products %}
+                                        <option value="{{ product.Product_Name }}">{{ product.Product_Name }}</option>
+                                        {% endfor %}
+                                    </select>
+                            
+                                    <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#productModal" style="text-decoration: none;">
+                                        <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                                    </a>
+                                    <div class="invalid-feedback">Please select a product.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -315,6 +336,33 @@
                     
                     <div class="modal-footer">
                         <button type="button" class="btn px-4" id="submitBrandBtn">Add Brand</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel">Add New Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="productForm" action="{% url 'submit_product' %}" method="POST" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="product" class="form-label fw-semibold">Product Name</label>
+                                    <input type="text" class="form-control py-2" name="product" id="product" required>
+                                    <div class="invalid-feedback">Please enter a product name.</div>
+                                </div>  
+                            </div>                    
+                        </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn px-4" id="submitProductBtn">Add Product</button>
                     </div>
                 </div>
             </div>
@@ -573,7 +621,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(){
             var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('success') === 'True') {
+            if (urlParams.get('success') === 'True'){
                 showToast('Data saved successfully.', 'success');
                 window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace('&success=True', '').replace('success=True', ''));
             }
@@ -583,7 +631,7 @@
             var toastElement = document.getElementById('toast');
             var toastBody = toastElement.querySelector('.toast-body');
     
-            if (type === 'success') {
+            if (type === 'success'){
                 toastBody.textContent = message;
             }
     
@@ -633,27 +681,46 @@
     </script>
 
     <script>
-        document.getElementById('city-filter').addEventListener('change', function() {
+        document.getElementById('city-filter').addEventListener('change', function(){
             var selectedCity = this.value;
             var url = new URL(window.location.href);
-            if (selectedCity) {
+            if (selectedCity){
                 url.searchParams.set('city', selectedCity);
-            } else {
+            } else{
                 url.searchParams.delete('city');
             }
             window.location.href = url.toString();
         });
-    </script> 
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            var statusFilter = document.getElementById('status-filter');
+            var url = new URL(window.location.href);
+    
+            if (!url.searchParams.has('status')){
+                statusFilter.value = 'active';
+                url.searchParams.set('status', 'active');
+                window.history.replaceState({}, '', url.toString());
+            }
+    
+            statusFilter.addEventListener('change', function(){
+                var selectedStatus = this.value;
+                url.searchParams.set('status', selectedStatus);
+                window.location.href = url.toString();
+            });
+        });
+    </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function (){
             var editButtons = document.querySelectorAll('.edit-service');
             var editServiceModal = new bootstrap.Modal(document.getElementById('editServiceModal'));
             var serviceNameInput = document.getElementById('serviceName');
             var serviceIdInput = document.getElementById('serviceId');
         
-            editButtons.forEach(function (button) {
-                button.addEventListener('click', function () {
+            editButtons.forEach(function (button){
+                button.addEventListener('click', function (){
                     var serviceId = this.getAttribute('data-id');
                     var serviceName = this.getAttribute('data-name');
         
@@ -667,18 +734,18 @@
     </script>
 
     <script>
-        document.getElementById('requirement-type').addEventListener('change', function() {
+        document.getElementById('requirement-type').addEventListener('change', function(){
             var type = this.value;
             var brandInput = document.getElementById('brandInput');
             var serviceInput = document.getElementById('serviceInput');
             
-            if (type === 'Product') {
+            if (type === 'Product'){
                 brandInput.style.display = 'block';
                 serviceInput.style.display = 'none';
-            } else if (type === 'Service') {
+            } else if (type === 'Service'){
                 brandInput.style.display = 'none';
                 serviceInput.style.display = 'block';
-            } else {
+            } else{
                 brandInput.style.display = 'none';
                 serviceInput.style.display = 'none';
             }
@@ -687,14 +754,14 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
-            (function() {
+            (function(){
                 'use strict';
                 var forms = document.querySelectorAll('.needs-validation');
 
                 Array.prototype.slice.call(forms)
-                    .forEach(function(form) {
-                        form.addEventListener('submit', function(event) {
-                            if (!form.checkValidity()) {
+                    .forEach(function(form){
+                        form.addEventListener('submit', function(event){
+                            if (!form.checkValidity()){
                                 event.preventDefault();
                                 event.stopPropagation();
                             }
@@ -737,7 +804,7 @@
                             } else if(xhr.status == 400){
                                 var response = JSON.parse(xhr.responseText);
                                 alert(response.error);
-                            } else {
+                            } else{
                                 console.error('Error:', xhr.statusText);
                             }
                         }
@@ -759,6 +826,10 @@
                 handleFormSubmission("brandForm", "brand", "#brandModal", "brand_name");
             });
 
+            document.getElementById("submitProductBtn").addEventListener("click", function(){
+                handleFormSubmission("productForm", "product", "#productModal", "product_name");
+            });
+
             document.getElementById("submitContactBtn").addEventListener("click", function(){
                 handleFormSubmission("contactForm", "contact-name", "#contactModal", "Contact_Name");
             });
@@ -766,18 +837,18 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function(){
             const companySelect = document.getElementById('company');
             const contactPersonSelect = document.getElementById('contact-name');
             
-            companySelect.addEventListener('change', function() {
+            companySelect.addEventListener('change', function(){
                 const selectedCompany = companySelect.value;
                 const contactOptions = contactPersonSelect.querySelectorAll('option');
         
                 contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
                 
-                contactOptions.forEach(option => {
-                    if (option.dataset.company === selectedCompany) {
+                contactOptions.forEach(option =>{
+                    if (option.dataset.company === selectedCompany){
                         contactPersonSelect.appendChild(option);
                     }
                 });
@@ -788,16 +859,16 @@
     </script>
 
     <script>
-        document.getElementById('company').addEventListener('change', function() {
+        document.getElementById('company').addEventListener('change', function(){
             var selectedCompany = this.value;
             var contactSelect = document.getElementById('contact-name');
             var contactOptions = contactSelect.options;
             
-            for (var i = 0; i < contactOptions.length; i++) {
+            for (var i = 0; i < contactOptions.length; i++){
                 var option = contactOptions[i];
-                if (option.dataset.company === selectedCompany || option.value === "") {
+                if (option.dataset.company === selectedCompany || option.value === ""){
                     option.style.display = "block";
-                } else {
+                } else{
                     option.style.display = "none";
                 }
             }
@@ -807,25 +878,24 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function(){
             const companySelect = document.getElementById('company');
             const contactPersonSelect = document.getElementById('contact-name');
             
-            companySelect.addEventListener('change', function() {
+            companySelect.addEventListener('change', function(){
                 const selectedCompany = companySelect.value;
-        
-                if (!selectedCompany) {
+                if (!selectedCompany){
                     contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
                     return;
                 }
         
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', '{% url "get_contacts" %}?company=' + selectedCompany, true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
+                xhr.onreadystatechange = function(){
+                    if (xhr.readyState == 4 && xhr.status == 200){
                         var response = JSON.parse(xhr.responseText);
                         contactPersonSelect.innerHTML = '<option value="">Choose a contact person</option>';
-                        response.contacts.forEach(function(contact) {
+                        response.contacts.forEach(function(contact){
                             contactPersonSelect.innerHTML += '<option value="' + contact.Contact_Name + '">' + contact.Contact_Name + '</option>';
                         });
                     }

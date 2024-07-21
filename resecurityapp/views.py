@@ -82,18 +82,19 @@ def transaction(request):
     if not fullname:
         return redirect('login')
     
-    companies = Company.objects.order_by('Company_Name')
+    companies = Company.objects.filter(status='active').order_by('Company_Name')
     contacts = Contact.objects.all()
     requirements = Requirement.objects.all()
     services = Service.objects.all()
     brands = Brand.objects.all()
+    products = Product.objects.all()
     success = request.GET.get('success')
     fullname = request.session.get('fullname')
 
     if not fullname:
         return redirect('login')
         
-    return render(request, 'transaction.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'success': success, 'fullname': fullname})
+    return render(request, 'transaction.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'success': success, 'fullname': fullname})
 
 def get_companydetails(request):
     fullname = request.session.get('fullname')
@@ -185,15 +186,21 @@ def master(request):
     sectors = Sector.objects.values('Sector_Name').order_by('Sector_Name')
     services = Service.objects.values('id', 'Service_Name').distinct().order_by('Service_Name')
     brands = Brand.objects.values('Brand_Name').distinct().order_by('Brand_Name')
+    products = Product.objects.values('Product_Name').distinct().order_by('Product_Name')
     partners = Partner.objects.all().order_by('Partner_Name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
 
     city_filter = request.GET.get('city', None)
+    status_filter = request.GET.get('status', 'active')
+
     if city_filter:
         companies = companies.filter(city=city_filter)
 
+    if status_filter:
+        companies = companies.filter(status=status_filter)
+
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
+    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
 
 def get_requirements(request):
     fullname = request.session.get('fullname')
@@ -202,8 +209,13 @@ def get_requirements(request):
         return redirect('login')
     
     company_name = request.GET.get('company', None)
-    requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'service').values('id', 'Requirement_Type', 'Product_Name', 'service__Service_Name', 'brand__Brand_Name')
+    requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'Product_Name', 'service').values('id', 'Requirement_Type', 'Product_Name__Product_Name', 'service__Service_Name', 'brand__Brand_Name')
+
+    # Debugging output
+    print("Requirements fetched: ", requirements)
+
     return JsonResponse({'requirements': list(requirements)})
+
 
 def get_contacts(request):
     fullname = request.session.get('fullname')
@@ -296,6 +308,7 @@ def submit_newcompany(request):
         country = request.POST.get('country')
         
         via_name = request.POST.get('via')
+        website = request.POST.get('website')
         
         if via_name == 'Referral':
             referral_name = request.POST.get('referral_name')
@@ -313,8 +326,7 @@ def submit_newcompany(request):
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
 
-        company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, via=via_name, Referral_Name=referral_name, Partner_Name=partner_name, 
-                          Created_By=fullname)
+        company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, via=via_name, Referral_Name=referral_name, Partner_Name=partner_name, website=website, Created_By=fullname)
         company.save()
 
         for i in range(len(contact_names)):
@@ -372,6 +384,8 @@ def submit_company(request):
         company.city = request.POST.get('city')
         company.state = request.POST.get('state')
         company.country = request.POST.get('country')
+        company.website = request.POST.get('website')
+        company.status = request.POST.get('status')
 
         company.save()
         company.contact_persons.all().delete()
@@ -436,19 +450,33 @@ def submit_requirement(request):
         except Contact.DoesNotExist:
             return HttpResponseBadRequest("Contact does not exist.")
 
-        requirement = Requirement.objects.create(company=company, Contact_Name=contact, Requirement_Type=requirement_type, Product_Name=product_name, currency=currency, 
+        requirement = Requirement.objects.create(company=company, Contact_Name=contact, Requirement_Type=requirement_type, currency=currency, 
                                                  price=price, status=status, Requirement_Description=requirement_description)
 
         if requirement_type == 'Product':
+            try:
+                product = Product.objects.get(Product_Name=product_name)
+            except Product.DoesNotExist:
+                return HttpResponseBadRequest("Product does not exist.")
+            
+            requirement.Product_Name = product
             if brand_name:
                 brand, created = Brand.objects.get_or_create(Brand_Name=brand_name)
                 requirement.brand = brand
 
+        # elif requirement_type == 'Service':
+        #     if service_name:
+        #         service, created = Service.objects.get_or_create(Service_Name=service_name)
+        #         requirement.service = service
+        #         requirement.Product_Name = None
+
         elif requirement_type == 'Service':
-            if service_name:
-                service, created = Service.objects.get_or_create(Service_Name=service_name)
-                requirement.service = service
-                requirement.Product_Name = None
+            try:
+                service = Service.objects.get(Service_Name=service_name)
+            except Service.DoesNotExist:
+                return HttpResponseBadRequest("Service does not exist.")
+            
+            requirement.service = service
 
         requirement.save()
 
@@ -611,6 +639,23 @@ def add_brand(request):
                 'brand_name': brand_name,
                 'formtype': 'brand'
             })
+    else:
+        return HttpResponse("Form Submission Error!")
+    
+@csrf_exempt
+def submit_product(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        product_name = request.POST.get('product')
+        
+        if product_name:
+            product = Product(Product_Name=product_name)
+            product.save()
+            return JsonResponse({'product_name': product_name})
     else:
         return HttpResponse("Form Submission Error!")
     

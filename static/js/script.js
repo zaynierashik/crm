@@ -24,12 +24,28 @@ document.addEventListener("DOMContentLoaded", function(){
     var baseUrl = "/master/";
     var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
 
-    dropdownLinks.forEach(function(link) {
-        link.addEventListener("click", function(event) {
+    dropdownLinks.forEach(function(link){
+        link.addEventListener("click", function(event){
             event.preventDefault();
             var selectedValue = link.getAttribute("value");
             var url = baseUrl + "?selection=" + selectedValue;
             window.location.href = url;
         });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function(){
+    var masterNavItem = document.getElementById('master');
+    var dropdownMenu = masterNavItem.querySelector('.dropdown-menu');
+            
+    masterNavItem.querySelector('.nav-link').addEventListener('click', function(event){
+        event.preventDefault();
+        dropdownMenu.style.display = dropdownMenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', function(event){
+        if (!masterNavItem.contains(event.target)){
+            dropdownMenu.style.display = 'none';
+        }
     });
 });

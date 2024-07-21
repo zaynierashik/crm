@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Staff, Company, Requirement, Sector, Service, Brand, Partner, Contact, Transaction
+from .models import Staff, Company, Requirement, Sector, Service, Brand, Product, Partner, Contact, Transaction
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = ('id', 'Company_Name')
@@ -26,5 +26,6 @@ admin.site.register(Contact, ContactAdmin)
 admin.site.register(Sector)
 admin.site.register(Service)
 admin.site.register(Brand)
+admin.site.register(Product)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Transaction, TransactionAdmin)

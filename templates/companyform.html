@@ -153,6 +153,20 @@
                         <label for="via" class="form-label fw-semibold">Via</label>
                         <input type="text" class="form-control py-2" id="via_display" value="{{ display_via }}" readonly>
                     </div>
+
+                    <div class="col-4">
+                        <label for="website" class="form-label fw-semibold">Website</label>
+                        <input type="text" class="form-control py-2" id="website" name="website" value="{{ company.website }}" required>
+                    </div>
+
+                    <div class="col-4">
+                        <label for="status" class="form-label fw-semibold">Status</label>
+                        <select class="form-control form-select py-2" name="status" id="status" required>
+                            <option value="active" {% if company.status == "active" %} selected {% endif %}>Active</option>
+                            <option value="inactive" {% if company.status == "inactive" %} selected {% endif %}>Inactive</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a status.</div>
+                    </div>
                 </div>
                         
                 <div class="d-flex mt-4 mb-4">
@@ -177,30 +191,6 @@
                     form.classList.add("was-validated");
                 }, false);
             });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function(){
-            const requirementType = document.getElementById('requirement-type');
-            const serviceInput = document.getElementById('serviceInput');
-            const brandInput = document.getElementById('brandInput');
-
-            function toggleRequirementFields(){
-                const selectedRequirement = requirementType.value;
-                if(selectedRequirement === 'Service'){
-                    serviceInput.style.display = 'block';
-                    brandInput.style.display = 'none';
-                }else if(selectedRequirement === 'Product'){
-                    brandInput.style.display = 'block';
-                    serviceInput.style.display = 'none';
-                }else{
-                    brandInput.style.display = 'none';
-                    serviceInput.style.display = 'none';
-                }
-            }
-            requirementType.addEventListener('change', toggleRequirementFields);
-            toggleRequirementFields();
         });
     </script>
 

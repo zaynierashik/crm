@@ -27,6 +27,12 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.Brand_Name
+    
+class Product(models.Model):
+    Product_Name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.Product_Name
 
 class Partner(models.Model):
     Partner_Name = models.CharField(max_length=100)
@@ -52,7 +58,11 @@ class Company(models.Model):
     via = models.CharField(max_length=100, null=False, blank=False)
     Referral_Name = models.CharField(max_length=100, null=True, blank=True)
     Partner_Name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='companies')
+    website = models.CharField(max_length=255, null=True, blank=True)
     Created_By = models.CharField(max_length=100, null=True, blank=True, default='Staff')
+
+    STATUS_CHOICES = (('active', 'Active'), ('inactive', 'Inactive'))
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
 
     def __str__(self):
         return self.Company_Name
@@ -75,7 +85,8 @@ class Requirement(models.Model):
     Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
-    Product_Name = models.CharField(max_length=100, null=True, blank=True)
+    Product_Name = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
+    # Product_Name = models.CharField(max_length=100, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100, null=True)

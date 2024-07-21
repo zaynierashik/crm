@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 18, 2024 at 02:50 PM
+-- Generation Time: Jul 21, 2024 at 12:56 AM
 -- Server version: 8.0.37-cll-lve
 -- PHP Version: 8.3.8
 
@@ -348,8 +348,8 @@ CREATE TABLE `django_session` (
 INSERT INTO `django_session` (`session_key`, `session_data`, `expire_date`) VALUES
 ('6arfh03oq8a4f9vyai3i81y9f6gjtwo7', 'eyJmdWxsbmFtZSI6IkFkbWluIn0:1sSxPz:-_AP4b8Wc1kPyF2sIjHD57gmzmzKTPKNgrMYUdr9ygY', '2024-07-15 11:29:27.306255'),
 ('o8223nfiy3x9961sj4civ8rfod6umlcr', '.eJxVjDsOwjAQBe_iGln-JetQ0ucM1nq9xgHkSHFSIe5OIqWA9s3Me4uA21rC1ngJUxJXocXld4tIT64HSA-s91nSXNdlivJQ5EmbHOfEr9vp_h0UbGWvY_ad1UmZaCxlsIA94NApcINKWXuGTI6sitp4xxjJZ7fbiB4y696Kzxfeuzf6:1sTBn9:0QBDZ7vZV-rOXZO4xpr8d4odrmAXDcp5P3_V0tHFX_Q', '2024-07-16 02:50:19.193196'),
-('o8y5k4ohxu5s038sb56kplkusaqhwbp4', 'eyJmdWxsbmFtZSI6IkFkbWluIn0:1sUN46:wDkS4azu-HRcfPV-zYqHX16GK0N3XGl-KkO4v12LhEE', '2024-07-19 09:04:42.361356'),
-('p8cz3xaq8sexxc1y9xsyws2l7mio8qyn', '.eJxVjDsOwjAQBe_iGln-JetQ0ucM1nq9xgHkSHFSIe5OIqWA9s3Me4uA21rC1ngJUxJXocXld4tIT64HSA-s91nSXNdlivJQ5EmbHOfEr9vp_h0UbGWvY_ad1UmZaCxlsIA94NApcINKWXuGTI6sitp4xxjJZ7fbiB4y696Kzxfeuzf6:1sUN47:MFZre8_8u4tPVxJg4aDbmonBi-Ot9-9yPL12vnlQV_c', '2024-07-19 09:04:43.821454'),
+('o8y5k4ohxu5s038sb56kplkusaqhwbp4', 'eyJmdWxsbmFtZSI6IkFkbWluIn0:1sUjWJ:_WVaFZjQan9crqlRLzYkH3Widf8K7uGlt8KXmbFS2R4', '2024-07-20 09:03:19.145147'),
+('p8cz3xaq8sexxc1y9xsyws2l7mio8qyn', '.eJxVjDsOwjAQBe_iGln-JetQ0ucM1nq9xgHkSHFSIe5OIqWA9s3Me4uA21rC1ngJUxJXocXld4tIT64HSA-s91nSXNdlivJQ5EmbHOfEr9vp_h0UbGWvY_ad1UmZaCxlsIA94NApcINKWXuGTI6sitp4xxjJZ7fbiB4y696Kzxfeuzf6:1sUjWL:G42cXqK_8xiXPJaHukZG8-22V4hv-JtfZtSEDzmPN9I', '2024-07-20 09:03:21.012255'),
 ('vwfh0jvjwa6o1gp3jgvn9yziegq182q0', 'eyJmdWxsbmFtZSI6IkFkbWluIn0:1sSE4K:dTmElS7dVYMYNawWgFvBHM7F60FRsG_5V2Qiw6DmwGk', '2024-07-13 11:04:04.272420'),
 ('zjwhlgmw4b2cjtqfl5i0g11bsr0o8vvv', 'eyJmdWxsbmFtZSI6IkFkbWluIn0:1sTIAF:4QfcV1JHQ8idlmdXdpN5nMIUdZVpas9tY5nWz3wBH-I', '2024-07-16 09:38:35.010028');
 

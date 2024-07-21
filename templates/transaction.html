@@ -75,11 +75,11 @@
                         <select class="form-control form-select py-2" name="company" id="company" required>
                             <option value="">Choose a company</option>
                             {% for company in companies %}
-                            <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
+                                <option value="{{ company.Company_Name }}">{{ company.Company_Name }}</option>
                             {% endfor %}
                         </select>
                         <div class="invalid-feedback">Please select a company.</div>
-                    </div>
+                    </div>                    
         
                     <div class="col-12">
                         <div class="row g-3">
@@ -139,6 +139,7 @@
                     <h5 class="modal-title" id="contactModalLabel">Add New Contact</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
                     <form id="contactForm" action="{% url 'submit_contact' %}" method="POST" class="needs-validation" novalidate>
                         {% csrf_token %}
@@ -232,25 +233,6 @@
                 }
                 form.classList.add("was-validated");
             }, false);
-        });
-    </script>
-
-    <script>
-        document.getElementById('requirement').addEventListener('change', function() {
-            var type = this.value;
-            var brandInput = document.getElementById('brandInput');
-            var serviceInput = document.getElementById('serviceInput');
-            
-            if (type === 'Product') {
-                brandInput.style.display = 'block';
-                serviceInput.style.display = 'none';
-            } else if (type === 'Service') {
-                brandInput.style.display = 'none';
-                serviceInput.style.display = 'block';
-            } else {
-                brandInput.style.display = 'none';
-                serviceInput.style.display = 'none';
-            }
         });
     </script>
 
@@ -370,7 +352,7 @@
                         response.requirements.forEach(function(requirement) {
                             let displayText = '';
                             if (requirement.Requirement_Type === 'Product') {
-                                displayText = requirement.brand__Brand_Name + ' - ' + requirement.Product_Name;
+                                displayText = requirement.brand__Brand_Name + ' - ' + requirement.Product_Name__Product_Name;
                             } else if (requirement.Requirement_Type === 'Service') {
                                 displayText = requirement.service__Service_Name || 'No Service Name';
                             }

@@ -21,18 +21,8 @@ html{
 }
 
 .dropdown-menu{
-    display: none;
-    position: absolute;
-    z-index: 1000;
-}
-
-.nav-item:hover .dropdown-menu{
-    display: flex;
-    flex-direction: row;
-    list-style: none;
     margin: 0;
     padding: 0;
-    position: absolute;
     left: 7vw;
 }
 
@@ -86,7 +76,7 @@ html{
     color: #212529;
 }
 
-.company-detail-content td:nth-child(6), .company-detail-content td:nth-child(7) {
+.company-detail-content td:nth-child(6), .company-detail-content td:nth-child(7){
     max-width: 200px;
     overflow-wrap: break-word;
 }
