@@ -1,3 +1,19 @@
+// Signup
+
+document.addEventListener("DOMContentLoaded", function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        var success = urlParams.get('success');
+        var message = urlParams.get('message');
+        if (success === 'True') {
+            showToast('Account created successfully.', 'success');
+        } else if (success === 'False') {
+            showToast(message ? decodeURIComponent(message) : 'Signup failed.', 'error');
+        }
+        window.history.replaceState({}, document.title, "{{ request.path }}");
+    }
+});
+
 // Show Password
 
 function showPassword(){
@@ -47,5 +63,21 @@ document.addEventListener("DOMContentLoaded", function(){
         if (!masterNavItem.contains(event.target)){
             dropdownMenu.style.display = 'none';
         }
+    });
+});
+
+// Form Validation
+
+document.addEventListener("DOMContentLoaded", function(){
+    var forms = document.querySelectorAll("form.needs-validation");
+
+    forms.forEach(function(form){
+        form.addEventListener("submit", function(event){
+            if(!form.checkValidity()){
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add("was-validated");
+        }, false);
     });
 });

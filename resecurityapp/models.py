@@ -86,7 +86,6 @@ class Requirement(models.Model):
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Product_Name = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
-    # Product_Name = models.CharField(max_length=100, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100, null=True)

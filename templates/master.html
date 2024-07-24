@@ -47,9 +47,15 @@
                                 </ul>
                             </li>
                             
-                            <li class="nav-item active" id="transactions">
+                            <li class="nav-item active pe-2" id="transactions">
                                 <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
                             </li>
+
+                            {% if request.session.staffrole == 'Admin' %}
+                                <li class="nav-item active" id="staffs">
+                                    <a class="nav-link fw-semibold" href="{% url 'master' %}?selection=staff">Staffs</a>
+                                </li>
+                            {% endif %}
                             
                             <li class="nav-item ms-auto" id="logout">
                                 <a class="nav-link fw-semibold" href="{% url 'logout' %}">Logout</a>
@@ -202,9 +208,6 @@
 
                             <div class="col">
                                 <label for="product" class="form-label fw-semibold">Product Name</label>
-                                <!-- <input type="text" class="form-control py-2" name="product" id="product">
-                                <div class="invalid-feedback">Please enter a product name.</div> -->
-
                                 <div class="input-group">
                                     <select class="form-control form-select py-2" name="product" id="product">
                                         <option value="">Choose a product</option>
@@ -294,6 +297,7 @@
                         <h5 class="modal-title" id="serviceModalLabel">Add New Service</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
                     <div class="modal-body">
                         <form id="serviceForm" action="{% url 'submit_service' %}" method="POST" class="needs-validation" novalidate>
                             {% csrf_token %}
@@ -323,6 +327,7 @@
                     </div>
                     <div class="modal-body">
                         <form id="brandForm" action="{% url 'submit_brand' %}" method="POST" class="needs-validation" novalidate>
+                            
                             {% csrf_token %}
                             <div class="row g-3 mb-3">
                                 <div class="col">
@@ -605,6 +610,95 @@
                 </table>
             </div>
         </div>
+
+        <!-- Staff Details Form -->
+
+        {% elif selection == "staff" %}        
+        <div id="staff-detail-content" class="staff-detail-content container">
+            <div class="row">
+                <div class="col">
+                    <h3>Authorized Access</h3>
+                </div>
+                <div class="col-3">
+                    <button type="button" class="btn fw-semibold w-100" name="staff-submit" style="background-color: #212529;" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+                        <i class="fa-solid fa-plus fa-xs" style="color: #ffffff;"></i> Add new staff
+                    </button>
+                </div>
+            </div>
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for staff in staffs %}
+                    <tr>
+                        <td>{{ staff.Full_Name }}</td>
+                        <td>{{ staff.email }}</td>
+                        <td>{{ staff.role }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="modal fade" id="addStaffModal" tabindex="-1" aria-labelledby="addStaffModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addStaffModalLabel">Add New Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <form id="signupForm" action="{% url 'submit_signup' %}" method="POST" class="row g-3 needs-validation" novalidate>
+                                {% csrf_token %}
+                                <div class="col">
+                                    <label for="fullname" class="form-label fw-semibold">Name</label>
+                                    <input type="text" class="form-control py-2" name="fullname" id="fullname" required>
+                                    <div class="invalid-feedback">Please enter a name.</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="role-type" class="form-label fw-semibold">Role</label>
+                                    <select class="form-control form-select py-2" name="role-type" id="role-type" required>
+                                        <option value="">Choose a role</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Staff">Staff</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a role.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="email" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email" id="email" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="password" class="form-label fw-semibold">Password</label>
+                                    <input type="password" class="form-control py-2" name="password" id="password" required>
+                                    <div class="invalid-feedback">Please enter a password.</div>
+                                </div>
+
+                                <div class="form-check" style="margin-left: 0.5rem;">
+                                    <small><label class="form-check-label" for="showpassword">Show Password</label></small>
+                                    <input type="checkbox" class="form-check-input" id="showpassword" onclick="showPassword()">
+                                </div>
+
+                                <div class="d-flex justify-content-end column-gap-3 mt-4">
+                                    <button type="submit" class="btn fw-semibold w-100 px-4" name="create-account">Create Account</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
     </div>
 
@@ -619,22 +713,28 @@
     </div>
     
     <script>
-        document.addEventListener("DOMContentLoaded", function(){
+        document.addEventListener("DOMContentLoaded", function() {
             var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('success') === 'True'){
-                showToast('Data saved successfully.', 'success');
-                window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace('&success=True', '').replace('success=True', ''));
+            if (urlParams.has('success')) {
+                var success = urlParams.get('success') === 'True';
+                var message = urlParams.get('message') || (success ? 'Data saved successfully.' : 'Operation failed.');
+                showToast(message, success ? 'success' : 'error');
+
+                let newUrl = window.location.origin + window.location.pathname + "?selection=" + urlParams.get('selection');
+                window.history.replaceState({}, document.title, newUrl);
             }
         });
-    
-        function showToast(message, type){
+
+        function showToast(message, type) {
             var toastElement = document.getElementById('toast');
             var toastBody = toastElement.querySelector('.toast-body');
-    
-            if (type === 'success'){
+
+            if (type === 'success') {
+                toastBody.textContent = message;
+            } else if (type === 'error') {
                 toastBody.textContent = message;
             }
-    
+
             var toast = new bootstrap.Toast(toastElement);
             toast.show();
         }

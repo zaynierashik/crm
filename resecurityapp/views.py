@@ -15,14 +15,6 @@ from openpyxl import Workbook
 from openpyxl.styles import *
 from openpyxl.utils import *
 
-def signup(request):
-    fullname = request.session.get('fullname')
-
-    if fullname:
-        return redirect(reverse('master') + '?selection=company')
-
-    return render(request, 'signup.html')
-
 def submit_signup(request):
     if request.method == 'POST':
         fullname = request.POST.get('fullname')
@@ -35,23 +27,25 @@ def submit_signup(request):
         email_exists = Staff.objects.filter(email=email).exists()
 
         if name_exists and email_exists:
-            return redirect(reverse('signup') + '?success=False&message=Both name and email already exists.')
+            redirect_url = reverse('master') + '?selection=staff&success=False&message=Both name and email already exist.'
         elif name_exists:
-            return redirect(reverse('signup') + '?success=False&message=Staff with this name already exists.')
+            redirect_url = reverse('master') + '?selection=staff&success=False&message=Staff with this name already exists.'
         elif email_exists:
-            return redirect(reverse('signup') + '?success=False&message=Email already exists.')
+            redirect_url = reverse('master') + '?selection=staff&success=False&message=Email already exists.'
         else:
             user = Staff(Full_Name=fullname, email=email, password=hashed_password, role=role)
             user.save()
-            return redirect(reverse('signup') + '?success=True')
+            redirect_url = reverse('master') + '?selection=staff&success=True&message=Staff account created successfully.'
+
+        return redirect(redirect_url)
     else:
-        return render(request, 'signup.html')
+        return redirect(reverse('master') + '?selection=staff')
 
 def login(request):
     fullname = request.session.get('fullname')
 
     if fullname:
-         return redirect(reverse('master') + '?selection=company')
+        return redirect(reverse('master') + '?selection=company')
     
     return render(request, 'login.html')
 
@@ -64,6 +58,7 @@ def submit_login(request):
             ss = Staff.objects.get(email=email)
             if check_password(password, ss.password):
                 request.session['fullname'] = ss.Full_Name
+                request.session['staffrole'] = ss.role
                 return redirect(reverse('master') + '?selection=company')
             else:
                 return redirect(reverse('login') + '?success=False')
@@ -82,7 +77,7 @@ def transaction(request):
     if not fullname:
         return redirect('login')
     
-    companies = Company.objects.filter(status='active').order_by('Company_Name')
+    companies = Company.objects.filter(status='active', Created_By=fullname).order_by('Company_Name')
     contacts = Contact.objects.all()
     requirements = Requirement.objects.all()
     services = Service.objects.all()
@@ -189,6 +184,7 @@ def master(request):
     products = Product.objects.values('Product_Name').distinct().order_by('Product_Name')
     partners = Partner.objects.all().order_by('Partner_Name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
+    staffs = Staff.objects.all()
 
     city_filter = request.GET.get('city', None)
     status_filter = request.GET.get('status', 'active')
@@ -200,7 +196,7 @@ def master(request):
         companies = companies.filter(status=status_filter)
 
     selection = request.GET.get('selection', None)
-    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'selection': selection, 'fullname': fullname})
+    return render(request, 'master.html', {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'selection': selection, 'fullname': fullname})
 
 def get_requirements(request):
     fullname = request.session.get('fullname')
@@ -211,11 +207,9 @@ def get_requirements(request):
     company_name = request.GET.get('company', None)
     requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'Product_Name', 'service').values('id', 'Requirement_Type', 'Product_Name__Product_Name', 'service__Service_Name', 'brand__Brand_Name')
 
-    # Debugging output
-    print("Requirements fetched: ", requirements)
+    # print("Requirements fetched: ", requirements)
 
     return JsonResponse({'requirements': list(requirements)})
-
 
 def get_contacts(request):
     fullname = request.session.get('fullname')
@@ -464,12 +458,6 @@ def submit_requirement(request):
                 brand, created = Brand.objects.get_or_create(Brand_Name=brand_name)
                 requirement.brand = brand
 
-        # elif requirement_type == 'Service':
-        #     if service_name:
-        #         service, created = Service.objects.get_or_create(Service_Name=service_name)
-        #         requirement.service = service
-        #         requirement.Product_Name = None
-
         elif requirement_type == 'Service':
             try:
                 service = Service.objects.get(Service_Name=service_name)
@@ -479,7 +467,6 @@ def submit_requirement(request):
             requirement.service = service
 
         requirement.save()
-
         return redirect(reverse('master') + '?selection=requirement&success=True')
     else:
         return HttpResponseBadRequest("Invalid request method.")

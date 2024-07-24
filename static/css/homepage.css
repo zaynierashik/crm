@@ -68,7 +68,7 @@ html{
 }
 
 .content, .transaction-content, .company-content, .company-detail-content, .requirement-detail-content, .sector-content, .sector-detail-content, .service-content, .service-detail-content, 
-.via-content, .via-detail-content, .status-content, .status-detail-content, .brand-content, .brand-detail-content, .partner-content, .partner-detail-content{
+.via-content, .via-detail-content, .status-content, .status-detail-content, .brand-content, .brand-detail-content, .partner-content, .partner-detail-content, .staff-detail-content{
     margin-top: 3%;
 }
 
