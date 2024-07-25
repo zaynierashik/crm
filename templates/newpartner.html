@@ -35,6 +35,11 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
+
+                                    {% if request.session.staffrole == 'Admin' %}
+                                        <li><a class="dropdown-item" href="{% url 'master' %}?selection=staff" value="staff">Staffs</a></li>
+                                    {% endif %}
+
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
@@ -44,12 +49,6 @@
                             <li class="nav-item active" id="transactions">
                                 <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
                             </li>
-
-                            {% if request.session.staffrole == 'Admin' %}
-                                <li class="nav-item active" id="staffs">
-                                    <a class="nav-link fw-semibold" href="{% url 'master' %}?selection=staff">Staffs</a>
-                                </li>
-                            {% endif %}
                         </ul>
                     </div>
                 </div>

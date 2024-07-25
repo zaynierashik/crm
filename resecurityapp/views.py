@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import *
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.contrib.auth.hashers import check_password, make_password
@@ -66,6 +67,13 @@ def submit_login(request):
             return redirect(reverse('login') + '?success=False')
 
     return render(request, 'login.html')
+
+@require_POST
+def toggle_staff_status(request, staff_id):
+    staff = get_object_or_404(Staff, id=staff_id)
+    staff.status = not staff.status
+    staff.save()
+    return JsonResponse({'status': staff.status})
 
 def logout(request):
     request.session.flush()

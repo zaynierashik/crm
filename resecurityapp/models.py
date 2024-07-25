@@ -6,6 +6,7 @@ class Staff(models.Model):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=250)
     role = models.CharField(max_length=100, null=False, blank=False)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return self.Full_Name

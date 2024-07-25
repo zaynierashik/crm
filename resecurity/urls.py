@@ -26,6 +26,7 @@ urlpatterns = [
     path('submit_signup/', views.submit_signup, name='submit_signup'),
     path('', views.login, name='login'),
     path('submit_login/', views.submit_login, name='submit_login'),
+    path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
     path('logout/', views.logout, name='logout'),
     path('transaction/', views.transaction, name='transaction'),
     path('transactiondetails/<int:company_id>/<int:requirement_id>/', views.transactiondetails, name='transactiondetails'),

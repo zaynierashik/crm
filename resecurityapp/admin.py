@@ -5,7 +5,7 @@ class CompanyAdmin(admin.ModelAdmin):
     list_display = ('id', 'Company_Name')
 
 class StaffAdmin(admin.ModelAdmin):
-    list_display = ('id', 'Full_Name', 'email', 'role')
+    list_display = ('id', 'Full_Name', 'email', 'role', 'status')
 
 class RequirementAdmin(admin.ModelAdmin):
     list_display = ('id', 'Requirement_Type', 'company', 'Contact_Name', 'brand', 'Product_Name', 'service')
