@@ -40,9 +40,16 @@
                                     <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
                                 </ul>
                             </li>
+
                             <li class="nav-item active" id="transactions">
                                 <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
                             </li>
+                            
+                            {% if request.session.staffrole == 'Admin' %}
+                                <li class="nav-item active" id="staffs">
+                                    <a class="nav-link fw-semibold" href="{% url 'master' %}?selection=staff">Staffs</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
