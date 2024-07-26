@@ -80,9 +80,19 @@
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success')) {
                 var success = urlParams.get('success');
-                var message = urlParams.get('message');
+                var reason = urlParams.get('reason');
                 if (success === 'False') {
-                    showToast('Invalid email or password.', 'success');
+                    var message = '';
+                    if (reason === 'inactive') {
+                        message = 'Your account is inactive. Please contact the administrator.';
+                    } else if (reason === 'wrong_password') {
+                        message = 'Incorrect password. Please try again.';
+                    } else if (reason === 'not_found') {
+                        message = 'No account found with this email.';
+                    } else {
+                        message = 'Invalid email or password. Please try again.';
+                    }
+                    showToast(message, 'error');
                 }
                 window.history.replaceState({}, document.title, "{{ request.path }}");
             }

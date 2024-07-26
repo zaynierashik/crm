@@ -57,14 +57,17 @@ def submit_login(request):
 
         try:
             ss = Staff.objects.get(email=email)
+            if not ss.status:
+                return redirect(reverse('login') + '?success=False&reason=inactive')
+            
             if check_password(password, ss.password):
                 request.session['fullname'] = ss.Full_Name
                 request.session['staffrole'] = ss.role
                 return redirect(reverse('master') + '?selection=company')
             else:
-                return redirect(reverse('login') + '?success=False')
+                return redirect(reverse('login') + '?success=False&reason=wrong_password')
         except Staff.DoesNotExist:
-            return redirect(reverse('login') + '?success=False')
+            return redirect(reverse('login') + '?success=False&reason=not_found')
 
     return render(request, 'login.html')
 
