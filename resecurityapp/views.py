@@ -1,4 +1,5 @@
 import io
+import pandas as pd
 from django.shortcuts import *
 from django.http import *
 from .models import *
@@ -102,6 +103,119 @@ def transaction(request):
         
     return render(request, 'transaction.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'success': success, 'fullname': fullname})
 
+def report(request):
+    fullname = request.session.get('fullname')
+
+    if not fullname:
+        return redirect('login')
+    
+    companies = Company.objects.filter(status='active', Created_By=fullname).order_by('Company_Name')
+    contacts = Contact.objects.all()
+    requirements = Requirement.objects.all()
+    services = Service.objects.all()
+    brands = Brand.objects.all()
+    products = Product.objects.all()
+        
+    return render(request, 'report.html', {'companies': companies, 'contacts': contacts, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products})
+
+def generate_report(request):
+    if request.method == 'POST':
+        company_id = request.POST.get('company')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        if company_id:
+            companies = Company.objects.filter(pk=company_id)
+        else:
+            companies = Company.objects.all()
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Company Report"
+        ws.append(['Date', 'Company Name', 'Address', 'City', 'State', 'Country', 'Contact Person(s)', 'Email', 'Brand', 'Product Name', 'Service', 'Price', 'Status', 'Action', 'Remark'])
+
+        column_widths = {'A': 15, 'B': 17, 'C': 25, 'D': 25, 'E': 35, 'F': 35, 'G': 35, 'H': 25, 'I': 10, 'J': 35, 'K': 25, 'L': 25, 'M': 25, 'N': 25, 'O': 25}
+        for column, width in column_widths.items():
+            ws.column_dimensions[column].width = width
+
+        date_style = NamedStyle(name='date_style', number_format='YYYY-MM-DD')
+        center_alignment = Alignment(horizontal='center', vertical='center')
+        wrap_text_alignment = Alignment(wrap_text=True, vertical='center')
+        thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+        for cell in ws[1]:
+            cell.alignment = center_alignment
+            cell.border = thin_border
+
+        for company in companies:
+            transactions = Transaction.objects.filter(company=company).order_by('-date')
+
+            if start_date and end_date:
+                transactions = transactions.filter(date__range=[start_date, end_date])
+
+            company_row_start = ws.max_row + 1
+            contact_names = set()
+            for transaction in transactions:
+                brand = transaction.requirement.brand.Brand_Name if transaction.requirement and transaction.requirement.brand else ''
+                service = transaction.requirement.service.Service_Name if transaction.requirement and transaction.requirement.service else ''
+                contact_person = transaction.contact.Contact_Name if transaction.contact else ''
+                contact_email = transaction.contact.email if transaction.contact else ''
+                price = transaction.requirement.price if transaction.requirement else ''
+                status = transaction.requirement.status if transaction.requirement else ''
+                product_name = transaction.requirement.Product_Name if transaction.requirement and hasattr(transaction.requirement, 'Product_Name') else ''
+
+                if contact_person:
+                    contact_names.add(contact_person)
+
+                ws.append([
+                    str(transaction.date),
+                    str(transaction.company.Company_Name),
+                    str(transaction.company.address),
+                    str(transaction.company.city),
+                    str(transaction.company.state),
+                    str(transaction.company.country),
+                    '',
+                    str(contact_email),
+                    str(brand),
+                    str(product_name),
+                    str(service),
+                    str(price),
+                    str(status),
+                    str(transaction.action),
+                    str(transaction.remark)
+                ])
+
+                row_num = ws.max_row
+                for col in ['H', 'I', 'J', 'K', 'O']:
+                    ws[f'{get_column_letter(ws.max_column - 4)}{row_num}'].alignment = wrap_text_alignment
+
+                for col in range(1, ws.max_column + 1):
+                    ws[f'{get_column_letter(col)}{row_num}'].border = thin_border
+
+            company_row_end = ws.max_row
+
+            if company_row_end > company_row_start:
+                for col in range(2, 7):  # Columns B to F (Company Name, Address, City, State, Country)
+                    ws.merge_cells(start_row=company_row_start, start_column=col, end_row=company_row_end, end_column=col)
+
+                # Merge and write contact names
+                ws.merge_cells(start_row=company_row_start, start_column=7, end_row=company_row_end, end_column=7)
+                ws.cell(row=company_row_start, column=7, value=', '.join(contact_names))
+                ws.cell(row=company_row_start, column=7).alignment = wrap_text_alignment
+
+            if transactions.exists():
+                ws.append([''] * 15)
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="Company_Report.xlsx"'
+        wb.save(response)
+
+        return response
+
+    companies = Company.objects.all()
+    return render(request, 'report.html', {'companies': companies})
+    
+
 def get_companydetails(request):
     fullname = request.session.get('fullname')
 
@@ -194,7 +308,7 @@ def master(request):
     brands = Brand.objects.values('Brand_Name').distinct().order_by('Brand_Name')
     products = Product.objects.values('Product_Name').distinct().order_by('Product_Name')
     partners = Partner.objects.all().order_by('Partner_Name')
-    cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
+    cities = Company.objects.filter(Created_By=fullname).values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
     city_filter = request.GET.get('city', None)
@@ -217,8 +331,6 @@ def get_requirements(request):
     
     company_name = request.GET.get('company', None)
     requirements = Requirement.objects.filter(company__Company_Name=company_name).select_related('brand', 'Product_Name', 'service').values('id', 'Requirement_Type', 'Product_Name__Product_Name', 'service__Service_Name', 'brand__Brand_Name')
-
-    # print("Requirements fetched: ", requirements)
 
     return JsonResponse({'requirements': list(requirements)})
 
@@ -790,53 +902,75 @@ def export_excel(request, company_id):
 
     if not fullname:
         return redirect('login')
-    
+
     company = Company.objects.get(pk=company_id)
     transactions = Transaction.objects.filter(company_id=company_id).order_by('-date')
-    
+
     wb = Workbook()
     ws = wb.active
-    ws.append(['Date', 'Requirement Type', 'Brand', 'Product Name', 'Service', 'Action', 'Remark'])
-
-    column_widths = {'A': 15, 'B': 17, 'C': 25, 'D': 25, 'E': 35, 'F': 35, 'G': 35}
-    for column, width in column_widths.items():
-        ws.column_dimensions[column].width = width
-
-    date_style = NamedStyle(name='date_style', number_format='YYYY-MM-DD')
-    for cell in ws['A']:
-        cell.style = date_style
 
     center_alignment = Alignment(horizontal='center', vertical='center')
-    wrap_text_alignment = Alignment(wrap_text=True, vertical='center')
+    left_alignment = Alignment(horizontal='left', vertical='center')
+    bold_font = Font(bold=True)
     
-    for cell in ws[1]:
-        cell.alignment = center_alignment
-
-    for row_num, transaction in enumerate(transactions, start=2):
-        brand = transaction.brand.Brand_Name if transaction.brand else ''
-        service = transaction.service.Service_Name if transaction.service else ''
-        ws.append([
-            transaction.date,
-            transaction.Requirement_Type,
-            brand,
-            transaction.Product_Name,
-            service,
-            transaction.action,
-            transaction.remark
-        ])
-
-        for col in ['E', 'F', 'G']:
-            ws[f'{col}{row_num}'].alignment = wrap_text_alignment
+    if transactions.exists():
+        first_transaction = transactions.first()
+        requirement = first_transaction.requirement
+        requirement_type = requirement.Requirement_Type if requirement else ''
         
-        for col in ['A', 'B', 'C', 'D']:
-            ws[f'{col}{row_num}'].alignment = center_alignment
+        if requirement_type.lower() == 'product':
+            ws.append(['Requirement Type', 'Product Name', 'Company Name'])
+            brand = requirement.brand.Brand_Name if requirement and requirement.brand else ''
+            product_name = requirement.Product_Name.Product_Name if requirement and requirement.Product_Name else ''
+            if brand and product_name:
+                product_name = f"{brand} - {product_name}"
+            ws.append([requirement_type, product_name, company.Company_Name])
+        elif requirement_type.lower() == 'service':
+            ws.append(['Requirement Type', 'Service', 'Company Name'])
+            service = requirement.service.Service_Name if requirement and requirement.service else ''
+            ws.append([requirement_type, service, company.Company_Name])
+
+        ws.append([])
+        ws.append(['Date', 'Action', 'Remark'])
+
+        column_widths = {'A': 20, 'B': 50, 'C': 50}
+        for column, width in column_widths.items():
+            ws.column_dimensions[column].width = width
+
+        date_style = NamedStyle(name='date_style', number_format='YYYY-MM-DD')
+        for cell in ws['A']:
+            cell.style = date_style
+        
+        # Apply styles to headers
+        for cell in ws[1]:
+            cell.alignment = center_alignment
+            cell.font = bold_font
+        for cell in ws[4]:
+            cell.alignment = center_alignment
+            cell.font = bold_font
+
+        # Apply alignment styles to the 'Date' column
+        for cell in ws['A']:
+            cell.alignment = center_alignment
+        for cell in ws['B']:
+            cell.alignment = center_alignment
+        for cell in ws['C']:
+            cell.alignment = center_alignment
+
+        # Apply alignment and styles to row values
+        for row_num, transaction in enumerate(transactions, start=5):
+            ws.append([transaction.date, transaction.action, transaction.remark])
+            
+            ws[f'A{row_num}'].alignment = center_alignment
+            ws[f'B{row_num}'].alignment = left_alignment
+            ws[f'C{row_num}'].alignment = left_alignment
 
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
 
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename="{company.Company_Name} Transactions.xlsx"'
+    response['Content-Disposition'] = f'attachment; filename="{company.Company_Name} - Transactions.xlsx"'
     return response
 
 def export_pdf(request, company_id):
