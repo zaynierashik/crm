@@ -442,19 +442,16 @@ def submit_newcompany(request):
         designations = request.POST.getlist('designation[]')
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
+        dobs = request.POST.getlist('dob[]')
+        religions = request.POST.getlist('religion[]')
 
         company = Company(Company_Name=company_name, sector=sectors, address=address, city=city, state=state, country=country, via=via_name, Referral_Name=referral_name, Partner_Name=partner_name, website=website, Created_By=fullname)
         company.save()
 
         for i in range(len(contact_names)):
             if contact_names[i] and designations[i] and emails[i] and phone_numbers[i]:
-                contact_person = Contact(
-                    company=company,
-                    Contact_Name=contact_names[i],
-                    designation=designations[i],
-                    email=emails[i],
-                    Phone_Number=phone_numbers[i]
-                )
+                dob = dobs[i] if dobs[i] else None
+                contact_person = Contact(company=company, Contact_Name=contact_names[i], designation=designations[i], email=emails[i], Phone_Number=phone_numbers[i], DOB=dob, religion=religions[i])
                 contact_person.save()
                 
         return redirect(reverse('master') + '?selection=company&success=True')
@@ -481,8 +478,8 @@ def companyform(request, company_id):
         display_via = company.Partner_Name.Partner_Name
 
     countries = ["Nepal", "USA", "India", "Singapore"]
-    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 
-                                                'display_via': display_via})
+    religions = ["Hinduism", "Buddhism", "Christianity"]
+    return render(request, 'companyform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions, 'display_via': display_via})
 
 def submit_company(request):
     fullname = request.session.get('fullname')
@@ -511,20 +508,20 @@ def submit_company(request):
         designations = request.POST.getlist('designation[]')
         emails = request.POST.getlist('email[]')
         phone_numbers = request.POST.getlist('number[]')
+        dobs = request.POST.getlist('dob[]')
+        religions = request.POST.getlist('religion[]')
 
-        for name, designation, email, phone_number in zip(contact_names, designations, emails, phone_numbers):
+        for name, designation, email, phone_number, dob, religion in zip(contact_names, designations, emails, phone_numbers, dobs, religions):
             if name and designation and email and phone_number:
-                Contact.objects.create(
-                    company=company,
-                    Contact_Name=name,
-                    designation=designation,
-                    email=email,
-                    Phone_Number=phone_number
-                )
+                # Set dob to None if it's an empty string
+                if not dob:
+                    dob = None
+                Contact.objects.create(company=company, Contact_Name=name, designation=designation, email=email, Phone_Number=phone_number, DOB=dob, religion=religion)
 
         return redirect(reverse('master') + '?selection=company')
     else:
         return HttpResponse("Form Submission Error!")
+
 
 def companydetails(request, company_id):
     fullname = request.session.get('fullname')
