@@ -1,4 +1,6 @@
+from datetime import timedelta, timezone
 import io
+import random
 import pandas as pd
 from django.shortcuts import *
 from django.http import *
@@ -16,6 +18,10 @@ from xhtml2pdf import pisa
 from openpyxl import Workbook
 from openpyxl.styles import *
 from openpyxl.utils import *
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 def submit_signup(request):
     if request.method == 'POST':
@@ -1012,3 +1018,38 @@ def add_transaction(request, company_id, requirement_id):
 
         Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
         return redirect('transactiondetails', company_id=company_id, requirement_id=requirement_id)
+    
+def send_offerEmail(request):
+    user = Contact.objects.all()  #change this...
+    threshold_date = timezone.now() - timedelta(hours=1)
+    print(f'+++++++++++++{threshold_date}++++++++++')
+    users = Contact.objects.filter(DOB__gte=threshold_date)
+    print(users)
+    emails = []
+    for user in users:
+        emails.append(user.email)
+
+        discount = random.randint(5,20)
+
+        subject = "Haven't Seen You Lately!"
+        html_content = render_to_string('offer_mail.html',{
+                                        'fname': user.Contact_Name, 
+                                        'lname': user.company, 
+                                        'email': user.email,
+                                        'discount': discount,
+                                        })
+        from_email = 'zaynierashik@gmail.com'
+        print(user.Contact_Name)
+        to = [user.email]
+
+        text_content = strip_tags(html_content)
+        email = EmailMultiAlternatives(
+            subject,
+            text_content,
+            from_email,
+            to,
+        )
+        email.attach_alternative(html_content, "text/html")
+        email.send(fail_silently=False)
+    # return render(request, "signin.html")
+    return redirect('transaction')

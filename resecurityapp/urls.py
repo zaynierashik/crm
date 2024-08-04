@@ -44,4 +44,5 @@ urlpatterns = [
     path('add-newpartner/', views.add_newpartner, name='add_newpartner'),
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
     path('export-pdf/<int:company_id>/', views.export_pdf, name='export_pdf'),
+    path('send_offeremail/', views.send_offerEmail, name='send_offerEmail'),
 ]
