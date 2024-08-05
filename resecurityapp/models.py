@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 class Staff(models.Model):
     Full_Name = models.CharField(max_length=100)
@@ -85,6 +86,7 @@ class Contact(models.Model):
 
 class Requirement(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='requirements')
+    date = models.DateField(default=now)
     Contact_Name = models.ForeignKey(Contact, on_delete=models.SET_NULL, null=True, blank=True)
     Requirement_Type = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
@@ -92,7 +94,7 @@ class Requirement(models.Model):
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirements')
     Requirement_Description = models.TextField()
     currency = models.CharField(max_length=100, null=True)
-    price = models.CharField(max_length=100, null=True)
+    price = models.FloatField(null=True, blank=True, default=0.00)
     status = models.CharField(max_length=100, null=False, blank=False)
 
     def __str__(self):

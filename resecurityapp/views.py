@@ -1,4 +1,6 @@
+from datetime import timezone, timedelta
 import io
+import random
 import pandas as pd
 from django.shortcuts import *
 from django.http import *
@@ -16,6 +18,10 @@ from xhtml2pdf import pisa
 from openpyxl import Workbook
 from openpyxl.styles import *
 from openpyxl.utils import *
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 def submit_signup(request):
     if request.method == 'POST':
@@ -214,7 +220,6 @@ def generate_report(request):
 
     companies = Company.objects.all()
     return render(request, 'report.html', {'companies': companies})
-    
 
 def get_companydetails(request):
     fullname = request.session.get('fullname')
@@ -513,7 +518,6 @@ def submit_company(request):
 
         for name, designation, email, phone_number, dob, religion in zip(contact_names, designations, emails, phone_numbers, dobs, religions):
             if name and designation and email and phone_number:
-                # Set dob to None if it's an empty string
                 if not dob:
                     dob = None
                 Contact.objects.create(company=company, Contact_Name=name, designation=designation, email=email, Phone_Number=phone_number, DOB=dob, religion=religion)
@@ -545,12 +549,19 @@ def submit_requirement(request):
     if request.method == 'POST':
         company_name = request.POST.get('company')
         contact_name = request.POST.get('contact-name')
+        date = request.POST.get('date')
+        if not date:
+            date = timezone.now().date()
+            
         requirement_type = request.POST.get('requirement-type')
         product_name = request.POST.get('product')
         brand_name = request.POST.get('brand')
         service_name = request.POST.get('service')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
+        if not price:
+            price = 0.00
+            
         status = request.POST.get('status')
         requirement_description = request.POST.get('requirement-description')
 
@@ -564,7 +575,7 @@ def submit_requirement(request):
         except Contact.DoesNotExist:
             return HttpResponseBadRequest("Contact does not exist.")
 
-        requirement = Requirement.objects.create(company=company, Contact_Name=contact, Requirement_Type=requirement_type, currency=currency, 
+        requirement = Requirement.objects.create(company=company, date=date, Contact_Name=contact, Requirement_Type=requirement_type, currency=currency, 
                                                  price=price, status=status, Requirement_Description=requirement_description)
 
         if requirement_type == 'Product':
@@ -916,21 +927,23 @@ def export_excel(request, company_id):
         requirement_type = requirement.Requirement_Type if requirement else ''
         
         if requirement_type.lower() == 'product':
-            ws.append(['Requirement Type', 'Product Name', 'Company Name'])
+            ws.append(['Requirement Type', 'Product Name', 'Company Name', 'Contact Person'])
             brand = requirement.brand.Brand_Name if requirement and requirement.brand else ''
             product_name = requirement.Product_Name.Product_Name if requirement and requirement.Product_Name else ''
             if brand and product_name:
                 product_name = f"{brand} - {product_name}"
-            ws.append([requirement_type, product_name, company.Company_Name])
+            contact_name = requirement.Contact_Name.Contact_Name if requirement and requirement.Contact_Name else ''
+            ws.append([requirement_type, product_name, company.Company_Name, contact_name])
         elif requirement_type.lower() == 'service':
-            ws.append(['Requirement Type', 'Service', 'Company Name'])
+            ws.append(['Requirement Type', 'Service', 'Company Name', 'Contact Person'])
             service = requirement.service.Service_Name if requirement and requirement.service else ''
-            ws.append([requirement_type, service, company.Company_Name])
+            contact_name = requirement.Contact_Name.Contact_Name if requirement and requirement.Contact_Name else ''
+            ws.append([requirement_type, service, company.Company_Name, contact_name])
 
         ws.append([])
         ws.append(['Date', 'Action', 'Remark'])
 
-        column_widths = {'A': 20, 'B': 50, 'C': 50}
+        column_widths = {'A': 20, 'B': 50, 'C': 50, 'D': 35}
         for column, width in column_widths.items():
             ws.column_dimensions[column].width = width
 
@@ -952,6 +965,8 @@ def export_excel(request, company_id):
         for cell in ws['B']:
             cell.alignment = center_alignment
         for cell in ws['C']:
+            cell.alignment = center_alignment
+        for cell in ws['D']:
             cell.alignment = center_alignment
 
         # Apply alignment and styles to row values
@@ -1012,3 +1027,21 @@ def add_transaction(request, company_id, requirement_id):
 
         Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
         return redirect('transactiondetails', company_id=company_id, requirement_id=requirement_id)
+    
+def send_mail(request):
+    threshold_date = timezone.now() - timedelta(hours=1)
+    print(f'+++++++++++++{threshold_date}++++++++++')
+    users = Contact.objects.filter(DOB__gte=threshold_date)
+
+    for user in users:
+        subject = "Happy Birthday!"
+        html_content = render_to_string('mail.html', {'name': user.Contact_Name, 'email': user.email})
+        from_email = 'zaynierashik@gmail.com'
+        to = [user.email]
+
+        text_content = strip_tags(html_content)
+        email = EmailMultiAlternatives(subject, text_content, from_email, to)
+        email.attach_alternative(html_content, "text/html")
+        email.send(fail_silently=False)
+
+    return redirect(reverse('master') + '?selection=company')

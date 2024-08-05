@@ -40,38 +40,30 @@
 
     <h1>Company Transactions</h1>
     <p><strong>Company Name:</strong> {{ company.Company_Name }}</p>
-    <p><strong>City:</strong> {{ company.city }}</p>
+    <p><strong>Contact Person:</strong> {{ requirement.Contact_Name }}</p>
 
     {% for contact in contacts %}
         <p><strong>Contact Person:</strong> {{ contact.Contact_Name }}</p>
-        <p><strong>Contact Email:</strong> {{ contact.email }}</p>
-        <p><strong>Contact Number:</strong> {{ contact.Phone_Number }}</p>
     {% endfor %}
 
     <table>
         <thead>
             <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Requirement</th>
-                <th scope="col">Brand</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Service</th>
-                <th scope="col">Action</th>
+                <th class="center">Date</th>
+                <th class="center">Action</th>
+                <th class="center">Remark</th>
             </tr>
         </thead>
-        
         <tbody>
             {% for transaction in transactions %}
             <tr>
-                <td>{{ transaction.date }}</td>
-                <td>{{ transaction.Requirement_Type }}</td>
-                <td>{{ transaction.brand }}</td>
-                <td>{{ transaction.Product_Name }}</td>
-                <td>{{ transaction.service }}</td>
-                <td>{{ transaction.action }}</td>
+                <td class="center">{{ transaction.date }}</td>
+                <td class="left">{{ transaction.action }}</td>
+                <td class="left">{{ transaction.remark }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    
 </body>
 </html>

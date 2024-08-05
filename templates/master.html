@@ -176,6 +176,11 @@
                                     <div class="invalid-feedback">Please select a contact person.</div>
                                 </div>
                             </div>
+                            
+                            <div class="col-4">
+                                    <label for="date" class="form-label fw-semibold">Date</label>
+                                    <input type="date" class="form-control py-2" name="date" id="date">
+                            </div>
                         </div>
                     </div>
 
@@ -266,8 +271,7 @@
         
                             <div class="col">
                                 <label for="price" class="form-label fw-semibold">Price</label>
-                                <input type="text" class="form-control py-2" name="price" id="price" value="{{ company.price }}" required>
-                                <div class="invalid-feedback">Please enter a price.</div>
+                                <input type="number" step="0.01" class="form-control py-2" name="price" id="price" value="0.00">
                             </div>
 
                             <div class="col-4">
