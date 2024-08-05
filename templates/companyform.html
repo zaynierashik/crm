@@ -1,0 +1,230 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Company</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '/favicon/favicon-32x32.png'  %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon/favicon-16x16.png'  %}">
+    <link rel="manifest" href="{% static '/favicon/site.webmanifest' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
+</head>
+<body>
+    
+    <div class="container">
+        <div id="navbar">
+            <nav class="navbar navbar-expand-lg justify-content-center">
+                <div class="container-fluid mt-3">
+                    <a class="navbar-brand" href="{% url 'master' %}?selection=company">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
+                    </a>
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mt-3">
+                            <li class="nav-item" id="master">
+                                <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
+
+                                    {% if request.session.staffrole == 'Admin' %}
+                                        <li><a class="dropdown-item" href="{% url 'master' %}?selection=staff" value="staff">Staffs</a></li>
+                                    {% endif %}
+
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item active" id="transactions">
+                                <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>        
+
+        <!-- Company Details Form -->
+
+        <div id="company-content" class="company-content container">
+            <h3>Company Master - Edit Company</h3>
+            <form id="companyForm" action="{% url 'submit_company' %}" method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="company_id" value="{{ company.id }}">
+                
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="company" class="form-label fw-semibold">Company Name</label>
+                        <input type="text" class="form-control py-2" name="company" id="company" value="{{ company.Company_Name }}" required>
+                        <div class="invalid-feedback">Please enter a company name.</div>
+                    </div>
+        
+                    <div class="col-4">
+                        <label for="sector" class="form-label fw-semibold">Sector</label>
+                        <select class="form-control form-select py-2" name="sector" id="sector" required>
+                            {% for sector in sectors %}
+                            <option value="{{ sector.Sector_Name }}" {% if sector.Sector_Name == company.sector.Sector_Name %} selected {% endif %}>{{ sector.Sector_Name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a sector.</div>
+                    </div>
+                </div>
+        
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="address" class="form-label fw-semibold">Address</label>
+                        <input type="text" class="form-control py-2" name="address" id="address" value="{{ company.address }}" required>
+                        <div class="invalid-feedback">Please enter an address.</div>
+                    </div>
+        
+                    <div class="col">
+                        <label for="city" class="form-label fw-semibold">City</label>
+                        <input type="text" class="form-control py-2" name="city" id="city" value="{{ company.city }}" required>
+                        <div class="invalid-feedback">Please enter a city.</div>
+                    </div>
+        
+                    <div class="col">
+                        <label for="state" class="form-label fw-semibold">State</label>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}">
+                        <div class="invalid-feedback">Please enter a state.</div>
+                    </div>
+        
+                    <div class="col-4">
+                        <label for="country" class="form-label fw-semibold">Country</label>
+                        <select class="form-control form-select py-2" name="country" id="country" required>
+                            {% for country_option in countries %}
+                            <option value="{{ country_option }}" {% if country_option == company.country %} selected {% endif %}>{{ country_option }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Please select a country.</div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col">
+                        <label for="via" class="form-label fw-semibold">Via</label>
+                        <input type="text" class="form-control py-2" id="via_display" value="{{ display_via }}" readonly>
+                    </div>
+        
+                    <div class="col-4">
+                        <label for="website" class="form-label fw-semibold">Website</label>
+                        <input type="text" class="form-control py-2" id="website" name="website" value="{{ company.website }}" required>
+                    </div>
+        
+                    <div class="col-4">
+                        <label for="status" class="form-label fw-semibold">Status</label>
+                        <select class="form-control form-select py-2" name="status" id="status" required>
+                            <option value="active" {% if company.status == "active" %} selected {% endif %}>Active</option>
+                            <option value="inactive" {% if company.status == "inactive" %} selected {% endif %}>Inactive</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a status.</div>
+                    </div>
+                </div>
+                    
+                <div class="mt-5 mb-3">
+                    <div id="contact-persons-container">
+                        {% for contact in contacts %}
+                        <div class="contact-person-template">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="contact_name_{{ forloop.counter }}" class="form-label fw-semibold">Contact Person</label>
+                                    <input type="text" class="form-control py-2" name="contact_name[]" id="contact_name_{{ forloop.counter }}" value="{{ contact.Contact_Name }}" required>
+                                    <div class="invalid-feedback">Please enter a contact person.</div>
+                                </div>
+        
+                                <div class="col-4">
+                                    <label for="email_{{ forloop.counter }}" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email[]" id="email_{{ forloop.counter }}" value="{{ contact.email }}" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+                                
+                                <div class="col">
+                                    <label for="contactnumber_{{ forloop.counter }}" class="form-label fw-semibold">Phone Number</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control py-2" name="number[]" id="contactnumber_{{ forloop.counter }}" value="{{ contact.Phone_Number }}" required>
+                                        <button type="button" class="btn border rounded-end remove-contact-person" onclick="removeContactPerson(this)" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-minus" style="color: #000000;"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn border rounded ms-2 add-contact-person" onclick="addContactPerson()" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-plus" style="color: #000000;"></i>
+                                        </button>
+                                        <div class="invalid-feedback">Please enter a phone number.</div>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="designation_{{ forloop.counter }}" class="form-label fw-semibold">Designation</label>
+                                    <input type="text" class="form-control py-2" name="designation[]" id="designation_{{ forloop.counter }}" value="{{ contact.designation }}" required>
+                                    <div class="invalid-feedback">Please enter a designation.</div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="dob_{{ forloop.counter }}" class="form-label fw-semibold">Date of Birth</label>
+                                    <input type="date" class="form-control py-2" name="dob[]" id="dob_{{ forloop.counter }}" value="{{ contact.DOB|date:'Y-m-d' }}">
+                                </div>
+        
+                                <div class="col">
+                                    <label for="religion" class="form-label fw-semibold">Religion</label>
+                                    <select class="form-control form-select py-2" name="religion[]" id="religion_{{ forloop.counter }}">
+                                        <option value="">Select a religion</option>
+                                        {% for religion_option in religions %}
+                                        <option value="{{ religion_option }}" {% if religion_option == contact.religion %} selected {% endif %}>{{ religion_option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+        
+                <div class="d-flex mt-4 mb-4">
+                    <div class="col">
+                        <button type="submit" class="btn fw-semibold w-100 px-4" name="company-submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>        
+    </div>
+
+    <script>
+        function addContactPerson() {
+            var container = document.getElementById('contact-persons-container');
+            var newContactPerson = document.querySelector('.contact-person-template').cloneNode(true);
+            
+            newContactPerson.classList.remove('contact-person-template');
+            newContactPerson.classList.add('contact-person');
+            newContactPerson.style.display = 'block';
+            container.appendChild(newContactPerson);
+        }
+
+        function removeContactPerson(element) {
+            element.closest('.contact-person').remove();
+        }
+    </script>
+
+    <script>
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
+
+    <script src="https://kit.fontawesome.com/296ff2fa8f.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>

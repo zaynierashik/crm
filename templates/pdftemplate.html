@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Transactions</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin: 20px 0px;
+        }
+        
+        h1{
+            font-size: 1.75rem;
+        }
+
+        p{
+            font-size: 1.25rem;
+        }
+
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td{
+            border: 1px solid #dddddd;
+            padding: 5.5px 5px 0px 5px;
+            font-size: 1.25rem;
+            text-align: left;
+        }
+
+        th{
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Company Transactions</h1>
+    <p><strong>Company Name:</strong> {{ company.Company_Name }}</p>
+    <p><strong>Contact Person:</strong> {{ requirement.Contact_Name }}</p>
+
+    {% for contact in contacts %}
+        <p><strong>Contact Person:</strong> {{ contact.Contact_Name }}</p>
+    {% endfor %}
+
+    <table>
+        <thead>
+            <tr>
+                <th class="center">Date</th>
+                <th class="center">Action</th>
+                <th class="center">Remark</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td class="center">{{ transaction.date }}</td>
+                <td class="left">{{ transaction.action }}</td>
+                <td class="left">{{ transaction.remark }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</body>
+</html>

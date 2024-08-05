@@ -1,0 +1,511 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New Company</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static '/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static '/favicon/favicon-32x32.png'  %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon/favicon-16x16.png'  %}">
+    <link rel="manifest" href="{% static '/favicon/site.webmanifest' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href="{% static 'css/homepage.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    
+    <div class="container">
+        <div id="navbar">
+            <nav class="navbar navbar-expand-lg justify-content-center">
+                <div class="container-fluid mt-3">
+                    <a class="navbar-brand" href="{% url 'master' %}?selection=company">
+                        <img src="{% static 'images/logo.png' %}" alt="Resecurity CRM" width="75">
+                    </a>
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mt-3">
+                            <li class="nav-item" id="master">
+                                <a class="nav-link fw-semibold" style="cursor: pointer;">Master</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=company" value="company">Company</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=requirement" value="requirement">Requirement</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=partner" value="partner">Partner</a></li>
+
+                                    {% if request.session.staffrole == 'Admin' %}
+                                        <li><a class="dropdown-item" href="{% url 'master' %}?selection=staff" value="staff">Staffs</a></li>
+                                    {% endif %}
+
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=sector" value="sector">Sector</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=service" value="service">Service</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'master' %}?selection=brand" value="brand">Brand</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item active" id="transactions">
+                                <a class="nav-link fw-semibold" href="{% url 'transaction' %}">Transactions</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>        
+
+        <!-- Company Details Form -->
+
+        <div id="company-content" class="company-content container">
+            <h3>Company Master - Add Company</h3>
+            <form id="companyForm" action="{% url 'submit_newcompany' %}" method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="company" class="form-label fw-semibold">Company Name</label>
+                        <input type="text" class="form-control py-2 {% if request.GET.error_message %}is-invalid{% endif %}" name="company" id="company" value="{{ request.GET.company_name|default:'' }}" required>
+                        <div class="invalid-feedback">
+                            {% if request.GET.error_message %}
+                                {{ request.GET.error_message }}
+                            {% else %}
+                                Please enter a company name.
+                            {% endif %}
+                        </div>
+                    </div>                    
+                
+                    <div class="col-4">
+                        <label for="sector" class="form-label fw-semibold">Sector</label>
+                        <div class="input-group">
+                            <select class="form-control form-select py-2" name="sector" id="sector" required>
+                                <option value="">Choose a sector</option>
+                                {% for sector in sectors %}
+                                <option value="{{ sector.Sector_Name }}">{{ sector.Sector_Name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#sectorModal" style="text-decoration: none;">
+                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                            </a>                            
+                            <div class="invalid-feedback">Please select a sector.</div>
+                        </div>
+                    </div>   
+                </div>
+                                     
+                <div class="row g-3 mb-3">
+                    <div class="col">
+                        <label for="address" class="form-label fw-semibold">Address</label>
+                        <input type="text" class="form-control py-2" name="address" id="address" value="{{ company.address }}" required>
+                        <div class="invalid-feedback">Please enter an address.</div>
+                    </div>     
+    
+                    <div class="col">
+                        <label for="city" class="form-label fw-semibold">City</label>
+                        <input type="text" class="form-control py-2" name="city" id="city" value="{{ company.city }}" required>
+                        <div class="invalid-feedback">Please enter a city.</div>
+                    </div>
+
+                    <div class="col">
+                        <label for="state" class="form-label fw-semibold">State</label>
+                        <input type="text" class="form-control py-2" name="state" id="state" value="{{ company.state }}">
+                        <div class="invalid-feedback">Please enter a state.</div>
+                    </div>
+    
+                    <div class="col-4">
+                        <label for="country" class="form-label fw-semibold">Country</label>
+                        <select class="form-control form-select py-2" name="country" id="country" onchange="updatePhoneNumber()" required>
+                            <option value="">Choose a country</option>
+                            <option value="Nepal" data-code="+977">Nepal</option>
+                            <option value="USA" data-code="+1">United States of America</option>
+                            <option value="India" data-code="+91">India</option>
+                            <option value="Singapore" data-code="+65">Singapore</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a country.</div>
+                    </div>
+                </div>
+                    
+                <div class="row g-3">
+                    <div class="col">
+                        <label for="via" class="form-label fw-semibold">Via</label>
+                        <select class="form-control form-select py-2" name="via" id="via" required>
+                            <option value="">Choose a via</option>
+                            <option value="Direct">Direct</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Partner">Partner</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a via.</div>
+                    </div>
+
+                    <div id="referralNameInput" class="col-4" style="display: none;">
+                        <label for="referral_name" class="form-label fw-semibold">Referral Name</label>
+                        <input type="text" class="form-control py-2" name="referral_name" id="referral_name">
+                    </div>
+                    
+                    <div id="partnerDropdown" class="col-4" style="display: none;">
+                        <label for="partner" class="form-label fw-semibold">Partner</label>
+                        <div class="input-group">
+                            <select class="form-control form-select py-2" name="partner" id="partner">
+                                <option value="">Choose a partner</option>
+                                {% for partner in partners %}
+                                <option value="{{ partner.Partner_Name }}">{{ partner.Partner_Name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <a href="#" class="input-group-text rounded-end" data-bs-toggle="modal" data-bs-target="#partnerModal" style="text-decoration: none;">
+                                <i class="fa-solid fa-plus" style="color: #212529;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <label for="website" class="form-label fw-semibold">Website Link</label>
+                        <input type="text" class="form-control py-2" name="website">
+                    </div>
+                </div>
+
+                <div class="mt-5 mb-3">
+                    <div id="contact-persons-container">
+                        <div class="contact-person-template">
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="contact_name" class="form-label fw-semibold">Contact Person</label>
+                                    <input type="text" class="form-control py-2" name="contact_name[]" required>
+                                    <div class="invalid-feedback">Please enter a contact person.</div>
+                                </div>
+
+                                <div class="col-4">
+                                    <label for="email" class="form-label fw-semibold">Email</label>
+                                    <input type="email" class="form-control py-2" name="email[]" required>
+                                    <div class="invalid-feedback">Please enter an email.</div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control py-2" name="number[]" id="contactnumber" required>
+                                        <button type="button" class="btn border rounded-end" onclick="removeContactPerson(this)" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-minus" style="color: #000000;"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn border rounded ms-2" onclick="addContactPerson()" style="background-color: var(--bs-tertiary-bg);">
+                                            <i class="fa-solid fa-plus" style="color: #000000;"></i>
+                                        </button>
+                                        <div class="invalid-feedback">Please enter a phone number.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col">
+                                    <label for="designation" class="form-label fw-semibold">Designation</label>
+                                    <input type="text" class="form-control py-2" name="designation[]" required>
+                                    <div class="invalid-feedback">Please enter a designation.</div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="dob" class="form-label fw-semibold">Date of Birth</label>
+                                    <input type="date" class="form-control py-2" name="dob[]" id="dob">
+                                </div>
+
+                                <div class="col">
+                                    <label for="religion" class="form-label fw-semibold">Religion</label>
+                                    <select class="form-control form-select py-2" name="religion[]" id="religion">
+                                        <option value="">Choose a religion</option>
+                                        <option value="Hinduism">Hinduism</option>
+                                        <option value="Buddhism">Buddhism</option>
+                                        <option value="Christianity">Christianity</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <div class="d-flex mt-4 mb-4">
+                    <div class="col">
+                        <button type="submit" class="btn fw-semibold w-100 px-4" name="company-submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <div class="modal fade" id="sectorModal" tabindex="-1" aria-labelledby="sectorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sectorModalLabel">Add New Sector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="sectorForm" action="{% url 'submit_sector' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="sector" class="form-label fw-semibold">Sector Name</label>
+                                <input type="text" class="form-control py-2" name="sector" id="sector" required>
+                                <div class="invalid-feedback">Please enter a sector name.</div>
+                            </div>  
+                        </div>                    
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitSectorBtn">Add Sector</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="partnerModal" tabindex="-1" aria-labelledby="partnerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="partnerModalLabel">Add New Partner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="partnerForm" action="{% url 'submit_newpartner' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="partner" class="form-label fw-semibold">Partner Name</label>
+                                <input type="text" class="form-control py-2" name="partner" id="partner" value="{{ partner.Partner_Name }}" required>
+                                <div class="invalid-feedback">Please enter a partner name.</div>
+                            </div>
+                        </div>
+                                             
+                        <div class="row g-3 mb-3">  
+                            <div class="col">
+                                <label for="address" class="form-label fw-semibold">Address</label>
+                                <input type="text" class="form-control py-2" name="address" id="address" value="{{ partner.address }}" required>
+                                <div class="invalid-feedback">Please enter an address.</div>
+                            </div>
+        
+                            <div class="col-3">
+                                <label for="city" class="form-label fw-semibold">City</label>
+                                <input type="text" class="form-control py-2" name="city" id="city" value="{{ partner.city }}" required>
+                                <div class="invalid-feedback">Please enter a city.</div>
+                            </div>
+
+                            <div class="col">
+                                <label for="state" class="form-label fw-semibold">State</label>
+                                <input type="text" class="form-control py-2" name="state" id="state" value="{{ partner.state }}">
+                                <div class="invalid-feedback">Please enter a state.</div>
+                            </div>
+            
+                            <div class="col-3">
+                                <label for="country" class="form-label fw-semibold">Country</label>
+                                <input type="text" class="form-control py-2" name="country" id="country" value="{{ partner.country }}" required>
+                                <div class="invalid-feedback">Please enter a country.</div>
+                            </div>
+                        </div>
+                            
+                        <div class="row g-3 mb-3">
+                            <div class="col">
+                                <label for="contact" class="form-label fw-semibold">Contact Person</label>
+                                <input type="text" class="form-control py-2" name="contact" id="contact" value="{{ partner.Contact_Person }}" required>
+                                <div class="invalid-feedback">Please enter a contact person.</div>
+                            </div>
+
+                            <div class="col">
+                                <label for="designation" class="form-label fw-semibold">Designation</label>
+                                <input type="text" class="form-control py-2" name="designation" value="{{ partner.designation }}" required>
+                                <div class="invalid-feedback">Please enter a designation.</div>
+                            </div>
+            
+                            <div class="col">
+                                <label for="email" class="form-label fw-semibold">Email</label>
+                                <input type="email" class="form-control py-2" name="email" id="email" value="{{ partner.email }}" required>
+                                <div class="invalid-feedback">Please enter an email.</div>
+                            </div>
+
+                            <div class="col">
+                                <label for="contactnumber" class="form-label fw-semibold">Phone Number</label>
+                                <input type="text" class="form-control py-2" name="number" id="contactnumber" value="{{ partner.Phone_Number }}" required>
+                                <div class="invalid-feedback">Please enter a phone number.</div>
+                            </div>
+                        </div>          
+                    </form>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn px-4" id="submitPartnerBtn">Add Partner</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body"></div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'True') {
+                showToast('Data saved successfully.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.search.replace('&success=True', '').replace('success=True', ''));
+            }
+        });
+    
+        function showToast(message, type){
+            var toastElement = document.getElementById('toast');
+            var toastBody = toastElement.querySelector('.toast-body');
+    
+            if (type === 'success') {
+                toastBody.textContent = message;
+            }
+    
+            var toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            function handleFormSubmission(formId, dropdownId, modalId, responseKey){
+                var form = document.getElementById(formId);
+                if(form.checkValidity()){
+                    var formData = new FormData(form);
+                    var xhr = new XMLHttpRequest();
+                    
+                    xhr.onreadystatechange = function(){
+                        if(xhr.readyState == XMLHttpRequest.DONE){
+                            if(xhr.status == 200){
+                                var response = JSON.parse(xhr.responseText);
+                                var dropdown = document.getElementById(dropdownId);
+                                var options = dropdown.options;
+                                var exists = false;
+
+                                for(var i = 0; i < options.length; i++){
+                                    if(options[i].value === response[responseKey]){
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+
+                                if(!exists){
+                                    var option = document.createElement("option");
+                                    option.text = response[responseKey];
+                                    option.value = response[responseKey];
+                                    dropdown.add(option);
+                                }
+                                
+                                $(modalId).modal('hide');
+                            } else if(xhr.status == 400){
+                                var response = JSON.parse(xhr.responseText);
+                                alert(response.error);
+                            } else {
+                                console.error('Error:', xhr.statusText);
+                            }
+                        }
+                    };
+
+                    xhr.open("POST", form.action);
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    xhr.send(formData);
+                }else{
+                    form.classList.add("was-validated");
+                }
+            }
+
+            document.getElementById("submitSectorBtn").addEventListener("click", function(){
+                handleFormSubmission("sectorForm", "sector", "#sectorModal", "sector_name");
+            });
+
+            document.getElementById("submitPartnerBtn").addEventListener("click", function(){
+                handleFormSubmission("partnerForm", "partner", "#partnerModal", "partner_name");
+            });
+
+            var viaDropdown = document.getElementById("via");
+            var referralNameInput = document.getElementById("referralNameInput");
+            var partnerDropdown = document.getElementById("partnerDropdown");
+
+            viaDropdown.addEventListener("change", function(){
+                var selectedVia = viaDropdown.value;
+                if(selectedVia === "Referral"){
+                    referralNameInput.style.display = "block";
+                    partnerDropdown.style.display = "none";
+                }else if(selectedVia === "Partner"){
+                    referralNameInput.style.display = "none";
+                    partnerDropdown.style.display = "block";
+                }else{
+                    referralNameInput.style.display = "none";
+                    partnerDropdown.style.display = "none";
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function updatePhoneNumber(){
+            const countrySelect = document.getElementById('country');
+            const phoneNumberInput = document.getElementById('contactnumber');
+            const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+            const countryCode = selectedOption.getAttribute('data-code');
+
+            if(countryCode){
+                phoneNumberInput.value = countryCode + ' ';
+            }else{
+                phoneNumberInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            updatePhoneNumber();
+        });
+    </script>
+
+    <script>
+        function addContactPerson() {
+            var container = document.getElementById('contact-persons-container');
+            var newContactPerson = document.querySelector('.contact-person-template').cloneNode(true);
+            newContactPerson.classList.remove('contact-person-template');
+            newContactPerson.classList.add('contact-person');
+            newContactPerson.style.display = 'block';
+            container.appendChild(newContactPerson);
+        }
+
+        function removeContactPerson(element) {
+            element.closest('.contact-person').remove();
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            var forms = document.querySelectorAll("form")
+            forms.forEach(function(form){
+                form.addEventListener("keydown", function(event){
+                    if(event.key === "Enter"){
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+
+        if( window.history.replaceState ){
+            window.history.replaceState( null, null, window.location.href );
+        }
+    </script>
+
+    <script src="/static/js/script.js"></script>
+    <script src="https://kit.fontawesome.com/296ff2fa8f.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>
