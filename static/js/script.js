@@ -1,27 +1,12 @@
-// Signup
-
-document.addEventListener("DOMContentLoaded", function() {
-    var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('success')) {
-        var success = urlParams.get('success');
-        var message = urlParams.get('message');
-        if (success === 'True') {
-            showToast('Account created successfully.', 'success');
-        } else if (success === 'False') {
-            showToast(message ? decodeURIComponent(message) : 'Signup failed.', 'error');
-        }
-        window.history.replaceState({}, document.title, "{{ request.path }}");
-    }
-});
-
 // Show Password
 
-function showPassword(){
-    var x = document.getElementById("password");
-    if(x.type == "password"){
-        x.type = "text";
-    }else{
-        x.type = "password";
+function toggleSignupPasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    const checkbox = document.getElementById('checkbox');
+    if (checkbox.checked) {
+        passwordField.type = 'text';
+    } else {
+        passwordField.type = 'password';
     }
 }
 
@@ -34,50 +19,77 @@ function showLoginPassword(){
     }
 }
 
-// Dropdown Menu
+// Company Search
+function searchTable(inputId, tableId){
+    var input, filter, table, tr, td, i, txtValue;
+    
+    input = document.getElementById(inputId);
+    filter = input.value.toUpperCase();
+    table = document.getElementById(tableId);
+    tr = table.getElementsByTagName("tr");
 
-document.addEventListener("DOMContentLoaded", function(){
-    var baseUrl = "/master/";
-    var dropdownLinks = document.querySelectorAll("#master .dropdown-item");
-
-    dropdownLinks.forEach(function(link){
-        link.addEventListener("click", function(event){
-            event.preventDefault();
-            var selectedValue = link.getAttribute("value");
-            var url = baseUrl + "?selection=" + selectedValue;
-            window.location.href = url;
-        });
-    });
-});
-
-document.addEventListener("DOMContentLoaded", function(){
-    var masterNavItem = document.getElementById('master');
-    var dropdownMenu = masterNavItem.querySelector('.dropdown-menu');
-            
-    masterNavItem.querySelector('.nav-link').addEventListener('click', function(event){
-        event.preventDefault();
-        dropdownMenu.style.display = dropdownMenu.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    document.addEventListener('click', function(event){
-        if (!masterNavItem.contains(event.target)){
-            dropdownMenu.style.display = 'none';
-        }
-    });
-});
-
-// Form Validation
-
-document.addEventListener("DOMContentLoaded", function(){
-    var forms = document.querySelectorAll("form.needs-validation");
-
-    forms.forEach(function(form){
-        form.addEventListener("submit", function(event){
-            if(!form.checkValidity()){
-                event.preventDefault();
-                event.stopPropagation();
+    for(i = 0; i < tr.length; i++){
+        td = tr[i].getElementsByTagName("td")[0];
+        if(td){
+            txtValue = td.textContent || td.innerText;
+            if(txtValue.toUpperCase().indexOf(filter) > -1){
+                tr[i].style.display = "";
+            }else{
+                tr[i].style.display = "none";
             }
-            form.classList.add("was-validated");
-        }, false);
-    });
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    var companySearchInput = document.getElementById("company-search");
+    var partnerSearchInput = document.getElementById("partner-search");
+
+    if(companySearchInput){
+        companySearchInput.addEventListener("input", function(){
+            searchTable('company-search', 'company-name-table');
+        });
+    }
+
+    if(partnerSearchInput){
+        partnerSearchInput.addEventListener("input", function(){
+            searchTable('partner-search', 'partner-name-table');
+        });
+    }
 });
+
+// City Filter
+document.getElementById('city-filter').addEventListener('change', function(){
+    var selectedCity = this.value;
+    var url = new URL(window.location.href);
+    if (selectedCity){
+        url.searchParams.set('city', selectedCity);
+    } else{
+        url.searchParams.delete('city');
+    }
+    window.location.href = url.toString();
+});
+
+// Toggle Via Fields
+var viaDropdown = document.getElementById("via");
+var referralDiv = document.getElementById("referralDiv");
+var partnerDiv = document.getElementById("partnerDiv");
+
+viaDropdown.addEventListener("change", function(){
+    var selectedVia = viaDropdown.value;
+    if(selectedVia === "Referral"){
+        referralDiv.style.display = "block";
+        partnerDiv.style.display = "none";
+    }else if(selectedVia === "Partner"){
+        referralDiv.style.display = "none";
+        partnerDiv.style.display = "block";
+    }else{
+        referralDiv.style.display = "none";
+        partnerDiv.style.display = "none";
+    }
+});
+
+// Form Double Submission Avoidance
+if( window.history.replaceState ){
+    window.history.replaceState( null, null, window.location.href );
+}

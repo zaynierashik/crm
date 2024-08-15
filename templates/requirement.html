@@ -7,8 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CRM</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"/>
+    <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}"/>
 </head>
 <body>
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
@@ -38,7 +37,8 @@
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'requirement' %}">
+                        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
+                        <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'requirement' %}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                             </svg>
@@ -63,8 +63,7 @@
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
-                        <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
-                        <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'transaction' %}">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'transaction' %}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
                             </svg>
@@ -328,56 +327,116 @@
 
             <main class="h-full pb-16 overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
-                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Transaction</h2>
+                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Requirement</h2>
               
                     <!-- Company Inputs -->
                     <!-- <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">Company</h4> -->
                     <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
                         <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name</label>
                         <select id="company-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected>Choose a company</option>
+                            <option value="" selected>Choose a company</option>
                             <option value="US">United States</option>
                             <option value="CA">Canada</option>
                             <option value="FR">France</option>
                             <option value="DE">Germany</option>
                         </select>
-                    
-                        <label for="contact-person" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person</label>
-                        <select id="contact-person" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                            <option selected>Choose a contact person</option>
-                            <option value="US">United States</option>
-                            <option value="CA">Canada</option>
-                            <option value="FR">France</option>
-                            <option value="DE">Germany</option>
-                        </select>
+
+                        <div>
+                            <label for="currency-input" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person</label>
+                            <div class="flex items-center">
+                                <select id="contact-person" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="" selected>Choose a contact person</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="FR">France</option>
+                                    <option value="DE">Germany</option>
+                                </select>
+                        
+                                <button class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11px]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
                     </div>
               
                     <!-- Requirement Inputs -->
                     <!-- <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement</h4> -->
                     <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                        <div class="grid gap-4 mb-4 md:grid-cols-1">
-                            <div class="flex">
-                                <div class="w-1/2">
-                                    <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
-                                    <input id="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                        <div class="grid gap-4 mb-2 md:grid-cols-2">
+                            <div class="md:col-span-1 lg:col-span-2">
+                                <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
+                                <select id="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="" selected>Choose a requirement category</option>
+                                    <option value="Service">Service</option>
+                                    <option value="Product">Product</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
+                                <select id="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="" selected>Choose a service</option>
+                                    <option value="Service">Service</option>
+                                    <option value="Product">Product</option>
+                                </select>
+                            </div>
+    
+                            <div class="grid gap-4 mb-2 md:grid-cols-2">
+                                <div>
+                                    <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
+                                    <select id="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="" selected>Choose a brand</option>
+                                        <option value="Service">Service</option>
+                                        <option value="Product">Product</option>
+                                    </select>
                                 </div>
-                        
-                                <div class="flex-grow w-full ml-4">
-                                    <label for="requirement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement</label>
-                                    <select id="requirement" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                        <option selected>Choose a requirement</option>
+    
+                                <div>
+                                    <label for="product" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product</label>
+                                    <select id="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="" selected>Choose a product</option>
                                         <option value="Service">Service</option>
                                         <option value="Product">Product</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-
-                        <label for="action" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Action</label>
-                        <textarea id="action" rows="4" class="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the performed work..."></textarea>
                 
-                        <label for="remarks" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Remarks</label>
-                        <textarea id="remarks" rows="4" class="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your remarks..."></textarea>
+                        <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
+                        <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement..."></textarea>
+                
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <label for="currency-input" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                                <div class="flex items-center">
+                                    <div class="relative w-24">
+                                        <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-2.5 py-[10.7px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <option value="USD">USD</option>
+                                            <option value="NPR">NPR</option>
+                                            <option value="INR">INR</option>
+                                        </select>
+                                    </div>
+                                        
+                                    <div class="relative w-full">
+                                        <input type="number" id="currency-input" min="0" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="status" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                                <select id="status" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="" selected>Choose a status</option>
+                                    <option value="Initiated">Initiated</option>
+                                    <option value="Pipeline">Pipeline</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">Submit</button>
@@ -386,11 +445,9 @@
         </div>
     </div>
     
-    <script src="{% static 'js/charts-lines.js' %}" defer></script>
-    <script src="{% static 'js/charts-pie.js' %}" defer></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
 </body>
 </html>
