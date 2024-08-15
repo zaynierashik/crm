@@ -7,7 +7,10 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-def index(request):
+def login(request):
+    return render(request, 'login.html')
+
+def dashboard(request):
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')

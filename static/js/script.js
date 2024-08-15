@@ -1,5 +1,4 @@
-// Show Password
-
+// Password Toggle
 function toggleSignupPasswordVisibility() {
     const passwordField = document.getElementById('password');
     const checkbox = document.getElementById('checkbox');
@@ -10,16 +9,17 @@ function toggleSignupPasswordVisibility() {
     }
 }
 
-function showLoginPassword(){
-    var x = document.getElementById("loginpassword");
-    if(x.type == "password"){
-        x.type = "text";
-    }else{
-        x.type = "password";
+function toggleLoginPasswordVisibility() {
+    const passwordField = document.getElementById('login-password');
+    const checkbox = document.getElementById('login-checkbox');
+    if (checkbox.checked) {
+        passwordField.type = 'text';
+    } else {
+        passwordField.type = 'password';
     }
 }
 
-// Company Search
+// Company & Partner Search
 function searchTable(inputId, tableId){
     var input, filter, table, tr, td, i, txtValue;
     
