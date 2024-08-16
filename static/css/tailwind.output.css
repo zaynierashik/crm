@@ -8326,11 +8326,6 @@ video {
   color: rgb(144 97 249 / var(--tw-text-opacity));
 }
 
-.hover\:border-gray-500:hover {
-  --tw-border-opacity: 1;
-  border-color: rgb(112 114 117 / var(--tw-border-opacity));
-}
-
 .hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(244 245 247 / var(--tw-bg-opacity));
@@ -8368,11 +8363,6 @@ video {
 .focus\:border-blue-500:focus {
   --tw-border-opacity: 1;
   border-color: rgb(63 131 248 / var(--tw-border-opacity));
-}
-
-.focus\:border-gray-500:focus {
-  --tw-border-opacity: 1;
-  border-color: rgb(112 114 117 / var(--tw-border-opacity));
 }
 
 .focus\:border-purple-300:focus {
@@ -8426,10 +8416,6 @@ video {
   --tw-ring-color: rgb(88 80 236 / var(--tw-ring-opacity));
 }
 
-.focus\:shadow-outline-gray:focus {
-  box-shadow: 0 0 0 3px hsla(210, 2.4%, 83.9%, 0.45);
-}
-
 .focus\:shadow-outline-purple:focus {
   box-shadow: 0 0 0 3px hsla(250.60000000000002, 93.9%, 87.1%, 0.45);
 }
@@ -8437,15 +8423,6 @@ video {
 .active\:bg-purple-600:active {
   --tw-bg-opacity: 1;
   background-color: rgb(126 58 242 / var(--tw-bg-opacity));
-}
-
-.active\:bg-transparent:active {
-  background-color: transparent;
-}
-
-.active\:text-gray-500:active {
-  --tw-text-opacity: 1;
-  color: rgb(112 114 117 / var(--tw-text-opacity));
 }
 
 @media (min-width: 640px) {
@@ -8475,6 +8452,14 @@ video {
 
   .sm\:p-12 {
     padding: 3rem;
+  }
+
+  .sm\:pr-0 {
+    padding-right: 0px;
+  }
+
+  .sm\:text-center {
+    text-align: center;
   }
 }
 

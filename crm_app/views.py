@@ -6,11 +6,75 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
 
 def login(request):
+    if 'staff_id' in request.session:
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        return login_authentication(request)
+    
     return render(request, 'login.html')
 
+# Login Authentication
+def login_authentication(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            user = Staff.objects.get(email=email)
+        except Staff.DoesNotExist:
+            error_message = "Invalid email or password!"
+            return HttpResponseRedirect(reverse('login') + f'?error_message={error_message}')
+
+        if not check_password(password, user.password):
+            error_message = "Invalid email or password!"
+            return HttpResponseRedirect(reverse('login') + f'?error_message={error_message}')
+
+        if not user.status:
+            error_message = "Your account is inactive. Please contact support."
+            return HttpResponseRedirect(reverse('login') + f'?error_message={error_message}')
+
+        request.session['staff_id'] = user.id
+        request.session['staff_email'] = user.email
+        request.session['staff_full_name'] = user.full_name
+
+        request.session.set_expiry(3600)
+        return redirect('dashboard')
+
+    return render(request, 'login.html')
+
+def profile(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    return render(request, 'profile.html', {'user': user})
+
+def setting(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    return render(request, 'setting.html', {'user': user})
+
+def logout(request):
+    request.session.flush()
+    return redirect('login')
+
 def dashboard(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+    
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
@@ -44,11 +108,17 @@ def dashboard(request):
         companies_page = paginator.page(paginator.num_pages)
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page,}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user}
 
     return render(request, 'index.html', context)
 
 def company(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
@@ -99,14 +169,26 @@ def company(request):
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
                 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
-                'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive}
+                'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive, 'user': user}
 
     return render(request, 'company.html', context)
 
 def requirement(request):
-    return render(request, 'requirement.html')
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    return render(request, 'requirement.html', {'user': user})
 
 def partner(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     partners = Partner.objects.order_by('partner_name')
     partner_count = Partner.objects.count()
     paginator = Paginator(partners, 10)
@@ -119,11 +201,17 @@ def partner(request):
     except EmptyPage:
         partners_page = paginator.page(paginator.num_pages)
 
-    context = {'partners': partners, 'partner_count': partner_count, 'partners': partners_page, 'paginator': paginator, 'page_obj': partners_page,}
+    context = {'partners': partners, 'partner_count': partner_count, 'partners': partners_page, 'paginator': paginator, 'page_obj': partners_page, 'user': user}
 
     return render(request, 'partner.html', context)
 
 def staff(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     staffs = Staff.objects.order_by('full_name')
     employee_count = Staff.objects.count()
     admin_count = Staff.objects.filter(role="Admin").count()
@@ -139,11 +227,17 @@ def staff(request):
     except EmptyPage:
         staffs_page = paginator.page(paginator.num_pages)
 
-    context = {'staffs': staffs, 'employee_count': employee_count, 'admin_count': admin_count, 'staff_count': staff_count, 'inactive_count': inactive_count, 'staffs': staffs_page, 'paginator': paginator, 'page_obj': staffs_page,}
+    context = {'staffs': staffs, 'employee_count': employee_count, 'admin_count': admin_count, 'staff_count': staff_count, 'inactive_count': inactive_count, 'staffs': staffs_page, 'paginator': paginator, 'page_obj': staffs_page, 'user': user}
 
     return render(request, 'staff.html', context)
 
 def transaction(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
@@ -181,11 +275,17 @@ def transaction(request):
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
                'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 
-               'completed_count': completed_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page,}
+               'completed_count': completed_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user}
 
     return render(request, 'transaction.html', context)
 
 def sector(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     sectors = Sector.objects.order_by('sector_name')
     sector_count = Sector.objects.count()
     paginator = Paginator(sectors, 10)
@@ -198,11 +298,17 @@ def sector(request):
     except EmptyPage:
         sectors_page = paginator.page(paginator.num_pages)
 
-    context = {'sectors': sectors, 'sector_count': sector_count, 'sectors': sectors_page, 'paginator': paginator, 'page_obj': sectors_page,}
+    context = {'sectors': sectors, 'sector_count': sector_count, 'sectors': sectors_page, 'paginator': paginator, 'page_obj': sectors_page, 'user': user}
 
     return render(request, 'sector.html', context)
 
 def service(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     services = Service.objects.order_by('service_name')
     service_count = Service.objects.count()
     paginator = Paginator(services, 10)
@@ -215,11 +321,17 @@ def service(request):
     except EmptyPage:
         services_page = paginator.page(paginator.num_pages)
 
-    context = {'services': services, 'service_count': service_count, 'services': services_page, 'paginator': paginator, 'page_obj': services_page,}
+    context = {'services': services, 'service_count': service_count, 'services': services_page, 'paginator': paginator, 'page_obj': services_page, 'user': user}
 
     return render(request, 'service.html', context)
 
 def brand(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     brands = Brand.objects.order_by('brand_name')
     brand_count = Brand.objects.count()
     paginator = Paginator(brands, 10)
@@ -232,12 +344,18 @@ def brand(request):
     except EmptyPage:
         brand_page = paginator.page(paginator.num_pages)
 
-    context = {'brands': brands, 'brand_count': brand_count, 'brands': brand_page, 'paginator': paginator, 'page_obj': brand_page,}
+    context = {'brands': brands, 'brand_count': brand_count, 'brands': brand_page, 'paginator': paginator, 'page_obj': brand_page, 'user': user}
 
     return render(request, 'brand.html', context)
 
 # New Company Submission
 def add_newcompany(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         company_name = request.POST.get('company-name')
 
@@ -275,18 +393,21 @@ def add_newcompany(request):
             referral = None
             partner = None
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website)
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
         company.save()
 
-        contact_name = request.POST.getlist('contact-name')
-        designation = request.POST.getlist('designation')
-        email = request.POST.getlist('email-address')
-        contact_number = request.POST.getlist('contact-number')
-        dob = request.POST.getlist('date')
-        religion = request.POST.getlist('religion')
+        contact_names = request.POST.getlist('contact-name[]')
+        designations = request.POST.getlist('designation[]')
+        emails = request.POST.getlist('email-address[]')
+        contact_numbers = request.POST.getlist('contact-number[]')
+        dobs = request.POST.getlist('date[]')
+        religions = request.POST.getlist('religion[]')
 
-        contact_person = Contact(company=company, contact_name=contact_name, designation=designation, email=email, phone_number=contact_number, dob=dob, religion=religion)
-        contact_person.save()
+        for i in range(len(contact_names)):
+            if contact_names[i]:
+                dob = dobs[i] if dobs[i] else None
+                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
+                contact_person.save()
                 
         return redirect(reverse('company'))
     else:
@@ -294,6 +415,12 @@ def add_newcompany(request):
     
 # New Partner Submission
 def add_newpartner(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         partner_name = request.POST.get('partner-name')
 
@@ -319,6 +446,12 @@ def add_newpartner(request):
     
 # New Staff Submission
 def add_newstaff(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         full_name = request.POST.get('staff-name')
         role = request.POST.get('role')
@@ -346,6 +479,12 @@ def add_newstaff(request):
     
 # New Sector Submission
 def add_newsector(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         sector_name = request.POST.get('sector-name')
 
@@ -361,6 +500,12 @@ def add_newsector(request):
     
 # New Service Submission
 def add_newservice(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         service_name = request.POST.get('service-name')
 
@@ -376,6 +521,12 @@ def add_newservice(request):
     
 # New Brand Submission
 def add_newbrand(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
     if request.method == 'POST':
         brand_name = request.POST.get('brand-name')
 

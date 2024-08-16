@@ -25,21 +25,22 @@
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
                         <h1 class="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Login</h1>
-                        
-                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                        <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full mb-4 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@example.com">
+                        <form id="staffForm" action="{% url 'login_authentication' %}" method="POST">
+                            {% csrf_token %}
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                            <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full mb-4 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@example.com">
 
-                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                        <input type="password" name="password" id="login-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full mb-2 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="********">
-                        
-                        <div class="flex items-center">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" id="login-checkbox" name="checkbox" onclick="toggleLoginPasswordVisibility()" class="h-3 w-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800">
+                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                            <input type="password" name="password" id="login-password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full mb-2 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="********">
+                            
+                            <div class="flex items-center">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" id="login-checkbox" name="checkbox" onclick="toggleLoginPasswordVisibility()" class="h-3 w-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800">
+                                </div>
+                                <label for="login-checkbox" class="ms-2 text-xs font-normal text-gray-500 dark:text-gray-300">Show Password</label>
                             </div>
-                            <label for="login-checkbox" class="ms-2 text-xs font-normal text-gray-500 dark:text-gray-300">Show Password</label>
-                        </div>
-            
-                        <a href="{% url 'dashboard' %}" class="block w-full p-2.5 mt-6 text-sm font-medium leading-5 text-center text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">Log In</a>
+                            <button type="submit" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full mt-6 py-2.5 shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">Log In</button>                                  
+                        </form>
                         <hr class="mt-7 mb-3" />
             
                         <p class="text-end">

@@ -3,6 +3,8 @@ from crm_app import views
 
 urlpatterns = [
     path('', views.login, name='login'),
+    path('profile/', views.profile, name='profile'),
+    path('setting/', views.setting, name='setting'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('company/', views.company, name='company'),
     path('requirement/', views.requirement, name='requirement'),
@@ -19,6 +21,9 @@ urlpatterns = [
     path('add-new-sector/', views.add_newsector, name='add_newsector'),
     path('add-new-service/', views.add_newservice, name='add_newservice'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
+
+    path('login-authentication/', views.login_authentication, name='login_authentication'),
+    path('logout/', views.logout, name='logout'),
 
     path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
 ]

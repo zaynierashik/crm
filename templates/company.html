@@ -671,7 +671,7 @@
 
                                             <div id="partnerDiv" class="w-1/2" style="display: none;">
                                                 <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
-                                                <select id="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option selected>Choose a partner</option>
                                                     {% for partner in partners %}
                                                     <option value="{{ partner.id }}">{{ partner.partner_name }}</option>
@@ -689,46 +689,58 @@
                             </div>
                     
                             <!-- Contact Inputs -->
-                            <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Contact Information</h4>
-                            <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                                <div class="grid gap-4 mb-4 md:grid-cols-2">
-                                    <div>
-                                        <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name</label>
-                                        <input type="text" id="contact-name" name="contact-name" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact name" required />
+                            <div class="grid gap-4 mb-2 md:grid-cols-2">
+                                <h4 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Contact Information</h4>
+                                <div class="flex justify-end">
+                                    <button type="button" id="add-contact-btn" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800" id="contacts-container">
+                                <div class="contact-form">
+                                    <div class="grid gap-4 mb-4 md:grid-cols-2">
+                                        <div>
+                                            <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name</label>
+                                            <input type="text" id="contact-name" name="contact-name[]" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact name" required />
+                                        </div>
+
+                                        <div>
+                                            <label for="designation" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Designation</label>
+                                            <input type="text" id="designation" name="designation[]" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter designation" />
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label for="designation" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Designation</label>
-                                        <input type="text" id="designation" name="designation" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter designation" />
+                                    <div class="grid gap-4 mb-4 md:grid-cols-2">
+                                        <div>
+                                            <label for="email-address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                                            <input type="email" id="email-address" name="email-address[]" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter emailaddress" />
+                                        </div>
+                
+                                        <div>
+                                            <label for="contact-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Number</label>
+                                            <input type="text" id="contact-number" name="contact-number[]" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact number" />
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="grid gap-4 mb-4 md:grid-cols-2">
-                                    <div>
-                                        <label for="email-address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                                        <input type="email" id="email-address" name="email-address" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter emailaddress" />
-                                    </div>
-            
-                                    <div>
-                                        <label for="contact-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Number</label>
-                                        <input type="text" id="contact-number" name="contact-number" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact number" />
-                                    </div>
-                                </div>
-                        
-                                <div class="grid gap-4 md:grid-cols-2">
-                                    <div>
-                                        <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
-                                        <input id="date" name="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="religion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Religion</label>
-                                        <select id="religion" name="religion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                            <option selected>Choose a religion</option>
-                                            <option value="Hinduism">Hinduism</option>
-                                            <option value="Buddhism">Buddhism</option>
-                                            <option value="Christianity">Christianity</option>
-                                        </select>
+                            
+                                    <div class="grid gap-4 md:grid-cols-2">
+                                        <div>
+                                            <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
+                                            <input id="date" name="date[]" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="religion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Religion</label>
+                                            <select id="religion" name="religion[]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="" selected>Choose a religion</option>
+                                                <option value="Hinduism">Hinduism</option>
+                                                <option value="Buddhism">Buddhism</option>
+                                                <option value="Christianity">Christianity</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
