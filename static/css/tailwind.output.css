@@ -1059,6 +1059,10 @@ video {
   grid-row-end: auto;
 }
 
+.float-start {
+  float: inline-start;
+}
+
 .float-right {
   float: right;
 }
@@ -8452,14 +8456,6 @@ video {
 
   .sm\:p-12 {
     padding: 3rem;
-  }
-
-  .sm\:pr-0 {
-    padding-right: 0px;
-  }
-
-  .sm\:text-center {
-    text-align: center;
   }
 }
 

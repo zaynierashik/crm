@@ -26,4 +26,8 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
 
     path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
+    path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
+
+    path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
+    path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
 ]

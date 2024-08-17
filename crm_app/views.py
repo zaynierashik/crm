@@ -1,3 +1,5 @@
+import io
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
 from django.urls import reverse
@@ -7,6 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, Border, Side
 
 def login(request):
     if 'staff_id' in request.session:
@@ -41,7 +45,7 @@ def login_authentication(request):
         request.session['staff_email'] = user.email
         request.session['staff_full_name'] = user.full_name
 
-        request.session.set_expiry(3600)
+        request.session.set_expiry(7200)
         return redirect('dashboard')
 
     return render(request, 'login.html')
@@ -417,9 +421,6 @@ def add_newcompany(request):
 def add_newpartner(request):
     if 'staff_id' not in request.session:
         return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         partner_name = request.POST.get('partner-name')
@@ -448,9 +449,6 @@ def add_newpartner(request):
 def add_newstaff(request):
     if 'staff_id' not in request.session:
         return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         full_name = request.POST.get('staff-name')
@@ -481,9 +479,6 @@ def add_newstaff(request):
 def add_newsector(request):
     if 'staff_id' not in request.session:
         return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         sector_name = request.POST.get('sector-name')
@@ -502,9 +497,6 @@ def add_newsector(request):
 def add_newservice(request):
     if 'staff_id' not in request.session:
         return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         service_name = request.POST.get('service-name')
@@ -523,9 +515,6 @@ def add_newservice(request):
 def add_newbrand(request):
     if 'staff_id' not in request.session:
         return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         brand_name = request.POST.get('brand-name')
@@ -547,3 +536,146 @@ def toggle_staff_status(request, staff_id):
     staff.status = not staff.status
     staff.save()
     return JsonResponse({'status': staff.status})
+
+# View Company Details
+def companydetails(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+    
+    requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
+    contacts = Contact.objects.filter(company=company)
+
+    requirements_count = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
+    requirements_paginator = Paginator(requirements_count, 10)
+    requirements_page_number = request.GET.get('requirements_page', 1)
+    requirements_page_obj = requirements_paginator.get_page(requirements_page_number)
+
+    context = {'company': company, 'requirements': requirements, 'contacts': contacts, 'requirements_page_obj': requirements_page_obj}
+    return render(request, 'companydetails.html', context)
+
+# View Requirement Details
+def requirementdetails(request, company_id, requirement_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    company = get_object_or_404(Company, id=company_id)
+    requirement = get_object_or_404(Requirement, id=requirement_id)
+    transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
+
+    transactions_count = Transaction.objects.filter(company=company).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
+    transactions_paginator = Paginator(transactions_count, 10)
+    transactions_page_number = request.GET.get('transactions_page', 1)
+    transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
+
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        transactions = transactions.filter(date__range=[start_date, end_date])
+
+    context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj}
+    return render(request, 'requirementdetails.html', context)
+
+# Export Excel File
+def export_excel(request, company_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    try:
+        company = Company.objects.get(pk=company_id)
+    except Company.DoesNotExist:
+        return HttpResponse("Company not found.", status=404)
+
+    transactions = Transaction.objects.filter(company_id=company_id).select_related('requirement').order_by('requirement__id', '-date')
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Company Data"
+
+    # Define styles
+    center_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    left_alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
+    bold_font = Font(bold=True)
+    thin_border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+
+    # Add headers for contacts
+    headers = ['Company Name', 'Contact Person', 'Email', 'Phone Number']
+    ws.append(headers)
+    for cell in ws[1]:
+        cell.alignment = center_alignment
+        cell.font = bold_font
+        cell.border = thin_border
+
+    # Add company contact persons
+    for contact in company.company_contacts.all():
+        ws.append([company.company_name, contact.contact_name, contact.email, contact.phone_number])
+        for cell in ws[ws.max_row]:
+            cell.border = thin_border
+
+    # Leave a blank row
+    ws.append([])
+    ws.append(['S.N.', 'Requirement Type', 'Requirement', 'Date', 'Action', 'Remark'])
+
+    for cell in ws[ws.max_row]:
+        cell.alignment = center_alignment
+        cell.font = bold_font
+        cell.border = thin_border
+
+    # Set column widths
+    column_widths = {'A': 23, 'B': 30, 'C': 35, 'D': 20, 'E': 50, 'F': 50}
+    for column, width in column_widths.items():
+        ws.column_dimensions[column].width = width
+
+    # Write transaction data
+    last_requirement_id = None
+    merge_start_row = ws.max_row + 1
+    sn = 1
+
+    for transaction in transactions:
+        requirement = transaction.requirement
+        requirement_id = requirement.id if requirement else None
+        requirement_type = requirement.requirement_type if requirement else ''
+        requirement_value = ''
+
+        if requirement_type.lower() == 'product':
+            brand = requirement.brand.brand_name if requirement and requirement.brand else ''
+            product_name = requirement.product_name.product_name if requirement and requirement.product_name else ''
+            if brand and product_name:
+                requirement_value = f"{brand} - {product_name}"
+        elif requirement_type.lower() == 'service':
+            requirement_value = requirement.service.service_name if requirement and requirement.service else ''
+
+        if last_requirement_id and last_requirement_id != requirement_id:
+            if ws.max_row - 1 > merge_start_row:
+                ws.merge_cells(start_row=merge_start_row, start_column=1, end_row=ws.max_row - 1, end_column=1)
+                ws.merge_cells(start_row=merge_start_row, start_column=2, end_row=ws.max_row - 1, end_column=2)
+                ws.merge_cells(start_row=merge_start_row, start_column=3, end_row=ws.max_row - 1, end_column=3)
+            merge_start_row = ws.max_row + 1
+
+        ws.append([sn, requirement_type, requirement_value, transaction.date, transaction.action, transaction.remark])
+        for cell in ws[ws.max_row]:
+            cell.alignment = left_alignment if cell.column_letter in ['E', 'F'] else center_alignment
+            cell.border = thin_border
+
+        last_requirement_id = requirement_id
+        sn += 1
+
+    if ws.max_row >= merge_start_row:
+        ws.merge_cells(start_row=merge_start_row, start_column=1, end_row=ws.max_row, end_column=1)
+        ws.merge_cells(start_row=merge_start_row, start_column=2, end_row=ws.max_row, end_column=2)
+        ws.merge_cells(start_row=merge_start_row, start_column=3, end_row=ws.max_row, end_column=3)
+
+    # Merge cells for company name
+    company_name_start_row = 2
+    company_name_end_row = company.company_contacts.count() + 1
+    ws.merge_cells(start_row=company_name_start_row, start_column=1, end_row=company_name_end_row, end_column=1)
+    for row in range(company_name_start_row, company_name_end_row + 1):
+        ws[f'A{row}'].alignment = center_alignment
+        ws[f'A{row}'].border = thin_border
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
+    return response
