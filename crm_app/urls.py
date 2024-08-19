@@ -18,6 +18,7 @@ urlpatterns = [
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
+    path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
     path('add-new-sector/', views.add_newsector, name='add_newsector'),
     path('add-new-service/', views.add_newservice, name='add_newservice'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),

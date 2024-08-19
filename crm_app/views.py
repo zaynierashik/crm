@@ -474,6 +474,23 @@ def add_newstaff(request):
             return redirect('add_newstaff')
 
     return render(request, 'staff.html')
+
+# New Transaction Submission
+def add_transaction(request, company_id, requirement_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        company = get_object_or_404(Company, id=company_id)
+        requirement = get_object_or_404(Requirement, id=requirement_id)
+        date = request.POST.get('date')
+        contact_id = request.POST.get('contact-person')
+        contact = get_object_or_404(Contact, id=contact_id)
+        action = request.POST.get('action')
+        remark = request.POST.get('remarks')
+
+        Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
+        return redirect('requirementdetails', company_id=company_id, requirement_id=requirement_id)
     
 # New Sector Submission
 def add_newsector(request):
@@ -559,6 +576,7 @@ def requirementdetails(request, company_id, requirement_id):
     
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
+    requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
     transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
 
     transactions_count = Transaction.objects.filter(company=company).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
@@ -572,7 +590,8 @@ def requirementdetails(request, company_id, requirement_id):
     if start_date and end_date:
         transactions = transactions.filter(date__range=[start_date, end_date])
 
-    context = {'company': company, 'requirement': requirement, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj}
+    contacts = Contact.objects.filter(company=company)
+    context = {'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'requirementdetails.html', context)
 
 # Export Excel File
