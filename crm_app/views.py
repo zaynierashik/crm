@@ -145,13 +145,17 @@ def company(request):
     status_filter = request.GET.get('status', 'active')
 
     if city_filter:
-        companies = companies.filter(city=city_filter)
+        active_companies = active_companies.filter(city=city_filter)
+        inactive_companies = inactive_companies.filter(city=city_filter)
 
     if status_filter:
         status_value = status_filter.lower() == 'active'
-        companies = companies.filter(status=status_value)
+        if status_value:
+            active_companies = active_companies.filter(status=True)
+        else:
+            inactive_companies = inactive_companies.filter(status=False)
 
-    paginator_active = Paginator(active_companies, 10)  # 10 items per page
+    paginator_active = Paginator(active_companies, 10)
     page_active = request.GET.get('page_active')
 
     try:
@@ -161,7 +165,7 @@ def company(request):
     except EmptyPage:
         active_companies_page = paginator_active.page(paginator_active.num_pages)
 
-    paginator_inactive = Paginator(inactive_companies, 10)  # 10 items per page
+    paginator_inactive = Paginator(inactive_companies, 10)
     page_inactive = request.GET.get('page_inactive')
 
     try:
@@ -593,6 +597,100 @@ def requirementdetails(request, company_id, requirement_id):
     contacts = Contact.objects.filter(company=company)
     context = {'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'requirementdetails.html', context)
+
+# Edit Company Details
+def companyeditform(request, company_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    company = Company.objects.get(pk=company_id)
+    contacts = Contact.objects.filter(company=company)
+    sectors = Sector.objects.values('sector_name')
+    partners = Partner.objects.all()
+
+    display_via = ''
+    if company.via and company.via == 'Direct':
+        display_via = 'Direct'
+    elif company.via and company.via == 'Referral' and company.Referral_Name:
+        display_via = company.Referral_Name
+    elif company.via and company.via == 'Partner' and company.Partner_Name:
+        display_via = company.Partner_Name.Partner_Name
+
+    countries = ["Nepal", "USA", "India", "Singapore"]
+    religions = ["Hinduism", "Buddhism", "Christianity"]
+    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions, 'display_via': display_via})
+
+# Update Company
+def update_company(request, company_id):
+    company = get_object_or_404(Company, id=company_id)
+
+    if request.method == "POST":
+        company.company_name = request.POST.get('company-name')
+        company.sector_id = request.POST.get('sector')
+        company.address = request.POST.get('address')
+        company.city = request.POST.get('city')
+        company.state = request.POST.get('state')
+        company.country = request.POST.get('country')
+        company.via = request.POST.get('via')
+        company.referral_name = request.POST.get('referral') if request.POST.get('via') == 'Referral' else None
+        company.partner_name_id = request.POST.get('partner') if request.POST.get('via') == 'Partner' else None
+        company.website = request.POST.get('website')
+        company.save()
+
+        contact_names = request.POST.getlist('contact-name[]')
+        designations = request.POST.getlist('designation[]')
+        emails = request.POST.getlist('email-address[]')
+        phone_numbers = request.POST.getlist('contact-number[]')
+        dobs = request.POST.getlist('date[]')
+        religions = request.POST.getlist('religion[]')
+
+        existing_contacts = list(company.company_contacts.all())
+
+        for i in range(len(contact_names)):
+            if i < len(existing_contacts):
+                contact = existing_contacts[i]
+            else:
+                contact = Contact(company=company)
+            
+            contact.contact_name = contact_names[i]
+            contact.designation = designations[i]
+            contact.email = emails[i]
+            contact.phone_number = phone_numbers[i]
+            contact.dob = dobs[i] if dobs[i] else None
+            contact.religion = religions[i]
+            contact.save()
+
+        return redirect(reverse('companyeditform', args=[company.id]))
+
+    sectors = Sector.objects.all()
+    countries = ["Nepal", "USA", "India", "Singapore"]
+    partners = Partner.objects.all()
+    religions = ["Hinduism", "Buddhism", "Christianity"]
+
+    return render(request, 'companyeditform.html', {'company': company, 'contacts': company.company_contacts.all(), 'sectors': sectors, 'countries': countries, 'partners': partners, 'religions': religions})
+
+# Get AJAX Contacts for Transaction Form
+def get_contacts(request):
+    company_id = request.GET.get('company_id')
+    contacts = Contact.objects.filter(company_id=company_id).values('id', 'contact_name')
+    return JsonResponse(list(contacts), safe=False)
+
+def get_requirements(request):
+    company_id = request.GET.get('company_id')
+    requirements = Requirement.objects.filter(company_id=company_id)
+    data = []
+
+    for requirement in requirements:
+        if requirement.requirement_type == 'Product':
+            display_text = f"{requirement.brand.brand_name if requirement.brand else ''} - {requirement.product_name.product_name if requirement.product_name else ''}"
+        elif requirement.requirement_type == 'Service':
+            display_text = requirement.service.service_name if requirement.service else 'No Service Name'
+        else:
+            display_text = 'Unknown Requirement'
+
+        data.append({'id': requirement.id, 'requirement_name': display_text})
+    
+    return JsonResponse(data, safe=False)
 
 # Export Excel File
 def export_excel(request, company_id):

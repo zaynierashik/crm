@@ -23,12 +23,18 @@ urlpatterns = [
     path('add-new-service/', views.add_newservice, name='add_newservice'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
 
+    path('update-company/<int:company_id>', views.update_company, name='update_company'),
+
+    path('get-contacts/', views.get_contacts, name='get_contacts'),
+    path('get-requirements/', views.get_requirements, name='get_requirements'),
+
     path('login-authentication/', views.login_authentication, name='login_authentication'),
     path('logout/', views.logout, name='logout'),
 
     path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
+    path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
 ]
