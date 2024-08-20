@@ -24,6 +24,9 @@ urlpatterns = [
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
 
     path('update-company/<int:company_id>', views.update_company, name='update_company'),
+    path('update-sector/', views.update_sector, name='update_sector'),
+    path('update-service/', views.update_service, name='update_service'),
+    path('update-brand/', views.update_brand, name='update_brand'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),
@@ -37,4 +40,6 @@ urlpatterns = [
     path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
+
+    path('send-email/', views.send_email, name='send_email'),
 ]

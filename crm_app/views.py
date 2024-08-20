@@ -1,3 +1,4 @@
+from django.utils import timezone
 import io
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -11,6 +12,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, Border, Side
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 def login(request):
     if 'staff_id' in request.session:
@@ -622,6 +627,9 @@ def companyeditform(request, company_id):
 
 # Update Company
 def update_company(request, company_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == "POST":
@@ -668,6 +676,42 @@ def update_company(request, company_id):
     religions = ["Hinduism", "Buddhism", "Christianity"]
 
     return render(request, 'companyeditform.html', {'company': company, 'contacts': company.company_contacts.all(), 'sectors': sectors, 'countries': countries, 'partners': partners, 'religions': religions})
+
+# Update Sector
+@require_POST
+def update_sector(request):
+    sector_id = request.POST.get('sector-id')
+    sector_name = request.POST.get('sector-name')
+    sector = get_object_or_404(Sector, id=sector_id)
+
+    sector.sector_name = sector_name
+    sector.save()
+
+    return redirect('sector')
+
+# Update Service
+@require_POST
+def update_service(request):
+    service_id = request.POST.get('service-id')
+    service_name = request.POST.get('service-name')
+    service = get_object_or_404(Service, id=service_id)
+
+    service.service_name = service_name
+    service.save()
+
+    return redirect('service')
+
+# Update Brand
+@require_POST
+def update_brand(request):
+    brand_id = request.POST.get('brand-id')
+    brand_name = request.POST.get('brand-name')
+    brand = get_object_or_404(Brand, id=brand_id)
+
+    brand.brand_name = brand_name
+    brand.save()
+
+    return redirect('brand')
 
 # Get AJAX Contacts for Transaction Form
 def get_contacts(request):
@@ -796,3 +840,22 @@ def export_excel(request, company_id):
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
     return response
+
+# SMTP
+def send_email(request):
+    now = timezone.now()
+    today = now.date()
+    users = Contact.objects.filter(dob__month=today.month, dob__day=today.day)
+
+    for user in users:
+        subject = "Happy Birthday!"
+        html_content = render_to_string('email.html', {'name': user.contact_name, 'email': user.email})
+        from_email = 'rashik.chauhan@greentechconcern.com'
+        to = [user.email]
+
+        text_content = strip_tags(html_content)
+        email = EmailMultiAlternatives(subject, text_content, from_email, to)
+        email.attach_alternative(html_content, "text/html")
+        email.send(fail_silently=False)
+
+    return redirect('dashboard')
