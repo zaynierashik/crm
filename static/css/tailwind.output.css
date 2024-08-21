@@ -8468,10 +8468,6 @@ video {
     inset: 0px;
   }
 
-  .md\:col-span-1 {
-    grid-column: span 1 / span 1;
-  }
-
   .md\:block {
     display: block;
   }
@@ -8514,10 +8510,6 @@ video {
 }
 
 @media (min-width: 1024px) {
-  .lg\:col-span-2 {
-    grid-column: span 2 / span 2;
-  }
-
   .lg\:mr-32 {
     margin-right: 8rem;
   }

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.db.models import Sum
 from .models import *
+from .services import predict_revenue_for_company
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
@@ -17,7 +18,6 @@ from openpyxl.styles import Alignment, Font, Border, Side
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
 
 def login(request):
     if 'staff_id' in request.session:
@@ -120,7 +120,6 @@ def dashboard(request):
 
     company_id = Company.objects.first().id
     predicted_price = predict_revenue_for_company(company_id)
-    # return JsonResponse({'predicted_price': predicted_price[0]})
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
                'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_price': predicted_price[0]}
@@ -199,7 +198,19 @@ def requirement(request):
     staff_id = request.session.get('staff_id')
     user = Staff.objects.get(id=staff_id)
 
-    return render(request, 'requirement.html', {'user': user})
+    companies = Company.objects.order_by('company_name')
+    contacts = Contact.objects.select_related('company').all()
+    sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
+    services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
+    brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
+    products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
+    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
+    cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
+    staffs = Staff.objects.all()
+
+    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'user': user}
+
+    return render(request, 'requirement.html', context)
 
 def partner(request):
     if 'staff_id' not in request.session:
@@ -406,6 +417,30 @@ def add_newcompany(request):
     else:
         return HttpResponse("Form Submission Error!")
     
+# New Requirement Submission
+def add_newrequirement(request):
+    if request.method == 'POST':
+        company_id = request.POST.get('company-name')
+        contact_id = request.POST.get('contact-person')
+        requirement_type = request.POST.get('requirement-category')
+        brand_id = request.POST.get('brand') if requirement_type == 'Product' else None
+        product_id = request.POST.get('product') if requirement_type == 'Product' else None
+        service_id = request.POST.get('service') if requirement_type == 'Service' else None
+        requirement_description = request.POST.get('message')
+        currency = request.POST.get('currency')
+        price = request.POST.get('price')
+        status = request.POST.get('status')
+
+        company = get_object_or_404(Company, pk=company_id)
+        contact = get_object_or_404(Contact, pk=contact_id) if contact_id else None
+        brand = get_object_or_404(Brand, pk=brand_id) if brand_id else None
+        product = get_object_or_404(Product, pk=product_id) if product_id else None
+        service = get_object_or_404(Service, pk=service_id) if service_id else None
+
+        Requirement.objects.create(company=company, date=now(), contact_name=contact, requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description, currency=currency, price=price, status=status)
+
+        return redirect(reverse('requirement'))
+    
 # New Partner Submission
 def add_newpartner(request):
     if 'staff_id' not in request.session:
@@ -603,14 +638,10 @@ def partnerdetails(request, partner_id):
 
     company_requirements = []
     for company in companies:
-        total_revenue = Requirement.objects.filter(company=company, status='Closed').aggregate(total=Sum('price'))['total'] or 0.00
+        total_revenue = Requirement.objects.filter(company=company, status='Completed').aggregate(total=Sum('price'))['total'] or 0.00
         pending_revenue = Requirement.objects.filter(company=company, status__in=['Pipeline', 'Initiated']).aggregate(total=Sum('price'))['total'] or 0.00
         
-        company_requirements.append({
-            'company': company,
-            'total_revenue': total_revenue,
-            'pending_revenue': pending_revenue,
-        })
+        company_requirements.append({'company': company, 'total_revenue': total_revenue, 'pending_revenue': pending_revenue})
 
     context = {'partner': partner, 'company_requirements': company_requirements}
     return render(request, 'partnerdetails.html', context)
@@ -853,10 +884,7 @@ def export_excel(request, company_id):
     response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
     return response
 
-# SMTP
-from django.http import JsonResponse
-from .services import predict_revenue_for_company
-
+# Linear Regression Call
 def predict_price(request):
     company_id = Company.objects.first().id
     predicted_price = predict_revenue_for_company(company_id)

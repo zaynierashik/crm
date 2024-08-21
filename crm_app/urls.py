@@ -16,6 +16,7 @@ urlpatterns = [
     path('brand/', views.brand, name='brand'),
 
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
+    path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
     path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
