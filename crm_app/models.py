@@ -61,7 +61,6 @@ class Requirement(models.Model):
     currency = models.CharField(max_length=100, null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0.00)
     status = models.CharField(max_length=100)
-
     def __str__(self):
         return self.requirement_type
 

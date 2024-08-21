@@ -45,4 +45,5 @@ urlpatterns = [
     path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
 
     # path('send-email/', views.send_email, name='send_email'),
+    path('predict-price/', views.predict_price, name='predict_price'),
 ]

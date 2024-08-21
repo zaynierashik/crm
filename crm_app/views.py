@@ -18,6 +18,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+
 def login(request):
     if 'staff_id' in request.session:
         return redirect('dashboard')
@@ -117,8 +118,12 @@ def dashboard(request):
     except EmptyPage:
         companies_page = paginator.page(paginator.num_pages)
 
+    company_id = Company.objects.first().id
+    predicted_price = predict_revenue_for_company(company_id)
+    # return JsonResponse({'predicted_price': predicted_price[0]})
+
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_price': predicted_price[0]}
 
     return render(request, 'index.html', context)
 
@@ -849,3 +854,10 @@ def export_excel(request, company_id):
     return response
 
 # SMTP
+from django.http import JsonResponse
+from .services import predict_revenue_for_company
+
+def predict_price(request):
+    company_id = Company.objects.first().id
+    predicted_price = predict_revenue_for_company(company_id)
+    return JsonResponse({'predicted_price': predicted_price[0]})
