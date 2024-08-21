@@ -1,9 +1,10 @@
-from django.utils import timezone
 import io
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
+from django.utils import timezone
 from django.urls import reverse
+from django.db.models import Sum
 from .models import *
 from django.views.decorators.http import require_POST
 from django.contrib import messages
@@ -261,34 +262,8 @@ def transaction(request):
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
-    company_count = Company.objects.count()
-    initiated_count = Requirement.objects.filter(status="Initiated").count()
-    pipeline_count = Requirement.objects.filter(status="Pipeline").count()
-    completed_count = Requirement.objects.filter(status="Completed").count()
-
-    city_filter = request.GET.get('city', None)
-    status_filter = request.GET.get('status', 'active')
-
-    if city_filter:
-        companies = companies.filter(city=city_filter)
-
-    if status_filter:
-        status_value = status_filter.lower() == 'active'
-        companies = companies.filter(status=status_value)
-
-    paginator = Paginator(companies, 10)
-    page = request.GET.get('page')
-
-    try:
-        companies_page = paginator.page(page)
-    except PageNotAnInteger:
-        companies_page = paginator.page(1)
-    except EmptyPage:
-        companies_page = paginator.page(paginator.num_pages)
-
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 
-               'completed_count': completed_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'user': user}
 
     return render(request, 'transaction.html', context)
 
@@ -485,6 +460,19 @@ def add_newstaff(request):
     return render(request, 'staff.html')
 
 # New Transaction Submission
+def add_newtransaction(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        company = get_object_or_404(Company, id=request.POST.get('company-name'))
+        requirement = get_object_or_404(Requirement, id=request.POST.get('requirement'))
+        contact = get_object_or_404(Contact, id=request.POST.get('contact-person'))
+
+        Transaction.objects.create(date=request.POST.get('date'), company=company, requirement=requirement, contact=contact, action=request.POST.get('action'), remark=request.POST.get('remarks'))
+        return redirect('transaction')
+
+# Add Transaction
 def add_transaction(request, company_id, requirement_id):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -602,6 +590,25 @@ def requirementdetails(request, company_id, requirement_id):
     contacts = Contact.objects.filter(company=company)
     context = {'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'requirementdetails.html', context)
+
+# View Partner Details
+def partnerdetails(request, partner_id):
+    partner = get_object_or_404(Partner, id=partner_id)
+    companies = Company.objects.filter(partner_name=partner)
+
+    company_requirements = []
+    for company in companies:
+        total_revenue = Requirement.objects.filter(company=company, status='Closed').aggregate(total=Sum('price'))['total'] or 0.00
+        pending_revenue = Requirement.objects.filter(company=company, status__in=['Pipeline', 'Initiated']).aggregate(total=Sum('price'))['total'] or 0.00
+        
+        company_requirements.append({
+            'company': company,
+            'total_revenue': total_revenue,
+            'pending_revenue': pending_revenue,
+        })
+
+    context = {'partner': partner, 'company_requirements': company_requirements}
+    return render(request, 'partnerdetails.html', context)
 
 # Edit Company Details
 def companyeditform(request, company_id):
@@ -842,20 +849,3 @@ def export_excel(request, company_id):
     return response
 
 # SMTP
-def send_email(request):
-    now = timezone.now()
-    today = now.date()
-    users = Contact.objects.filter(dob__month=today.month, dob__day=today.day)
-
-    for user in users:
-        subject = "Happy Birthday!"
-        html_content = render_to_string('email.html', {'name': user.contact_name, 'email': user.email})
-        from_email = 'rashik.chauhan@greentechconcern.com'
-        to = [user.email]
-
-        text_content = strip_tags(html_content)
-        email = EmailMultiAlternatives(subject, text_content, from_email, to)
-        email.attach_alternative(html_content, "text/html")
-        email.send(fail_silently=False)
-
-    return redirect('dashboard')

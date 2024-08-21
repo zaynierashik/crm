@@ -18,10 +18,12 @@ urlpatterns = [
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
-    path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
+    path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
     path('add-new-sector/', views.add_newsector, name='add_newsector'),
     path('add-new-service/', views.add_newservice, name='add_newservice'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
+
+    path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
 
     path('update-company/<int:company_id>', views.update_company, name='update_company'),
     path('update-sector/', views.update_sector, name='update_sector'),
@@ -40,6 +42,7 @@ urlpatterns = [
     path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
+    path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
 
-    path('send-email/', views.send_email, name='send_email'),
+    # path('send-email/', views.send_email, name='send_email'),
 ]
