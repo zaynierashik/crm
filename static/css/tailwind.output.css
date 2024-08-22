@@ -5919,6 +5919,11 @@ video {
   --tw-border-opacity: 0.75;
 }
 
+.bg-\[\#CF6679\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(207 102 121 / var(--tw-bg-opacity));
+}
+
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
@@ -6705,6 +6710,10 @@ video {
 
 .p-\[11px\] {
   padding: 11px;
+}
+
+.p-\[8\.5px\] {
+  padding: 8.5px;
 }
 
 .p-\[9px\] {
@@ -8424,6 +8433,11 @@ video {
   --tw-ring-color: rgb(88 80 236 / var(--tw-ring-opacity));
 }
 
+.focus\:ring-purple-300:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(202 191 253 / var(--tw-ring-opacity));
+}
+
 .focus\:shadow-outline-purple:focus {
   box-shadow: 0 0 0 3px hsla(250.60000000000002, 93.9%, 87.1%, 0.45);
 }
@@ -8694,6 +8708,11 @@ video {
     --tw-ring-offset-color: #1a1c23;
   }
 
+  .dark\:hover\:bg-\[\#B00020\]:hover {
+    --tw-bg-opacity: 1;
+    background-color: rgb(176 0 32 / var(--tw-bg-opacity));
+  }
+
   .dark\:hover\:bg-gray-600:hover {
     --tw-bg-opacity: 1;
     background-color: rgb(76 79 82 / var(--tw-bg-opacity));
@@ -8747,6 +8766,11 @@ video {
   .dark\:focus\:ring-purple-800:focus {
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(85 33 181 / var(--tw-ring-opacity));
+  }
+
+  .dark\:focus\:ring-purple-900:focus {
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(74 29 150 / var(--tw-ring-opacity));
   }
 
   .dark\:focus\:ring-offset-gray-800:focus {

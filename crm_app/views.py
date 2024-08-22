@@ -653,7 +653,7 @@ def companyeditform(request, company_id):
     
     company = Company.objects.get(pk=company_id)
     contacts = Contact.objects.filter(company=company)
-    sectors = Sector.objects.values('sector_name')
+    sectors = Sector.objects.all()
     partners = Partner.objects.all()
 
     display_via = ''
@@ -670,55 +670,64 @@ def companyeditform(request, company_id):
 
 # Update Company
 def update_company(request, company_id):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
     company = get_object_or_404(Company, id=company_id)
 
-    if request.method == "POST":
-        company.company_name = request.POST.get('company-name')
-        company.sector_id = request.POST.get('sector')
-        company.address = request.POST.get('address')
-        company.city = request.POST.get('city')
-        company.state = request.POST.get('state')
-        company.country = request.POST.get('country')
-        company.via = request.POST.get('via')
-        company.referral_name = request.POST.get('referral') if request.POST.get('via') == 'Referral' else None
-        company.partner_name_id = request.POST.get('partner') if request.POST.get('via') == 'Partner' else None
-        company.website = request.POST.get('website')
+    if request.method == 'POST':
+        # Update company information
+        company.company_name = request.POST['company_name']
+        company.sector_id = request.POST['sector']
+        company.address = request.POST['address']
+        company.city = request.POST['city']
+        company.state = request.POST['state']
+        company.country = request.POST['country']
+        company.via = request.POST['via']
+        company.referral = request.POST.get('referral', '')
+        company.partner_id = request.POST.get('partner', None)
+        company.website = request.POST['website']
         company.save()
 
-        contact_names = request.POST.getlist('contact-name[]')
+        # Update contact information
+        contact_ids = request.POST.getlist('contact_id[]')
+        contact_names = request.POST.getlist('contact_name[]')
         designations = request.POST.getlist('designation[]')
-        emails = request.POST.getlist('email-address[]')
-        phone_numbers = request.POST.getlist('contact-number[]')
-        dobs = request.POST.getlist('date[]')
+        emails = request.POST.getlist('email[]')
+        phone_numbers = request.POST.getlist('phone_number[]')
+        dobs = request.POST.getlist('dob[]')
         religions = request.POST.getlist('religion[]')
 
-        existing_contacts = list(company.company_contacts.all())
+        # Delete removed contacts
+        existing_contacts = set(Contact.objects.filter(company=company).values_list('id', flat=True))
+        updated_contacts = set([int(contact_id) for contact_id in contact_ids if contact_id])
+        contacts_to_delete = existing_contacts - updated_contacts
+        Contact.objects.filter(id__in=contacts_to_delete).delete()
 
+        # Update or create contacts
         for i in range(len(contact_names)):
-            if i < len(existing_contacts):
-                contact = existing_contacts[i]
+            contact_id = contact_ids[i] if contact_ids[i] else None
+            if contact_id:
+                contact = Contact.objects.get(id=contact_id, company=company)
             else:
                 contact = Contact(company=company)
-            
             contact.contact_name = contact_names[i]
             contact.designation = designations[i]
             contact.email = emails[i]
             contact.phone_number = phone_numbers[i]
-            contact.dob = dobs[i] if dobs[i] else None
+            contact.dob = dobs[i] or None
             contact.religion = religions[i]
             contact.save()
 
-        return redirect(reverse('companyeditform', args=[company.id]))
+        return redirect('companyeditform', company_id=company.id)
 
     sectors = Sector.objects.all()
-    countries = ["Nepal", "USA", "India", "Singapore"]
     partners = Partner.objects.all()
-    religions = ["Hinduism", "Buddhism", "Christianity"]
+    contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'companyeditform.html', {'company': company, 'contacts': company.company_contacts.all(), 'sectors': sectors, 'countries': countries, 'partners': partners, 'religions': religions})
+    return render(request, 'company.html', {
+        'company': company,
+        'sectors': sectors,
+        'partners': partners,
+        'contacts': contacts,
+    })
 
 # Update Sector
 @require_POST

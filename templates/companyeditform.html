@@ -24,7 +24,7 @@
                 </a>
                 <ul class="mt-6">
                     <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100" href="{% url 'dashboard' %}">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'dashboard' %}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                             </svg>
@@ -35,7 +35,7 @@
                 <ul>
                     <li class="relative px-6 py-3">
                         <span class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg" aria-hidden="true"></span>
-                        <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'company' %}">
+                        <a class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:text-gray-100 dark:hover:text-gray-200" href="{% url 'company' %}">
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
@@ -283,87 +283,88 @@
             
             <main class="h-full pb-16 overflow-y-auto">
                 <form id="companyForm" action="{% url 'update_company' company.id %}" method="POST">
+                    {% csrf_token %}
                     <div class="container px-6 mx-auto grid">
                         <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">{{ company.company_name }}</h2>
-            
+                
                         <!-- Company Inputs -->
-                        {% csrf_token %}
                         <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Company Information</h4>
                         <div class="px-4 pt-5 pb-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
                             <div class="grid gap-4 mb-4 md:grid-cols-2">
                                 <div>
                                     <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name</label>
-                                    <input type="text" id="company-name" value="{{ company.company_name }}" name="company-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
+                                    <input type="text" id="company-name" value="{{ company.company_name }}" name="company_name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
                                 </div>
-        
+                
                                 <div>
                                     <label for="sector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sector</label>
                                     <select id="sector" name="sector" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                         <option value="" selected>Choose a sector</option>
                                         {% for sector in sectors %}
-                                        <option value="{{ sector.id }}" {% if sector.sector_name == company.sector.sector_name %} selected {% endif %}>{{ sector.sector_name }}</option>
+                                        <option value="{{ sector.id }}" {% if sector.id == company.sector.id %} selected {% endif %}>{{ sector.sector_name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
-
+                
                             <div class="grid gap-4 mb-4 md:grid-cols-4">
                                 <div>
                                     <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
                                     <input type="text" id="address" value="{{ company.address }}" name="address" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter address" />
                                 </div>
-
+                
                                 <div>
                                     <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
                                     <input type="text" id="city" value="{{ company.city }}" name="city" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter city" />
                                 </div>
-
+                
                                 <div>
                                     <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
                                     <input type="text" id="state" value="{{ company.state }}" name="state" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter state" />
                                 </div>
-
+                
                                 <div>
                                     <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
                                     <select id="country" name="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                        <option value="" selected>Choose a country</option>
-                                        {% for country in countries %}
-                                        <option value="{{ country }}" {% if country == company.country %} selected {% endif %}>{{ country }}</option>
-                                        {% endfor %}
+                                        <option value="">Choose a country</option>
+                                        <option value="USA" {% if company.country == "USA" %}selected{% endif %}>United States</option>
+                                        <option value="Nepal" {% if company.country == "Nepal" %}selected{% endif %}>Nepal</option>
+                                        <option value="India" {% if company.country == "India" %}selected{% endif %}>India</option>
+                                        <option value="Singapore" {% if company.country == "Singapore" %}selected{% endif %}>Singapore</option>
                                     </select>
                                 </div>
                             </div>
-
+                
                             <div class="grid gap-4 md:grid-cols-2">
                                 <div class="grid gap-4 mb-2 md:grid-cols-1">
                                     <div class="flex gap-4">
                                         <div class="flex-grow w-1/2">
                                             <label for="via" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Via</label>
                                             <select id="via" name="via" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option value="" selected>Choose a via</option>
-                                                <option value="Direct">Direct</option>
-                                                <option value="Referral">Referral</option>
-                                                <option value="Partner">Partner</option>
+                                                <option value="">Choose a via</option>
+                                                <option value="Direct" {% if company.via == "Direct" %} selected {% endif %}>Direct</option>
+                                                <option value="Referral" {% if company.via == "Referral" %} selected {% endif %}>Referral</option>
+                                                <option value="Partner" {% if company.via == "Partner" %} selected {% endif %}>Partner</option>
                                             </select>
                                         </div>
-
-                                        <div id="referralDiv" class="w-1/2" style="display: none;">
+                
+                                        <div id="referralDiv" class="w-1/2" style="display: {% if company.via == 'Referral' %}block{% else %}none{% endif %};">
                                             <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
-                                            <input type="text" id="referral" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
+                                            <input type="text" id="referral" value="{{ company.referral }}" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
                                         </div>
-
-                                        <div id="partnerDiv" class="w-1/2" style="display: none;">
+                
+                                        <div id="partnerDiv" class="w-1/2" style="display: {% if company.via == 'Partner' %}block{% else %}none{% endif %};">
                                             <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
                                             <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option selected>Choose a partner</option>
+                                                <option value="">Choose a partner</option>
                                                 {% for partner in partners %}
-                                                <option value="{{ partner.id }}">{{ partner.partner_name }}</option>
+                                                <option value="{{ partner.id }}" {% if partner.id == company.partner_id %} selected {% endif %}>{{ partner.partner_name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-
+                
                                 <div>
                                     <label for="website" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Website</label>
                                     <input type="text" id="website" value="{{ company.website }}" name="website" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter website link" />
@@ -374,7 +375,7 @@
                         <!-- Contact Inputs -->
                         <div class="grid gap-4 mb-2 md:grid-cols-2">
                             <h4 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Contact Information</h4>
-                            <div class="flex justify-end">
+                            <div class="flex justify-end gap-2">
                                 <button type="button" id="add-contact-btn" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
@@ -382,57 +383,68 @@
                                 </button>
                             </div>
                         </div>
-                        
-                        {% for contact in contacts %}
-                        <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800" id="contacts-container">
-                            <div class="contact-form">
+                
+                        <div id="contact-container">
+                            {% for contact in contacts %}
+                            <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800 contact-item">
+                                <input type="hidden" name="contact_id[]" value="{{ contact.id }}">
                                 <div class="grid gap-4 mb-4 md:grid-cols-2">
                                     <div>
                                         <label for="contact-name-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name</label>
-                                        <input type="text" id="contact-name-{{ forloop.counter }}" value="{{ contact.contact_name }}" name="contact-name[]" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact name" required />
+                                        <input type="text" id="contact-name-{{ forloop.counter }}" value="{{ contact.contact_name }}" name="contact_name[]" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact name" required/>
                                     </div>
-
+                
                                     <div>
                                         <label for="designation-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Designation</label>
-                                        <input type="text" id="designation-{{ forloop.counter }}" value="{{ contact.designation }}" name="designation[]" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter designation" />
+                                        <input type="text" id="designation-{{ forloop.counter }}" value="{{ contact.designation }}" name="designation[]" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter designation" />
                                     </div>
                                 </div>
-
+                
                                 <div class="grid gap-4 mb-4 md:grid-cols-2">
                                     <div>
-                                        <label for="email-address-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                                        <input type="email" id="email-address-{{ forloop.counter }}" value="{{ contact.email }}" name="email-address[]" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter email address" />
+                                        <label for="email-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                                        <input type="email" id="email-{{ forloop.counter }}" value="{{ contact.email }}" name="email[]" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter email" />
                                     </div>
-
+                
                                     <div>
-                                        <label for="contact-number-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Number</label>
-                                        <input type="text" id="contact-number-{{ forloop.counter }}" value="{{ contact.phone_number }}" name="contact-number[]" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact number" />
+                                        <label for="phone-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Number</label>
+                                        <input type="text" id="phone-{{ forloop.counter }}" value="{{ contact.phone_number }}" name="phone_number[]" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact number" />
                                     </div>
                                 </div>
-
+                
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div>
-                                        <label for="date-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
-                                        <input id="date-{{ forloop.counter }}" value="{{ contact.dob|date:'Y-m-d' }}" name="date[]" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                                        <label for="dob-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
+                                        <input type="date" id="dob-{{ forloop.counter }}" value="{{ contact.dob }}" name="dob[]" class="block p-[8.5px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" />
                                     </div>
 
-                                    <div>
+                                    <div> 
                                         <label for="religion-{{ forloop.counter }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Religion</label>
-                                        <select id="religion-{{ forloop.counter }}" name="religion[]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                            <option value="">Choose a religion</option>
-                                            {% for religion in religions %}
-                                            <option value="{{ religion }}" {% if contact.religion == religion %}selected{% endif %}>{{ religion }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                                        <div class="flex items-center space-x-2">
+                                            <select id="religion-{{ forloop.counter }}" value="{{ contact.religion }}" name="religion[]" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="">Choose a religion</option>
+                                                <option value="Hinduism" {% if contact.religion == "Hinduism" %} selected {% endif %}>Hinduism</option>
+                                                <option value="Buddhism" {% if contact.religion == "Buddhism" %} selected {% endif %}>Buddhism</option>
+                                                <option value="Christianity" {% if contact.religion == "Christianity" %} selected {% endif %}>Christianity</option>
+                                            </select>
+                                            
+                                            <button type="button" class="remove-contact-btn text-white bg-[#CF6679] hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm sm:w-auto p-2.5 text-center dark:bg-red-600 dark:hover:bg-[#B00020]">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 pointer-events-none">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>                                    
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-    
-                        <button type="submit" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">Submit</button>
+                
+                        <button type="submit" class="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">
+                            Save Changes
+                        </button>
                     </div>
-                </form>
+                </form>                
             </main>
         </div>
     </div>
@@ -508,21 +520,40 @@
         };
     </script>
 
-    <!-- Clone Contact Form -->
+    <!-- Toggle Via Fields -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const addContactBtn = document.getElementById('add-contact-btn');
-            const contactsContainer = document.getElementById('contacts-container');
+        var viaDropdown = document.getElementById("via");
+        var referralDiv = document.getElementById("referralDiv");
+        var partnerDiv = document.getElementById("partnerDiv");
 
-            addContactBtn.addEventListener('click', () => {
-                const newContactForm = contactsContainer.querySelector('.contact-form').cloneNode(true);
-                
-                const newContactFormContainer = document.createElement('div');
-                newContactFormContainer.classList.add('px-4', 'py-5', 'mb-8', 'bg-white', 'rounded-lg', 'shadow-md', 'dark:bg-gray-800');
-                newContactFormContainer.appendChild(newContactForm);
-                
-                contactsContainer.parentElement.insertBefore(newContactFormContainer, contactsContainer.nextSibling);
-            });
+        viaDropdown.addEventListener("change", function(){
+            var selectedVia = viaDropdown.value;
+            if(selectedVia === "Referral"){
+                referralDiv.style.display = "block";
+                partnerDiv.style.display = "none";
+            }else if(selectedVia === "Partner"){
+                referralDiv.style.display = "none";
+                partnerDiv.style.display = "block";
+            }else{
+                referralDiv.style.display = "none";
+                partnerDiv.style.display = "none";
+            }
+        });
+    </script>
+
+    <!-- Clone & Remove Contact Form -->
+    <script>
+        document.getElementById('add-contact-btn').addEventListener('click', function() {
+            const contactContainer = document.getElementById('contact-container');
+            const newContact = document.querySelector('.contact-item').cloneNode(true);
+            newContact.querySelectorAll('input').forEach(input => input.value = '');
+            contactContainer.appendChild(newContact);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-contact-btn')) {
+                e.target.closest('.contact-item').remove();
+            }
         });
     </script>
 
