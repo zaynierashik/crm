@@ -8373,10 +8373,6 @@ video {
   color: rgb(18 19 23 / var(--tw-text-opacity));
 }
 
-.hover\:underline:hover {
-  text-decoration-line: underline;
-}
-
 .focus\:border-blue-500:focus {
   --tw-border-opacity: 1;
   border-color: rgb(63 131 248 / var(--tw-border-opacity));
@@ -8520,12 +8516,6 @@ video {
 
   .md\:p-5 {
     padding: 1.25rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:mr-32 {
-    margin-right: 8rem;
   }
 }
 

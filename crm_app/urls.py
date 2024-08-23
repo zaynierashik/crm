@@ -27,6 +27,7 @@ urlpatterns = [
     path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
 
     path('update-company/<int:company_id>', views.update_company, name='update_company'),
+    path('update-partner/<int:partner_id>', views.update_partner, name='update_partner'),
     path('update-sector/', views.update_sector, name='update_sector'),
     path('update-service/', views.update_service, name='update_service'),
     path('update-brand/', views.update_brand, name='update_brand'),
@@ -41,10 +42,12 @@ urlpatterns = [
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
     path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
+    path('edit-partner/<int:partner_id>/', views.partnereditform, name='partnereditform'),
+
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
     path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
 
     # path('send-email/', views.send_email, name='send_email'),
-    path('predict-price/', views.predict_price, name='predict_price'),
+    path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
 ]

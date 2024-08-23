@@ -98,6 +98,8 @@ def dashboard(request):
 
     company_count = Company.objects.count()
 
+    total_revenue = Requirement.objects.filter(status='Completed').aggregate(total_revenue=Sum('price'))['total_revenue'] or 0.00
+
     city_filter = request.GET.get('city', None)
     status_filter = request.GET.get('status', 'active')
 
@@ -119,10 +121,10 @@ def dashboard(request):
         companies_page = paginator.page(paginator.num_pages)
 
     company_id = Company.objects.first().id
-    predicted_price = predict_revenue_for_company(company_id)
+    predicted_revenue = predict_revenue_for_company(company_id)
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_price': predicted_price[0]}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'total_revenue': total_revenue, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_revenue': predicted_revenue[0]}
 
     return render(request, 'index.html', context)
 
@@ -636,6 +638,15 @@ def partnerdetails(request, partner_id):
     partner = get_object_or_404(Partner, id=partner_id)
     companies = Company.objects.filter(partner_name=partner)
 
+    paginator = Paginator(companies, 10)
+    page = request.GET.get('page')
+    try:
+        paginated_companies = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_companies = paginator.page(1)
+    except EmptyPage:
+        paginated_companies = paginator.page(paginator.num_pages)
+
     company_requirements = []
     for company in companies:
         total_revenue = Requirement.objects.filter(company=company, status='Completed').aggregate(total=Sum('price'))['total'] or 0.00
@@ -643,7 +654,7 @@ def partnerdetails(request, partner_id):
         
         company_requirements.append({'company': company, 'total_revenue': total_revenue, 'pending_revenue': pending_revenue})
 
-    context = {'partner': partner, 'company_requirements': company_requirements}
+    context = {'partner': partner, 'company_requirements': company_requirements, 'requirements_page_obj': paginated_companies}
     return render(request, 'partnerdetails.html', context)
 
 # Edit Company Details
@@ -656,24 +667,23 @@ def companyeditform(request, company_id):
     sectors = Sector.objects.all()
     partners = Partner.objects.all()
 
-    display_via = ''
-    if company.via and company.via == 'Direct':
-        display_via = 'Direct'
-    elif company.via and company.via == 'Referral' and company.Referral_Name:
-        display_via = company.Referral_Name
-    elif company.via and company.via == 'Partner' and company.Partner_Name:
-        display_via = company.Partner_Name.Partner_Name
-
     countries = ["Nepal", "USA", "India", "Singapore"]
     religions = ["Hinduism", "Buddhism", "Christianity"]
-    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions, 'display_via': display_via})
+    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions})
+
+# Edit Partner Details
+def partnereditform(request, partner_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    partner = Partner.objects.get(pk=partner_id)
+    return render(request, 'partnereditform.html', {'partner': partner})
 
 # Update Company
 def update_company(request, company_id):
     company = get_object_or_404(Company, id=company_id)
 
     if request.method == 'POST':
-        # Update company information
         company.company_name = request.POST['company_name']
         company.sector_id = request.POST['sector']
         company.address = request.POST['address']
@@ -681,12 +691,11 @@ def update_company(request, company_id):
         company.state = request.POST['state']
         company.country = request.POST['country']
         company.via = request.POST['via']
-        company.referral = request.POST.get('referral', '')
-        company.partner_id = request.POST.get('partner', None)
+        company.referral_name = request.POST.get('referral_name', '')
+        company.partner_name_id = request.POST.get('partner_name', '')
         company.website = request.POST['website']
         company.save()
 
-        # Update contact information
         contact_ids = request.POST.getlist('contact_id[]')
         contact_names = request.POST.getlist('contact_name[]')
         designations = request.POST.getlist('designation[]')
@@ -695,13 +704,11 @@ def update_company(request, company_id):
         dobs = request.POST.getlist('dob[]')
         religions = request.POST.getlist('religion[]')
 
-        # Delete removed contacts
         existing_contacts = set(Contact.objects.filter(company=company).values_list('id', flat=True))
         updated_contacts = set([int(contact_id) for contact_id in contact_ids if contact_id])
         contacts_to_delete = existing_contacts - updated_contacts
         Contact.objects.filter(id__in=contacts_to_delete).delete()
 
-        # Update or create contacts
         for i in range(len(contact_names)):
             contact_id = contact_ids[i] if contact_ids[i] else None
             if contact_id:
@@ -722,12 +729,27 @@ def update_company(request, company_id):
     partners = Partner.objects.all()
     contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'company.html', {
-        'company': company,
-        'sectors': sectors,
-        'partners': partners,
-        'contacts': contacts,
-    })
+    return render(request, 'company.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
+
+# Update Partner
+def update_partner(request, partner_id):
+    partner = get_object_or_404(Partner, id=partner_id)
+
+    if request.method == 'POST':
+        partner.partner_name = request.POST['partner-name']
+        partner.address = request.POST['address']
+        partner.city = request.POST['city']
+        partner.state = request.POST['state']
+        partner.country = request.POST['country']
+        partner.contact_person = request.POST['contact-name']
+        partner.designation = request.POST['designation']
+        partner.email = request.POST['email']
+        partner.phone_number = request.POST['contact-number']
+        partner.save()
+
+        return redirect('partnereditform', partner_id=partner.id)
+    
+    return redirect('partnereditform', partner_id=partner.id)
 
 # Update Sector
 @require_POST
@@ -894,7 +916,7 @@ def export_excel(request, company_id):
     return response
 
 # Linear Regression Call
-def predict_price(request):
+def predict_revenue(request):
     company_id = Company.objects.first().id
-    predicted_price = predict_revenue_for_company(company_id)
-    return JsonResponse({'predicted_price': predicted_price[0]})
+    predicted_revenue = predict_revenue_for_company(company_id)
+    return JsonResponse({'predicted_revenue': predicted_revenue[0]})

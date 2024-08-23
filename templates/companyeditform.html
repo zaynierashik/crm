@@ -348,20 +348,20 @@
                                             </select>
                                         </div>
                 
-                                        <div id="referralDiv" class="w-1/2" style="display: {% if company.via == 'Referral' %}block{% else %}none{% endif %};">
-                                            <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
-                                            <input type="text" id="referral" value="{{ company.referral }}" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
+                                        <div id="referralDiv" class="w-1/2" style="display: none">
+                                            <label for="referral_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
+                                            <input type="text" id="referral_name" value="{{ company.referral_name }}" name="referral_name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
                                         </div>
                 
-                                        <div id="partnerDiv" class="w-1/2" style="display: {% if company.via == 'Partner' %}block{% else %}none{% endif %};">
-                                            <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
-                                            <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <div id="partnerDiv" class="w-1/2" style="display: none">
+                                            <label for="partner_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
+                                            <select id="partner_name" name="partner_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                 <option value="">Choose a partner</option>
                                                 {% for partner in partners %}
-                                                <option value="{{ partner.id }}" {% if partner.id == company.partner_id %} selected {% endif %}>{{ partner.partner_name }}</option>
+                                                <option value="{{ partner.id }}" {% if partner.id == company.partner_name.id %} selected {% endif %}>{{ partner.partner_name }}</option>
                                                 {% endfor %}
                                             </select>
-                                        </div>
+                                        </div>                                       
                                     </div>
                                 </div>
                 
@@ -375,7 +375,7 @@
                         <!-- Contact Inputs -->
                         <div class="grid gap-4 mb-2 md:grid-cols-2">
                             <h4 class="text-lg font-semibold text-gray-600 dark:text-gray-300">Contact Information</h4>
-                            <div class="flex justify-end gap-2">
+                            <div class="flex justify-end">
                                 <button type="button" id="add-contact-btn" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
@@ -522,22 +522,27 @@
 
     <!-- Toggle Via Fields -->
     <script>
-        var viaDropdown = document.getElementById("via");
-        var referralDiv = document.getElementById("referralDiv");
-        var partnerDiv = document.getElementById("partnerDiv");
+        document.addEventListener('DOMContentLoaded', function() {
+            const viaSelect = document.getElementById('via');
+            const referralDiv = document.getElementById('referralDiv');
+            const partnerDiv = document.getElementById('partnerDiv');
 
-        viaDropdown.addEventListener("change", function(){
-            var selectedVia = viaDropdown.value;
-            if(selectedVia === "Referral"){
-                referralDiv.style.display = "block";
-                partnerDiv.style.display = "none";
-            }else if(selectedVia === "Partner"){
-                referralDiv.style.display = "none";
-                partnerDiv.style.display = "block";
-            }else{
-                referralDiv.style.display = "none";
-                partnerDiv.style.display = "none";
+            function updateVisibility() {
+                const selectedVia = viaSelect.value;
+                if (selectedVia === 'Referral') {
+                    referralDiv.style.display = 'block';
+                    partnerDiv.style.display = 'none';
+                } else if (selectedVia === 'Partner') {
+                    referralDiv.style.display = 'none';
+                    partnerDiv.style.display = 'block';
+                } else {
+                    referralDiv.style.display = 'none';
+                    partnerDiv.style.display = 'none';
+                }
             }
+
+            updateVisibility();
+            viaSelect.addEventListener('change', updateVisibility);
         });
     </script>
 

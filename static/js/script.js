@@ -89,22 +89,6 @@ viaDropdown.addEventListener("change", function(){
     }
 });
 
-// Clone Contact Form
-document.addEventListener('DOMContentLoaded', () => {
-    const addContactBtn = document.getElementById('add-contact-btn');
-    const contactsContainer = document.getElementById('contacts-container');
-
-    addContactBtn.addEventListener('click', () => {
-        const newContactForm = contactsContainer.querySelector('.contact-form').cloneNode(true);
-        
-        const newContactFormContainer = document.createElement('div');
-        newContactFormContainer.classList.add('px-4', 'py-5', 'mb-8', 'bg-white', 'rounded-lg', 'shadow-md', 'dark:bg-gray-800');
-        newContactFormContainer.appendChild(newContactForm);
-        
-        contactsContainer.parentElement.insertBefore(newContactFormContainer, contactsContainer.nextSibling);
-    });
-});
-
 // Form Double Submission Avoidance
 if( window.history.replaceState ){
     window.history.replaceState( null, null, window.location.href );
