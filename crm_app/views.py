@@ -195,15 +195,22 @@ def dashboard(request):
 def user_dashboard(request):
     if 'user_id' not in request.session:
         return redirect('user')
-
-    return render(request, 'userdashboard.html')
-
-def company(request):
-    if 'user_id' not in request.session:
-        return redirect('login')
     
     user_id = request.session.get('user_id')
-    user = Staff.objects.get(id=user_id)
+    user = User.objects.get(id=user_id)
+
+    company_added = request.GET.get('company_added', False)
+    company = Company.objects.filter(created_by=user)
+    context = {'company_added': company_added, 'company': company}
+
+    return render(request, 'userdashboard.html', context)
+
+def company(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
 
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
@@ -213,7 +220,7 @@ def company(request):
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
     partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
-    users = Staff.objects.all()
+    staffs = Staff.objects.all()
 
     active_companies = Company.objects.filter(status=True).order_by('company_name')
     inactive_companies = Company.objects.filter(status=False).order_by('company_name')
@@ -257,18 +264,40 @@ def company(request):
     except EmptyPage:
         inactive_companies_page = paginator_inactive.page(paginator_inactive.num_pages)
 
-    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'users': users, 'company_count': company_count,
+    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
                 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
                 'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive, 'user': user}
 
     return render(request, 'company.html', context)
 
+def company_profile(request):
+    if 'user_id' not in request.session:
+        return redirect('user')
+
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+
+    user_company = Company.objects.filter(created_by=user).first()
+
+    if user_company:
+        contacts = Contact.objects.filter(company=user_company)
+        sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
+        services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
+        brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
+        products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
+        partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
+        cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
+
+        return render(request, 'companyprofile.html', {'company': user_company, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'edit_mode': True})
+    else:
+        return render(request, 'companyprofile.html', {'edit_mode': False})
+
 def requirement(request):
-    if 'staff_id' not in request.session:
+    if 'user_id' not in request.session:
         return redirect('login')
     
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    user_id = request.session.get('user_id')
+    user = Staff.objects.get(id=user_id)
 
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
@@ -308,11 +337,11 @@ def partner(request):
     return render(request, 'partner.html', context)
 
 def staff(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
+    # if 'staff_id' not in request.session:
+    #     return redirect('login')
     
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    # staff_id = request.session.get('staff_id')
+    # user = Staff.objects.get(id=staff_id)
 
     staffs = Staff.objects.order_by('full_name')
     employee_count = Staff.objects.count()
@@ -426,18 +455,18 @@ def brand(request):
 
 # New Company Submission
 def add_newcompany(request):
-    if 'staff_id' not in request.session:
+    if 'user_id' not in request.session:
         return redirect('login')
     
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
 
     if request.method == 'POST':
         company_name = request.POST.get('company-name')
 
         if Company.objects.filter(company_name=company_name).exists():
             error_message = "Company with this name already exists!"
-            return HttpResponseRedirect(reverse('company') + f'?add-company&error_message={error_message}&company_name={company_name}')
+            return HttpResponseRedirect(reverse('company_profile') + f'?add-company&error_message={error_message}&company_name={company_name}')
 
         sector_id = request.POST.get('sector')
         if sector_id:
@@ -469,7 +498,19 @@ def add_newcompany(request):
             referral = None
             partner = None
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
+        company = Company(
+            company_name=company_name, 
+            sector=sector, 
+            address=address, 
+            city=city, 
+            state=state, 
+            country=country, 
+            via=via, 
+            referral_name=referral, 
+            partner_name=partner, 
+            website=website, 
+            created_by=user
+        )
         company.save()
 
         contact_names = request.POST.getlist('contact-name[]')
@@ -482,10 +523,18 @@ def add_newcompany(request):
         for i in range(len(contact_names)):
             if contact_names[i]:
                 dob = dobs[i] if dobs[i] else None
-                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
+                contact_person = Contact(
+                    company=company, 
+                    contact_name=contact_names[i], 
+                    designation=designations[i], 
+                    email=emails[i], 
+                    phone_number=contact_numbers[i], 
+                    dob=dob, 
+                    religion=religions[i]
+                )
                 contact_person.save()
                 
-        return redirect(reverse('company'))
+        return HttpResponseRedirect(reverse('company_profile') + f'?company_added=true&company_id={company.id}')
     else:
         return HttpResponse("Form Submission Error!")
     
@@ -515,7 +564,7 @@ def add_newrequirement(request):
     
 # New Partner Submission
 def add_newpartner(request):
-    if 'staff_id' not in request.session:
+    if 'user_id' not in request.session:
         return redirect('login')
 
     if request.method == 'POST':
@@ -543,9 +592,6 @@ def add_newpartner(request):
     
 # New Staff Submission
 def add_newstaff(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-
     if request.method == 'POST':
         full_name = request.POST.get('staff-name')
         role = request.POST.get('role')
@@ -793,13 +839,13 @@ def update_company(request, company_id):
             contact.religion = religions[i]
             contact.save()
 
-        return redirect('companyeditform', company_id=company.id)
+        return redirect('company_profile')
 
     sectors = Sector.objects.all()
     partners = Partner.objects.all()
     contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'company.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
+    return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
 
 # Update Partner
 def update_partner(request, partner_id):

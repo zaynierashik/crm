@@ -85,7 +85,7 @@ class Company(models.Model):
     referral_name = models.CharField(max_length=100, null=True, blank=True)
     partner_name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='partner_companies')
     website = models.CharField(max_length=255, null=True, blank=True)
-    created_by = models.CharField(max_length=100, null=True, blank=True)
+    created_by = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_company')
     status = models.BooleanField(default=True)
 
     def __str__(self):
