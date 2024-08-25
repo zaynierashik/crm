@@ -15,6 +15,11 @@ urlpatterns = [
     path('service/', views.service, name='service'),
     path('brand/', views.brand, name='brand'),
 
+    path('user/', views.user, name='user'),
+    path('add-new-user/', views.add_newuser, name='add_newuser'),
+    path('user-authentication/', views.user_authentication, name='user_authentication'),
+    path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
+
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),

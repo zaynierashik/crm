@@ -5,6 +5,10 @@ from .models import *
 class StaffAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'email', 'role', 'status')
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('full_name', 'email', 'role', 'status')
+
 @admin.register(Sector)
 class SectorAdmin(admin.ModelAdmin):
     list_display = ('sector_name',)

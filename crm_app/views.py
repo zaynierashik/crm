@@ -57,6 +57,70 @@ def login_authentication(request):
 
     return render(request, 'login.html')
 
+def user(request):
+    if 'user_id' in request.session:
+        return redirect('user_dashboard')
+    
+    if request.method == 'POST':
+        return user_authentication(request)
+    
+    return render(request, 'userauthentication.html')
+
+# User Registration
+def add_newuser(request):
+    if request.method == 'POST':
+        full_name = request.POST.get('user-name')
+        email = request.POST.get('email-address')
+        password = request.POST.get('password')
+        
+        if not full_name or not email or not password:
+            error_message = "All fields are required!"
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+
+        if User.objects.filter(email=email).exists():
+            error_message = "Email is already in use!"
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+
+        try:
+            new_user = User(full_name=full_name, email=email, password=make_password(password))
+            new_user.save()
+            messages.success(request, "Account created successfully.")
+            return redirect('user')
+        except Exception as e:
+            messages.error(request, f"An error occurred: {e}")
+            return redirect('user')
+
+    return render(request, 'signup.html')
+
+# User Login Authentication
+def user_authentication(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            error_message = "Invalid email or password!"
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+
+        if not check_password(password, user.password):
+            error_message = "Invalid email or password!"
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+
+        if not user.status:
+            error_message = "Your account is inactive. Please contact support."
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+
+        request.session['user_id'] = user.id
+        request.session['user_email'] = user.email
+        request.session['user_full_name'] = user.full_name
+
+        request.session.set_expiry(7200)
+        return redirect('user_dashboard')
+
+    return redirect('user')
+
 def profile(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -128,12 +192,18 @@ def dashboard(request):
 
     return render(request, 'index.html', context)
 
+def user_dashboard(request):
+    if 'user_id' not in request.session:
+        return redirect('user')
+
+    return render(request, 'userdashboard.html')
+
 def company(request):
-    if 'staff_id' not in request.session:
+    if 'user_id' not in request.session:
         return redirect('login')
     
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    user_id = request.session.get('user_id')
+    user = Staff.objects.get(id=user_id)
 
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
@@ -143,7 +213,7 @@ def company(request):
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
     partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
-    staffs = Staff.objects.all()
+    users = Staff.objects.all()
 
     active_companies = Company.objects.filter(status=True).order_by('company_name')
     inactive_companies = Company.objects.filter(status=False).order_by('company_name')
@@ -187,7 +257,7 @@ def company(request):
     except EmptyPage:
         inactive_companies_page = paginator_inactive.page(paginator_inactive.num_pages)
 
-    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
+    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'users': users, 'company_count': company_count,
                 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
                 'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive, 'user': user}
 
