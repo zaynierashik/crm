@@ -201,7 +201,7 @@ def user_dashboard(request):
 
     company_added = request.GET.get('company_added', False)
     company = Company.objects.filter(created_by=user)
-    context = {'company_added': company_added, 'company': company}
+    context = {'company_added': company_added, 'company': company, 'user': user}
 
     return render(request, 'userdashboard.html', context)
 
@@ -288,28 +288,35 @@ def company_profile(request):
         partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
         cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
 
-        return render(request, 'companyprofile.html', {'company': user_company, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'edit_mode': True})
+        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'edit_mode': True})
     else:
-        return render(request, 'companyprofile.html', {'edit_mode': False})
+        return render(request, 'companyprofile.html', {'user': user, 'edit_mode': False})
 
 def requirement(request):
     if 'user_id' not in request.session:
         return redirect('login')
     
     user_id = request.session.get('user_id')
-    user = Staff.objects.get(id=user_id)
+    user = get_object_or_404(User, id=user_id)
 
-    companies = Company.objects.order_by('company_name')
-    contacts = Contact.objects.select_related('company').all()
-    sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
+    company = Company.objects.filter(created_by=user).first()
+
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
-    cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
-    staffs = Staff.objects.all()
+    requests = Request.objects.filter(company=company).order_by('date')
 
-    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'user': user}
+    paginator = Paginator(requests, 10)
+    page = request.GET.get('page')
+
+    try:
+        requirements_page = paginator.page(page)
+    except PageNotAnInteger:
+        requirements_page = paginator.page(1)
+    except EmptyPage:
+        requirements_page = paginator.page(paginator.num_pages)
+
+    context = {'services': services, 'brands': brands, 'products': products, 'requests': requests, 'user': user, 'requirement_count': requests.count(), 'requirements': requirements_page, 'paginator': paginator, 'page_obj': requirements_page}
 
     return render(request, 'requirement.html', context)
 
@@ -453,8 +460,8 @@ def brand(request):
 
     return render(request, 'brand.html', context)
 
-# New Company Submission
-def add_newcompany(request):
+# New Company Profile Submission
+def add_companyprofile(request):
     if 'user_id' not in request.session:
         return redirect('login')
     
@@ -498,19 +505,7 @@ def add_newcompany(request):
             referral = None
             partner = None
 
-        company = Company(
-            company_name=company_name, 
-            sector=sector, 
-            address=address, 
-            city=city, 
-            state=state, 
-            country=country, 
-            via=via, 
-            referral_name=referral, 
-            partner_name=partner, 
-            website=website, 
-            created_by=user
-        )
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
         company.save()
 
         contact_names = request.POST.getlist('contact-name[]')
@@ -523,20 +518,37 @@ def add_newcompany(request):
         for i in range(len(contact_names)):
             if contact_names[i]:
                 dob = dobs[i] if dobs[i] else None
-                contact_person = Contact(
-                    company=company, 
-                    contact_name=contact_names[i], 
-                    designation=designations[i], 
-                    email=emails[i], 
-                    phone_number=contact_numbers[i], 
-                    dob=dob, 
-                    religion=religions[i]
-                )
+                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
                 contact_person.save()
                 
         return HttpResponseRedirect(reverse('company_profile') + f'?company_added=true&company_id={company.id}')
     else:
         return HttpResponse("Form Submission Error!")
+    
+# New Requirement Request Submission
+def add_newrequest(request):
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+
+    company = Company.objects.filter(created_by=user).first()
+
+    if request.method == 'POST':
+        requirement_type = request.POST.get('requirement-category')
+        brand_id = request.POST.get('brand') if requirement_type == 'Product' else None
+        product_id = request.POST.get('product') if requirement_type == 'Product' else None
+        service_id = request.POST.get('service') if requirement_type == 'Service' else None
+        requirement_description = request.POST.get('message')
+
+        brand = get_object_or_404(Brand, pk=brand_id) if brand_id else None
+        product = get_object_or_404(Product, pk=product_id) if product_id else None
+        service = get_object_or_404(Service, pk=service_id) if service_id else None
+
+        Request.objects.create(company=company, date=now(), requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description)
+
+        return redirect(reverse('requirement'))
     
 # New Requirement Submission
 def add_newrequirement(request):

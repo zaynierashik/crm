@@ -41,6 +41,10 @@ class ContactAdmin(admin.ModelAdmin):
 class RequirementAdmin(admin.ModelAdmin):
     list_display = ('requirement_type', 'company', 'contact_name', 'brand', 'product_name', 'service', 'status')
 
+@admin.register(Request)
+class RequestAdmin(admin.ModelAdmin):
+    list_display = ('requirement_type', 'company', 'brand', 'product_name', 'service')
+
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('date', 'company', 'requirement', 'contact', 'action', 'remark')

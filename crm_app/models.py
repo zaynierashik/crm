@@ -58,6 +58,18 @@ class Partner(models.Model):
 
     def __str__(self):
         return self.partner_name
+    
+class Request(models.Model):
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_requests')
+    date = models.DateField(default=now)
+    requirement_type = models.CharField(max_length=100)
+    brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_requests')
+    product_name = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='product_requests')
+    service = models.ForeignKey('Service', on_delete=models.SET_NULL, null=True, blank=True, related_name='service_requests')
+    requirement_description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.requirement_type
 
 class Requirement(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_requirements')
@@ -71,6 +83,7 @@ class Requirement(models.Model):
     currency = models.CharField(max_length=100, null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0.00)
     status = models.CharField(max_length=100)
+
     def __str__(self):
         return self.requirement_type
 

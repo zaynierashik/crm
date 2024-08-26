@@ -1,5 +1,3 @@
-// User Signup & Login Form Toggle
-
 // Password Toggle
 function toggleSignupPasswordVisibility() {
     const passwordField = document.getElementById('password');
