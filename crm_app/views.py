@@ -549,6 +549,25 @@ def add_newrequest(request):
         Request.objects.create(company=company, date=now(), requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description)
 
         return redirect(reverse('requirement'))
+
+# Update Requirement Request
+@require_POST
+def update_request(request):
+    if request.method == 'POST':
+        request_id = request.POST.get('request-id')
+        request_obj = get_object_or_404(Request, id=request_id)
+
+        request_obj.requirement_type = request.POST.get('requirement-category')
+        request_obj.service_id = request.POST.get('service')
+        request_obj.brand_id = request.POST.get('brand')
+        request_obj.product_name_id = request.POST.get('product')
+        request_obj.requirement_description = request.POST.get('message')
+        request_obj.save()
+        messages.success(request, "Request updated successfully.")
+        
+        return redirect('requirement')
+
+    return redirect('requirement')
     
 # New Requirement Submission
 def add_newrequirement(request):

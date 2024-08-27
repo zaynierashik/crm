@@ -24,6 +24,8 @@ urlpatterns = [
     path('add-company-profile/', views.add_companyprofile, name='add_companyprofile'),
     path('add-new-request/', views.add_newrequest, name='add_newrequest'),
 
+    path('update-request/', views.update_request, name='update_request'),
+
     # path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
