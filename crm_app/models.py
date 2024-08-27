@@ -67,6 +67,7 @@ class Request(models.Model):
     product_name = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='product_requests')
     service = models.ForeignKey('Service', on_delete=models.SET_NULL, null=True, blank=True, related_name='service_requests')
     requirement_description = models.TextField(null=True, blank=True)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return self.requirement_type
@@ -83,6 +84,7 @@ class Requirement(models.Model):
     currency = models.CharField(max_length=100, null=True, blank=True)
     price = models.FloatField(null=True, blank=True, default=0.00)
     status = models.CharField(max_length=100)
+    progress = models.CharField(max_length=100, default='Initiated')
 
     def __str__(self):
         return self.requirement_type

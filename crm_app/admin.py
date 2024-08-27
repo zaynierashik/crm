@@ -44,6 +44,27 @@ class RequirementAdmin(admin.ModelAdmin):
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
     list_display = ('requirement_type', 'company', 'brand', 'product_name', 'service')
+    actions = ['approve_requests']
+
+    @admin.action(description='Approve selected requests')
+    def approve_requests(self, request, queryset):
+        for req in queryset:
+            # Create a corresponding Requirement object
+            Requirement.objects.create(
+                company=req.company,
+                date=req.date,
+                contact_name=None,  # Set this to the relevant contact if needed
+                requirement_type=req.requirement_type,
+                brand=req.brand,
+                product_name=req.product_name,
+                service=req.service,
+                requirement_description=req.requirement_description,
+                currency=None,  # Set default or provide this field
+                price=0.00,     # Set default or provide this field
+                status="Approved"
+            )
+            # Delete the original request after creating the Requirement
+            req.delete()
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):

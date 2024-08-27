@@ -1608,6 +1608,11 @@ video {
   margin-bottom: 16rem;
 }
 
+.my-7 {
+  margin-top: 1.75rem;
+  margin-bottom: 1.75rem;
+}
+
 .my-8 {
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -1981,6 +1986,10 @@ video {
 
 .mb-64 {
   margin-bottom: 16rem;
+}
+
+.mb-7 {
+  margin-bottom: 1.75rem;
 }
 
 .mb-8 {
@@ -7003,6 +7012,10 @@ video {
 
 .pb-64 {
   padding-bottom: 16rem;
+}
+
+.pb-7 {
+  padding-bottom: 1.75rem;
 }
 
 .pb-8 {

@@ -304,10 +304,16 @@ def requirement(request):
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    requests = Request.objects.filter(company=company).order_by('date')
+    requests = Request.objects.filter(company=company).order_by('-date')
+    requirements = Requirement.objects.filter(company=company).order_by('-date')
 
-    paginator = Paginator(requests, 10)
-    page = request.GET.get('page')
+    total_request = Request.objects.count()
+    total_requirement = Requirement.objects.count()
+    pipeline_count = Requirement.objects.filter(progress="Pipeline").count()
+    completed_count = Requirement.objects.filter(progress="Completed").count()
+
+    paginator = Paginator(requirements, 10)
+    page = request.GET.get('requirements_page')
 
     try:
         requirements_page = paginator.page(page)
@@ -316,7 +322,8 @@ def requirement(request):
     except EmptyPage:
         requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'services': services, 'brands': brands, 'products': products, 'requests': requests, 'user': user, 'requirement_count': requests.count(), 'requirements': requirements_page, 'paginator': paginator, 'page_obj': requirements_page}
+    context = {'services': services, 'brands': brands, 'products': products, 'requests': requests, 'requirements': requirements, 'user': user, 'total_request': total_request, 'total_requirement': total_requirement, 
+               'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
 
     return render(request, 'requirement.html', context)
 
@@ -1067,3 +1074,22 @@ def predict_revenue(request):
     company_id = Company.objects.first().id
     predicted_revenue = predict_revenue_for_company(company_id)
     return JsonResponse({'predicted_revenue': predicted_revenue[0]})
+
+# Extra Views
+def approve_request_view(request, request_id):
+    req = get_object_or_404(Request, id=request_id)
+    req.approve()
+    return redirect('requirement')
+
+def reject_request_view(request, request_id):
+    req = get_object_or_404(Request, id=request_id)
+    req.reject()
+    return redirect('requirement')
+
+def request_list_view(request):
+    requests = Request.objects.filter(is_approved=False)
+    return render(request, 'requirement.html', {'requests': requests})
+
+def requirement_list_view(request):
+    requirements = Requirement.objects.all()
+    return render(request, 'requirement.html', {'requirements': requirements})
