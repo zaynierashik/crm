@@ -31,7 +31,7 @@ urlpatterns = [
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
     path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
-    path('add-new-sector/', views.add_newsector, name='add_newsector'),
+    # path('add-new-sector/', views.add_newsector, name='add_newsector'),
     path('add-new-service/', views.add_newservice, name='add_newservice'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
 
@@ -61,4 +61,7 @@ urlpatterns = [
 
     # path('send-email/', views.send_email, name='send_email'),
     path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
+
+    # AJAX
+    path('add-sector/', views.add_sector, name='add_sector'),
 ]

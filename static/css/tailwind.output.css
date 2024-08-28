@@ -1996,6 +1996,10 @@ video {
   margin-bottom: 2rem;
 }
 
+.mb-\[22px\] {
+  margin-bottom: 22px;
+}
+
 .mb-auto {
   margin-bottom: auto;
 }
@@ -6725,12 +6729,20 @@ video {
   padding: 2rem;
 }
 
+.p-\[11\.5px\] {
+  padding: 11.5px;
+}
+
 .p-\[11px\] {
   padding: 11px;
 }
 
 .p-\[8\.5px\] {
   padding: 8.5px;
+}
+
+.p-\[9\.5px\] {
+  padding: 9.5px;
 }
 
 .p-\[9px\] {

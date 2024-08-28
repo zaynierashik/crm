@@ -277,20 +277,15 @@ def company_profile(request):
     user_id = request.session.get('user_id')
     user = User.objects.get(id=user_id)
 
+    sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
+    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     user_company = Company.objects.filter(created_by=user).first()
 
     if user_company:
         contacts = Contact.objects.filter(company=user_company)
-        sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
-        services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
-        brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
-        products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-        partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
-        cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
-
-        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'edit_mode': True})
+        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'edit_mode': True})
     else:
-        return render(request, 'companyprofile.html', {'user': user, 'edit_mode': False})
+        return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'partners': partners, 'edit_mode': False})
 
 def requirement(request):
     if 'user_id' not in request.session:
@@ -498,35 +493,19 @@ def add_companyprofile(request):
         country = request.POST.get('country')
         via = request.POST.get('via')
         website = request.POST.get('website')
+
+        partner = None
+        referral = None
         
         if via == 'Referral':
             referral = request.POST.get('referral')
             partner_name = None
         elif via == 'Partner':
             partner_id = request.POST.get('partner')
-            partner_name = Partner.objects.filter(id=partner_id).first()
-            if partner_name:
-                partner = partner_name
-                referral = None
-        else:
-            referral = None
-            partner = None
+            partner = Partner.objects.filter(id=partner_id).first()
 
         company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
         company.save()
-
-        contact_names = request.POST.getlist('contact-name[]')
-        designations = request.POST.getlist('designation[]')
-        emails = request.POST.getlist('email-address[]')
-        contact_numbers = request.POST.getlist('contact-number[]')
-        dobs = request.POST.getlist('date[]')
-        religions = request.POST.getlist('religion[]')
-
-        for i in range(len(contact_names)):
-            if contact_names[i]:
-                dob = dobs[i] if dobs[i] else None
-                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
-                contact_person.save()
                 
         return HttpResponseRedirect(reverse('company_profile') + f'?company_added=true&company_id={company.id}')
     else:
@@ -684,24 +663,6 @@ def add_transaction(request, company_id, requirement_id):
 
         Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
         return redirect('requirementdetails', company_id=company_id, requirement_id=requirement_id)
-    
-# New Sector Submission
-def add_newsector(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-
-    if request.method == 'POST':
-        sector_name = request.POST.get('sector-name')
-
-        if Sector.objects.filter(sector_name=sector_name).exists():
-            return redirect(reverse('sector'))
-
-        sector = Sector(sector_name=sector_name)
-        sector.save()
-
-        return redirect('sector')
-    else:
-        return render(request, 'sector.html')
     
 # New Service Submission
 def add_newservice(request):
@@ -1093,3 +1054,20 @@ def request_list_view(request):
 def requirement_list_view(request):
     requirements = Requirement.objects.all()
     return render(request, 'requirement.html', {'requirements': requirements})
+
+# AJAX
+def add_sector(request):
+    if 'user_id' not in request.session:
+        return redirect('user')
+
+    if request.method == 'POST':
+        sector_name = request.POST.get('sector-name')
+
+        if Sector.objects.filter(sector_name=sector_name).exists():
+            return redirect(reverse('company_profile'))
+
+        sector = Sector(sector_name=sector_name)
+        sector.save()
+        return redirect('company_profile')
+    else:
+        return render(request, 'companyprofile.html')
