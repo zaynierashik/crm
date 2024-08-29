@@ -3,6 +3,7 @@ import io
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
 from django.utils import timezone
+from datetime import datetime
 from django.urls import reverse
 from django.db.models import Sum
 from .models import *
@@ -321,6 +322,85 @@ def requirement(request):
                'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
 
     return render(request, 'requirement.html', context)
+
+def contact(request):
+    if 'user_id' not in request.session:
+        return redirect('user')
+    
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+
+    company = Company.objects.filter(created_by=user).first()
+    contacts = Contact.objects.filter(company=company).order_by('contact_name')
+
+    paginator = Paginator(contacts, 10)
+    page = request.GET.get('contacts_page')
+
+    try:
+        contacts_page = paginator.page(page)
+    except PageNotAnInteger:
+        contacts_page = paginator.page(1)
+    except EmptyPage:
+        contacts_page = paginator.page(paginator.num_pages)
+
+    context = {'user': user, 'company': company, 'contacts': contacts, 'contact_count': contacts.count(), 'contacts_page': contacts_page, 'paginator': paginator}
+    return render(request, 'contact.html', context)
+
+def add_newcontact(request):
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    user_id = request.session.get('user_id')
+    user = User.objects.get(id=user_id)
+    company = Company.objects.filter(created_by=user).first()
+
+    if request.method == "POST":
+        contact_name = request.POST.get('contact-name')
+        designation = request.POST.get('designation')
+        email = request.POST.get('email-address')
+        contact_number = request.POST.get('contact-number')
+        dob = request.POST.get('date')
+        religion = request.POST.get('religion')
+
+        if dob:
+            try:
+                dob = datetime.strptime(dob, '%Y-%m-%d').date()
+            except ValueError:
+                dob = None
+        else:
+            dob = None
+
+        contact = Contact(company=company, contact_name=contact_name, designation=designation, email=email, phone_number=contact_number, DOB=dob, religion=religion)
+        contact.save()
+        return redirect(reverse('contact'))
+    
+    return render(request, 'contact.html', {'user': user, 'company': company})
+
+@require_POST
+def update_contact(request):
+    if request.method == 'POST':
+        contact_id = request.POST.get('contact-id')
+        contact_obj = get_object_or_404(Contact, id=contact_id)
+
+        contact_obj.contact_name = request.POST.get('contact-name')
+        contact_obj.designation = request.POST.get('designation')
+        contact_obj.email = request.POST.get('email-address')
+        contact_obj.phone_number = request.POST.get('contact-number')
+        contact_obj.DOB = request.POST.get('date')
+
+        dob = request.POST.get('date')
+        if dob:
+            contact_obj.DOB = dob
+        else:
+            contact_obj.DOB = None
+            
+        contact_obj.religion = request.POST.get('religion')
+        contact_obj.save()
+        messages.success(request, "Contact updated successfully.")
+        
+        return redirect('contact')
+
+    return redirect('contact')
 
 def partner(request):
     if 'staff_id' not in request.session:

@@ -7,7 +7,7 @@ urlpatterns = [
     path('setting/', views.setting, name='setting'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('company/', views.company, name='company'),
-    path('requirement/', views.requirement, name='requirement'),
+    
     path('partner/', views.partner, name='partner'),
     path('staff/', views.staff, name='staff'),
     path('transaction/', views.transaction, name='transaction'),
@@ -20,11 +20,15 @@ urlpatterns = [
     path('user-authentication/', views.user_authentication, name='user_authentication'),
     path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
     path('company-profile/', views.company_profile, name='company_profile'),
+    path('requirement/', views.requirement, name='requirement'),
+    path('contact/', views.contact, name='contact'),
 
     path('add-company-profile/', views.add_companyprofile, name='add_companyprofile'),
     path('add-new-request/', views.add_newrequest, name='add_newrequest'),
+    path('add-new-contact/', views.add_newcontact, name='add_newcontact'),
 
     path('update-request/', views.update_request, name='update_request'),
+    path('update-contact/', views.update_contact, name='update_contact'),
 
     # path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),

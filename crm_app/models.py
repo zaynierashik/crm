@@ -115,7 +115,7 @@ class Contact(models.Model):
     designation = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
-    dob = models.DateField(null=True, blank=True)
+    DOB = models.DateField(null=True, blank=True)
     religion = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):

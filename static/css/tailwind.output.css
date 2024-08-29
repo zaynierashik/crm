@@ -2513,8 +2513,20 @@ video {
   min-height: 0px;
 }
 
+.min-h-96 {
+  min-height: 24rem;
+}
+
+.min-h-\[91\.25vh\] {
+  min-height: 91.25vh;
+}
+
 .min-h-full {
   min-height: 100%;
+}
+
+.min-h-px {
+  min-height: 1px;
 }
 
 .min-h-screen {
