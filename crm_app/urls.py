@@ -5,9 +5,11 @@ urlpatterns = [
     path('', views.login, name='login'),
     path('profile/', views.profile, name='profile'),
     path('setting/', views.setting, name='setting'),
+    
+    # Admin/Staff
     path('dashboard/', views.dashboard, name='dashboard'),
     path('company/', views.company, name='company'),
-    
+    path('contract/', views.contract, name='contract'),
     path('partner/', views.partner, name='partner'),
     path('staff/', views.staff, name='staff'),
     path('transaction/', views.transaction, name='transaction'),
@@ -15,6 +17,24 @@ urlpatterns = [
     path('service/', views.service, name='service'),
     path('brand/', views.brand, name='brand'),
 
+    path('add-new-company/', views.add_newcompany, name='add_newcompany'),
+    path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
+    path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
+    path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
+    path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
+    path('add-new-sector/', views.add_newsector, name='add_newsector'),
+    path('add-new-service/', views.add_newservice, name='add_newservice'),
+    path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
+
+    path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
+
+    path('update-company/<int:company_id>', views.update_company, name='update_company'),
+    path('update-partner/<int:partner_id>', views.update_partner, name='update_partner'),
+    path('update-sector/', views.update_sector, name='update_sector'),
+    path('update-service/', views.update_service, name='update_service'),
+    path('update-brand/', views.update_brand, name='update_brand'),
+
+    # User
     path('user/', views.user, name='user'),
     path('add-new-user/', views.add_newuser, name='add_newuser'),
     path('user-authentication/', views.user_authentication, name='user_authentication'),
@@ -29,23 +49,7 @@ urlpatterns = [
 
     path('update-request/', views.update_request, name='update_request'),
     path('update-contact/', views.update_contact, name='update_contact'),
-
-    # path('add-new-company/', views.add_newcompany, name='add_newcompany'),
-    path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
-    path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
-    path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
-    path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
-    # path('add-new-sector/', views.add_newsector, name='add_newsector'),
-    path('add-new-service/', views.add_newservice, name='add_newservice'),
-    path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
-
-    path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
-
-    path('update-company/<int:company_id>', views.update_company, name='update_company'),
-    path('update-partner/<int:partner_id>', views.update_partner, name='update_partner'),
-    path('update-sector/', views.update_sector, name='update_sector'),
-    path('update-service/', views.update_service, name='update_service'),
-    path('update-brand/', views.update_brand, name='update_brand'),
+    path('requests/delete/<int:id>/', views.delete_request, name='delete_request'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),

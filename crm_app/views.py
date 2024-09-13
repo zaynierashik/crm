@@ -271,6 +271,70 @@ def company(request):
 
     return render(request, 'company.html', context)
 
+def add_newcompany(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    if request.method == 'POST':
+        company_name = request.POST.get('company-name')
+
+        if Company.objects.filter(company_name=company_name).exists():
+            error_message = "Company with this name already exists!"
+            return HttpResponseRedirect(reverse('company') + f'?add-company&error_message={error_message}&company_name={company_name}')
+
+        sector_id = request.POST.get('sector')
+        if sector_id:
+            try:
+                sector_id = int(sector_id)
+                sector = Sector.objects.get(id=sector_id)
+            except (ValueError, Sector.DoesNotExist):
+                sector = None
+        else:
+            sector = None
+        
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        country = request.POST.get('country')
+        via = request.POST.get('via')
+        website = request.POST.get('website')
+        
+        if via == 'Referral':
+            referral = request.POST.get('referral')
+            partner_name = None
+        elif via == 'Partner':
+            partner_id = request.POST.get('partner')
+            partner_name = Partner.objects.filter(id=partner_id).first()
+            if partner_name:
+                partner = partner_name
+                referral = None
+        else:
+            referral = None
+            partner = None
+
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
+        company.save()
+
+        contact_names = request.POST.getlist('contact-name[]')
+        designations = request.POST.getlist('designation[]')
+        emails = request.POST.getlist('email-address[]')
+        contact_numbers = request.POST.getlist('contact-number[]')
+        dobs = request.POST.getlist('date[]')
+        religions = request.POST.getlist('religion[]')
+
+        for i in range(len(contact_names)):
+            if contact_names[i]:
+                dob = dobs[i] if dobs[i] else None
+                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
+                contact_person.save()
+                
+        return redirect(reverse('company'))
+    else:
+        return HttpResponse("Form Submission Error!")
+
 def company_profile(request):
     if 'user_id' not in request.session:
         return redirect('user')
@@ -287,10 +351,33 @@ def company_profile(request):
         return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'edit_mode': True})
     else:
         return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'partners': partners, 'edit_mode': False})
+    
+def contract(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+    
+    requirements = Requirement.objects.all().order_by('-date')
+
+    paginator = Paginator(requirements, 10)
+    page = request.GET.get('requirements_page')
+
+    try:
+        requirements_page = paginator.page(page)
+    except PageNotAnInteger:
+        requirements_page = paginator.page(1)
+    except EmptyPage:
+        requirements_page = paginator.page(paginator.num_pages)
+
+    context = {'user': user, 'requirements': requirements, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
+    
+    return render(request, 'contract.html', context)
 
 def requirement(request):
     if 'user_id' not in request.session:
-        return redirect('login')
+        return redirect('user')
     
     user_id = request.session.get('user_id')
     user = get_object_or_404(User, id=user_id)
@@ -634,6 +721,15 @@ def update_request(request):
         return redirect('requirement')
 
     return redirect('requirement')
+
+# Delete Requirement Request
+def delete_request(request, id):
+    request_to_delete = get_object_or_404(Request, id=id)
+    if request.method == "POST":
+        request_to_delete.delete()
+        messages.success(request, f"Request '{request_to_delete.requirement_type}' has been deleted.")
+        return redirect('your-redirect-url')  # Replace with your actual redirect
+    return redirect('your-redirect-url')
     
 # New Requirement Submission
 def add_newrequirement(request):
@@ -696,12 +792,10 @@ def add_newstaff(request):
         password = request.POST.get('password')
         
         if not full_name or not email or not password or not role:
-            error_message = "All fields are required!"
-            return HttpResponseRedirect(reverse('add_newstaff') + f'?error_message={error_message}')
+            return redirect('staff')
 
         if Staff.objects.filter(email=email).exists():
-            error_message = "Email is already in use!"
-            return HttpResponseRedirect(reverse('add_newstaff') + f'?error_message={error_message}')
+            return redirect('staff')
 
         try:
             new_staff = Staff(full_name=full_name, role=role, email=email, password=make_password(password))
@@ -744,6 +838,24 @@ def add_transaction(request, company_id, requirement_id):
         Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
         return redirect('requirementdetails', company_id=company_id, requirement_id=requirement_id)
     
+# New Sector Submission
+def add_newsector(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        sector_name = request.POST.get('sector-name')
+
+        if Sector.objects.filter(sector_name=sector_name).exists():
+            return redirect(reverse('sector'))
+
+        sector = Sector(sector_name=sector_name)
+        sector.save()
+
+        return redirect(reverse('sector'))
+    else:
+        return render(request, 'sector.html')    
+
 # New Service Submission
 def add_newservice(request):
     if 'staff_id' not in request.session:

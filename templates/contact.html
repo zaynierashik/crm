@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ company.company_name|default:'Company Profile' }}</title>
+    <title>Contacts</title>
     <link rel="apple-touch-icon" sizes="180x180" href="{% static '/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static '/favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon/favicon-16x16.png' %}">
@@ -328,7 +328,7 @@
 
                     <!-- Contact Edit Form -->
                     <div id="contact-edit-crud-modal" x-data="{ contactId: null, contactName: '', designation: '', phoneNumber: '', email: '', dob: '', religion: ''}" x-show="contactId !== null"
-                        @contact-edit.window="contactId = $event.detail.id; contactName = $event.detail.contact_name; designation = $event.detail.designation; phoneNumber = $event.detail.phone_number; email = $event.detail.email;"
+                        @contact-edit.window="contactId = $event.detail.id; contactName = $event.detail.contact_name; designation = $event.detail.designation; phoneNumber = $event.detail.phone_number; email = $event.detail.email; dob = $event.detail.DOB; religion= $event.detail.religion;"
                         tabindex="-1" aria-hidden="true" class="fixed top-0 right-0 left-0 z-50 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
 
                         <!-- Modal Content -->
@@ -365,16 +365,16 @@
                                         <div class="grid gap-4 md:grid-cols-2">
                                             <div>
                                                 <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
-                                                <input id="date" x-model="dob" name="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                                                <input id="date" x-model="dob" name="date" value="{{ contact.DOB|date:'Y-m-d' }}" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
                                             </div>
 
                                             <div>
                                                 <label for="religion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Religion</label>
-                                                <select id="religion" x-model="religion" name="religion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="" selected>Choose a religion</option>
-                                                    <option value="Hinduism">Hinduism</option>
-                                                    <option value="Buddhism">Buddhism</option>
-                                                    <option value="Christianity">Christianity</option>
+                                                <select id="religion" x-model="religion" name="religion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="">Choose a religion</option>
+                                                    <option value="Hinduism" {% if contact.religion == "Hinduism" %} selected {% endif %}>Hinduism</option>
+                                                    <option value="Buddhism" {% if contact.religion == "Buddhism" %} selected {% endif %}>Buddhism</option>
+                                                    <option value="Christianity" {% if contact.religion == "Christianity" %} selected {% endif %}>Christianity</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -455,34 +455,9 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const viaSelect = document.getElementById('via');
-            const referralDiv = document.getElementById('referralDiv');
-            const partnerDiv = document.getElementById('partnerDiv');
-
-            function updateVisibility() {
-                const selectedVia = viaSelect.value;
-                if (selectedVia === 'Referral') {
-                    referralDiv.style.display = 'block';
-                    partnerDiv.style.display = 'none';
-                } else if (selectedVia === 'Partner') {
-                    referralDiv.style.display = 'none';
-                    partnerDiv.style.display = 'block';
-                } else {
-                    referralDiv.style.display = 'none';
-                    partnerDiv.style.display = 'none';
-                }
-            }
-
-            updateVisibility();
-            viaSelect.addEventListener('change', updateVisibility);
-        });
-    </script>
-
-    <script>
-        function openContactEditModal(contactId, contactName, designation, phoneNumber, email) {
+        function openContactEditModal(contactId, contactName, designation, phoneNumber, email, dob, religion) {
             const event = new CustomEvent('contact-edit', { 
-                detail: {id: contactId, contact_name: contactName, designation: designation, phone_number: phoneNumber, email: email}
+                detail: {id: contactId, contact_name: contactName, designation: designation, phone_number: phoneNumber, email: email, DOB: dob, religion: religion}
             });
             window.dispatchEvent(event);
         }
