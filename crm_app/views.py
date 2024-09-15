@@ -360,6 +360,9 @@ def contract(request):
     user = Staff.objects.get(id=staff_id)
     
     requirements = Requirement.objects.all().order_by('-date')
+    services = Service.objects.values('id', 'service_name').order_by('service_name')
+    brands = Brand.objects.values('id', 'brand_name').order_by('brand_name')
+    products = Product.objects.values('id', 'product_name').order_by('product_name')
 
     paginator = Paginator(requirements, 10)
     page = request.GET.get('requirements_page')
@@ -371,7 +374,7 @@ def contract(request):
     except EmptyPage:
         requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'user': user, 'requirements': requirements, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
+    context = {'user': user, 'services': services, 'brands': brands, 'products': products, 'requirements': requirements, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
     
     return render(request, 'contract.html', context)
 
@@ -513,11 +516,11 @@ def partner(request):
     return render(request, 'partner.html', context)
 
 def staff(request):
-    # if 'staff_id' not in request.session:
-    #     return redirect('login')
+    if 'staff_id' not in request.session:
+        return redirect('login')
     
-    # staff_id = request.session.get('staff_id')
-    # user = Staff.objects.get(id=staff_id)
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
 
     staffs = Staff.objects.order_by('full_name')
     employee_count = Staff.objects.count()

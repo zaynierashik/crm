@@ -280,7 +280,7 @@
                 </div>
             </header>            
             
-            <main class="h-full overflow-y-auto">
+            <main class="h-full overflow-y-auto" id="main-company-content">
                 <div class="container px-6 mx-auto grid">
                     <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">{{ company.company_name }}</h2>
 
@@ -327,6 +327,14 @@
                                     {% endif %}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="flex justify-end items-center">
+                            <button type="button" id="add-requirement-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] text-center dark:bg-purple-600 dark:hover:bg-purple-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                                </svg>
+                            </button>
                         </div>
                         
                         <div class="w-full overflow-x-auto">
@@ -451,11 +459,155 @@
                                 </ul>
                             </nav>
                         </span>
-                    </div>                                      
+                    </div>        
                 </div>
             </main>
+
+            <!-- New Requirement Form -->
+            <div id="new-requirement-form" style="display: none;">
+                <main class="h-full pb-16 overflow-y-auto">
+                    <form id="companyForm" action="{% url 'add_newcompany' %}" method="POST">
+                        <div class="container px-6 mx-auto grid">
+                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">New Requirement Form</h2>
+                  
+                            <!-- Requirement Inputs -->
+                            {% csrf_token %}
+                            <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement Information</h4>
+                            <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                                <div class="grid gap-4 mb-4 md:grid-cols-2">
+                                    <div>
+                                        <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Name</label>
+                                        <input type="text" id="company-name" name="company-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
+                                    </div>
+            
+                                    <div>
+                                        <label for="sector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sector</label>
+                                        <div class="flex items-center">
+                                            <select id="sector" name="sector" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="" selected>Choose a sector</option>
+                                                {% for sector in sectors %}
+                                                <option value="{{ sector.id }}">{{ sector.sector_name }}</option>
+                                                {% endfor %}
+                                            </select>                                            
+                                    
+                                            <button type="button" id="ajax-sector-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11px]">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid gap-4 mb-4 md:grid-cols-4">
+                                    <div>
+                                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                                        <input type="text" id="address" name="address" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter address" />
+                                    </div>
+
+                                    <div>
+                                        <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
+                                        <input type="text" id="city" name="city" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter city" />
+                                    </div>
+
+                                    <div>
+                                        <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
+                                        <input type="text" id="state" name="state" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter state" />
+                                    </div>
+
+                                    <div>
+                                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                                        <select id="country" name="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <option value="" selected>Choose a country</option>
+                                            <option value="USA">United States</option>
+                                            <option value="Nepal">Nepal</option>
+                                            <option value="India">India</option>
+                                            <option value="Singapore">Singapore</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid gap-4 mb-2 md:grid-cols-2">
+                                    <div class="grid gap-4 mb-2 md:grid-cols-1">
+                                        <div class="flex gap-4">
+                                            <div class="flex-grow w-1/2">
+                                                <label for="via" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Via</label>
+                                                <select id="via" name="via" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="" selected>Choose a via</option>
+                                                    <option value="Direct">Direct</option>
+                                                    <option value="Referral">Referral</option>
+                                                    <option value="Partner">Partner</option>
+                                                </select>
+                                            </div>
+
+                                            <div id="referralDiv" class="w-1/2" style="display: none;">
+                                                <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
+                                                <input type="text" id="referral" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
+                                            </div>
+
+                                            <div id="partnerDiv" class="w-1/2" style="display: none;">
+                                                <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
+                                                <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option selected>Choose a partner</option>
+                                                    {% for partner in partners %}
+                                                    <option value="{{ partner.id }}">{{ partner.partner_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label for="website" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Website</label>
+                                        <input type="text" id="website" name="website" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter website link" />
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <button type="submit" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">Submit</button>
+                        </div>
+                    </form>
+                </main>
+            </div>
         </div>
     </div>
+
+    <!-- New Requirement Form Toggle -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            var urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.has('add-requirement')) {
+                document.getElementById('main-company-content').style.display = 'none';
+                document.getElementById('new-requirement-form').style.display = 'block';
+
+                if (urlParams.has('error_message')) {
+                    var errorMessage = urlParams.get('error_message');
+                    alert(errorMessage);
+                }
+
+                if (urlParams.has('company_name')) {
+                    document.getElementById('company-name').value = urlParams.get('company_name');
+                }
+            }
+        });
+
+        document.getElementById('add-requirement-button').addEventListener('click', () => {
+            document.getElementById('main-company-content').style.display = 'none';
+            document.getElementById('new-requirement-form').style.display = 'block';
+            window.history.pushState({page: 'add-requirement'}, '', '?add-requirement');
+        });
+
+        window.onpopstate = (event) => {
+            if (event.state && event.state.page === 'add-requirement') {
+                document.getElementById('main-company-content').style.display = 'none';
+                document.getElementById('new-requirement-form').style.display = 'block';
+            } else {
+                document.getElementById('new-requirement-form').style.display = 'none';
+                document.getElementById('main-company-content').style.display = 'block';
+            }
+        };
+    </script>
 
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>
