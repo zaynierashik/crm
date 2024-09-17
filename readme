@@ -1,0 +1,2 @@
+Tailwind CLI Build Code:
+    npx tailwindcss -i ./static/css/tailwind.css -o ./static/css/tailwind.output.css --watch

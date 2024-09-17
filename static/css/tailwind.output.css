@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.4.9 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.11 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -6965,6 +6965,16 @@ video {
   padding-bottom: 2rem;
 }
 
+.py-\[10px\] {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.py-\[9px\] {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
 .py-px {
   padding-top: 1px;
   padding-bottom: 1px;
@@ -7052,6 +7062,10 @@ video {
 
 .pe-0 {
   padding-inline-end: 0px;
+}
+
+.pe-4 {
+  padding-inline-end: 1rem;
 }
 
 .pe-5 {
@@ -7218,12 +7232,20 @@ video {
   padding-right: 1px;
 }
 
+.ps-1 {
+  padding-inline-start: 0.25rem;
+}
+
 .ps-10 {
   padding-inline-start: 2.5rem;
 }
 
 .ps-2 {
   padding-inline-start: 0.5rem;
+}
+
+.ps-2\.5 {
+  padding-inline-start: 0.625rem;
 }
 
 .ps-3 {
@@ -8593,6 +8615,11 @@ video {
   .dark\:border-gray-800 {
     --tw-border-opacity: 1;
     border-color: rgb(26 28 35 / var(--tw-border-opacity));
+  }
+
+  .dark\:border-s-gray-700 {
+    --tw-border-opacity: 1;
+    border-inline-start-color: rgb(36 38 45 / var(--tw-border-opacity));
   }
 
   .dark\:bg-blue-500 {

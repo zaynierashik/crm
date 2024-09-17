@@ -2,7 +2,7 @@ import io
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
-from django.utils import timezone
+from django.utils.timezone import now
 from datetime import datetime
 from django.urls import reverse
 from django.db.models import Sum
@@ -13,8 +13,8 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Font, Border, Side
+from openpyxl import Workbook # type: ignore
+from openpyxl.styles import Alignment, Font, Border, Side # type: ignore
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -746,17 +746,18 @@ def add_newrequirement(request):
         requirement_description = request.POST.get('message')
         currency = request.POST.get('currency')
         price = request.POST.get('price')
-        status = request.POST.get('status')
+        status = request.POST.get('status') or 'Approved'
+        progress = request.POST.get('progress')
 
         company = get_object_or_404(Company, pk=company_id)
-        contact = get_object_or_404(Contact, pk=contact_id) if contact_id else None
-        brand = get_object_or_404(Brand, pk=brand_id) if brand_id else None
-        product = get_object_or_404(Product, pk=product_id) if product_id else None
-        service = get_object_or_404(Service, pk=service_id) if service_id else None
+        contact = Contact.objects.filter(pk=contact_id).first() if contact_id else None
+        brand = Brand.objects.filter(pk=brand_id).first() if brand_id else None
+        product = Product.objects.filter(pk=product_id).first() if product_id else None
+        service = Service.objects.filter(pk=service_id).first() if service_id else None
 
-        Requirement.objects.create(company=company, date=now(), contact_name=contact, requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description, currency=currency, price=price, status=status)
+        Requirement.objects.create(company=company, date=now(), contact_name=contact, requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description, currency=currency, price=price, status=status, progress=progress)
 
-        return redirect(reverse('requirement'))
+        return redirect(reverse('contract'))
     
 # New Partner Submission
 def add_newpartner(request):
@@ -909,13 +910,16 @@ def companydetails(request, company_id):
     
     requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
     contacts = Contact.objects.filter(company=company)
+    services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
+    brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
+    products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
 
     requirements_count = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
     requirements_paginator = Paginator(requirements_count, 10)
     requirements_page_number = request.GET.get('requirements_page', 1)
     requirements_page_obj = requirements_paginator.get_page(requirements_page_number)
 
-    context = {'company': company, 'requirements': requirements, 'contacts': contacts, 'requirements_page_obj': requirements_page_obj}
+    context = {'company': company, 'requirements': requirements, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products, 'requirements_page_obj': requirements_page_obj}
     return render(request, 'companydetails.html', context)
 
 # View Requirement Details

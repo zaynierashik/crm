@@ -12,6 +12,7 @@
     <link rel="manifest" href="{% static '/favicon/site.webmanifest' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
 </head>
 <body>
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
@@ -294,9 +295,6 @@
                                         <th class="px-4 py-3">Contact Person</th>
                                         <th class="px-4 py-3">Email</th>
                                         <th class="px-4 py-3">Contact Number</th>
-                                        <th class="px-4 py-3"></th>
-                                        <th class="px-4 py-3"></th>
-                                        <th class="px-4 py-3"></th>
                                     </tr>
                                 </thead>
 
@@ -322,7 +320,7 @@
                                         {% endfor %}
                                     {% else %}
                                     <tr>
-                                        <td colspan="5" class="font-medium text-sm text-center dark:text-gray-400">No contacts found.</td>
+                                        <td colspan="4" class="font-medium text-sm text-center dark:text-gray-400">No contacts found.</td>
                                     </tr>
                                     {% endif %}
                                 </tbody>
@@ -345,6 +343,7 @@
                                         <th class="px-4 py-3">Brand</th>
                                         <th class="px-4 py-3">Product Name</th>
                                         <th class="px-4 py-3">Service</th>
+                                        <th class="px-4 py-3"></th>
                                         <th class="px-4 py-3"></th>
                                     </tr>
                                 </thead>
@@ -383,6 +382,13 @@
                                             </p>
                                         </td>
                                         <td class="px-4 py-3">
+                                            <a href="">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                                </svg>    
+                                            </a>  
+                                        </td>
+                                        <td class="px-4 py-3">
                                             <a href="{% url 'requirementdetails' company.id requirement.id %}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -393,7 +399,7 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="5" class="font-medium text-sm text-center dark:text-gray-400">No requirements found.</td>
+                                        <td colspan="6" class="font-medium text-sm text-center dark:text-gray-400">No requirements found.</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -466,100 +472,110 @@
             <!-- New Requirement Form -->
             <div id="new-requirement-form" style="display: none;">
                 <main class="h-full pb-16 overflow-y-auto">
-                    <form id="companyForm" action="{% url 'add_newcompany' %}" method="POST">
+                    <form id="requirementForm" action="{% url 'add_newrequirement' %}" method="POST">
                         <div class="container px-6 mx-auto grid">
                             <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">New Requirement Form</h2>
                   
                             <!-- Requirement Inputs -->
                             {% csrf_token %}
-                            <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement Information</h4>
+                            <!-- <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement Information</h4> -->
                             <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                                <div class="grid gap-4 mb-4 md:grid-cols-2">
-                                    <div>
-                                        <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Name</label>
-                                        <input type="text" id="company-name" name="company-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
-                                    </div>
-            
-                                    <div>
-                                        <label for="sector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sector</label>
-                                        <div class="flex items-center">
-                                            <select id="sector" name="sector" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option value="" selected>Choose a sector</option>
-                                                {% for sector in sectors %}
-                                                <option value="{{ sector.id }}">{{ sector.sector_name }}</option>
-                                                {% endfor %}
-                                            </select>                                            
-                                    
-                                            <button type="button" id="ajax-sector-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11px]">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <input type="hidden" id="company-name" name="company-name" value="{{ company.id }}">
 
-                                <div class="grid gap-4 mb-4 md:grid-cols-4">
-                                    <div>
-                                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                                        <input type="text" id="address" name="address" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter address" />
-                                    </div>
-
-                                    <div>
-                                        <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
-                                        <input type="text" id="city" name="city" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter city" />
-                                    </div>
-
-                                    <div>
-                                        <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
-                                        <input type="text" id="state" name="state" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter state" />
-                                    </div>
-
-                                    <div>
-                                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-                                        <select id="country" name="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                            <option value="" selected>Choose a country</option>
-                                            <option value="USA">United States</option>
-                                            <option value="Nepal">Nepal</option>
-                                            <option value="India">India</option>
-                                            <option value="Singapore">Singapore</option>
+                                <div class="grid gap-4 md:grid-cols-2">
+                                    <div class="mb-4">
+                                        <label for="contact-person" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person</label>
+                                        <select id="contact-person" name="contact-person" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option value="" selected>Choose a contact person</option>
+                                            {% for contact in contacts %}
+                                                <option value="{{ contact.id }}">{{ contact.contact_name }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
+
+                                    <div>
+                                        <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
+                                        <input id="date" name="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" required>
+                                    </div>
                                 </div>
 
-                                <div class="grid gap-4 mb-2 md:grid-cols-2">
-                                    <div class="grid gap-4 mb-2 md:grid-cols-1">
-                                        <div class="flex gap-4">
-                                            <div class="flex-grow w-1/2">
-                                                <label for="via" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Via</label>
-                                                <select id="via" name="via" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="" selected>Choose a via</option>
-                                                    <option value="Direct">Direct</option>
-                                                    <option value="Referral">Referral</option>
-                                                    <option value="Partner">Partner</option>
+                                <div class="flex gap-4 mb-4">
+                                    <div class="flex-grow w-1/2">
+                                        <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
+                                        <select id="requirement-category" name="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option value="" selected>Choose a requirement category</option>
+                                            <option value="Service">Service</option>
+                                            <option value="Product">Product</option>
+                                        </select>
+                                    </div>
+    
+                                    <div id="serviceDiv" class="w-1/2" style="display: none;">
+                                        <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
+                                        <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <option value="" selected>Choose a service</option>
+                                            {% for service in services %}
+                                                <option value="{{ service.id }}">{{ service.service_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+    
+                                    <div id="productDiv" class="w-1/2" style="display: none;">
+                                        <div class="grid gap-4 md:grid-cols-2">
+                                            <div>
+                                                <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
+                                                <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="" selected>Choose a brand</option>
+                                                    {% for brand in brands %}
+                                                        <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
+                                                    {% endfor %}
                                                 </select>
                                             </div>
-
-                                            <div id="referralDiv" class="w-1/2" style="display: none;">
-                                                <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
-                                                <input type="text" id="referral" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
-                                            </div>
-
-                                            <div id="partnerDiv" class="w-1/2" style="display: none;">
-                                                <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
-                                                <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option selected>Choose a partner</option>
-                                                    {% for partner in partners %}
-                                                    <option value="{{ partner.id }}">{{ partner.partner_name }}</option>
+                        
+                                            <div>
+                                                <label for="product" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product</label>
+                                                <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="" selected>Choose a product</option>
+                                                    {% for product in products %}
+                                                        <option value="{{ product.id }}">{{ product.product_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
+                                <div>
+                                    <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
+                                    <textarea id="message" name="message" rows="5" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement..."></textarea>
+                                </div>
+
+                                <div class="grid gap-4 md:grid-cols-2">
                                     <div>
-                                        <label for="website" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Website</label>
-                                        <input type="text" id="website" name="website" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter website link" />
+                                        <label for="price" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                                        <div class="flex items-center">
+                                            <div class="relative w-24">
+                                                <select id="currency" name="currency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-1 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="USD">USD</option>
+                                                    <option value="NPR">NPR</option>
+                                                    <option value="INR">INR</option>
+                                                </select>
+                                            </div>
+                                                
+                                            <div class="relative w-full">
+                                                <input type="number" id="price" name="price" min="0" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="progress" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                                        <select id="progress" name="progress" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option value="" selected>Choose a status</option>
+                                            <option value="Initiated">Initiated</option>
+                                            <option value="Pipeline">Pipeline</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Rejected">Rejected</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -607,6 +623,26 @@
                 document.getElementById('main-company-content').style.display = 'block';
             }
         };
+    </script>
+
+    <script>
+        var requirementDropdown = document.getElementById("requirement-category");
+        var serviceDiv = document.getElementById("serviceDiv");
+        var productDiv = document.getElementById("productDiv");
+
+        requirementDropdown.addEventListener("change", function(){
+            var selectedRequirement = requirementDropdown.value;
+            if(selectedRequirement === "Service"){
+                serviceDiv.style.display = "block";
+                productDiv.style.display = "none";
+            }else if(selectedRequirement === "Product"){
+                serviceDiv.style.display = "none";
+                productDiv.style.display = "block";
+            }else{
+                serviceDiv.style.display = "none";
+                productDiv.style.display = "none";
+            }
+        });
     </script>
 
     <script src="{% static 'js/script.js' %}"></script>
