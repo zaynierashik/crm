@@ -28,7 +28,12 @@ urlpatterns = [
 
     path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
 
+    path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
+    path('edit-requirement/<int:requirement_id>/', views.requirementeditform, name='requirementeditform'),
+    path('edit-partner/<int:partner_id>/', views.partnereditform, name='partnereditform'),
+
     path('update-company/<int:company_id>', views.update_company, name='update_company'),
+    path('update-requirement/', views.update_requirement, name='update_requirement'),
     path('update-partner/<int:partner_id>', views.update_partner, name='update_partner'),
     path('update-sector/', views.update_sector, name='update_sector'),
     path('update-service/', views.update_service, name='update_service'),
@@ -60,8 +65,7 @@ urlpatterns = [
     path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
-    path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
-    path('edit-partner/<int:partner_id>/', views.partnereditform, name='partnereditform'),
+    
 
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),

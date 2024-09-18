@@ -761,7 +761,7 @@ def add_newrequirement(request):
     
 # New Partner Submission
 def add_newpartner(request):
-    if 'user_id' not in request.session:
+    if 'staff_id' not in request.session:
         return redirect('login')
 
     if request.method == 'POST':
@@ -780,8 +780,7 @@ def add_newpartner(request):
         email = request.POST.get('email-address')
         contact_number = request.POST.get('contact-number')
 
-        partner = Partner(partner_name=partner_name, address=address, city=city, state=state, country=country, contact_person=contact_name, designation=designation, email=email, phone_number=contact_number)
-        partner.save()
+        Partner.objects.create(partner_name=partner_name, address=address, city=city, state=state, country=country, contact_person=contact_name, designation=designation, email=email, phone_number=contact_number)
                 
         return redirect(reverse('partner'))
     else:
@@ -985,6 +984,29 @@ def companyeditform(request, company_id):
     religions = ["Hinduism", "Buddhism", "Christianity"]
     return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions})
 
+# Edit Requirement Details
+def requirementeditform(request, requirement_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    # Get the requirement object
+    requirement = get_object_or_404(Requirement, id=requirement_id)
+    
+    # Assuming you want to filter other related objects based on the company's requirement
+    company = requirement.company
+    contacts = Contact.objects.filter(company=company)
+    services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
+    brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
+    products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
+
+    return render(request, 'requirementeditform.html', {
+        'requirement': requirement,
+        'contacts': contacts,
+        'services': services,
+        'brands': brands,
+        'products': products
+    })
+
 # Edit Partner Details
 def partnereditform(request, partner_id):
     if 'staff_id' not in request.session:
@@ -1044,6 +1066,52 @@ def update_company(request, company_id):
     contacts = Contact.objects.filter(company=company)
 
     return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
+
+def add_newrequirement(request):
+    if request.method == 'POST':
+        company_id = request.POST.get('company-name')
+        contact_id = request.POST.get('contact-person')
+        requirement_type = request.POST.get('requirement-category')
+        brand_id = request.POST.get('brand') if requirement_type == 'Product' else None
+        product_id = request.POST.get('product') if requirement_type == 'Product' else None
+        service_id = request.POST.get('service') if requirement_type == 'Service' else None
+        requirement_description = request.POST.get('message')
+        currency = request.POST.get('currency')
+        price = request.POST.get('price')
+        status = request.POST.get('status') or 'Approved'
+        progress = request.POST.get('progress')
+
+        company = get_object_or_404(Company, pk=company_id)
+        contact = Contact.objects.filter(pk=contact_id).first() if contact_id else None
+        brand = Brand.objects.filter(pk=brand_id).first() if brand_id else None
+        product = Product.objects.filter(pk=product_id).first() if product_id else None
+        service = Service.objects.filter(pk=service_id).first() if service_id else None
+
+        Requirement.objects.create(company=company, date=now(), contact_name=contact, requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description, currency=currency, price=price, status=status, progress=progress)
+
+        return redirect(reverse('contract'))
+
+
+# Update Requirement
+def update_requirement(request, requirement_id):
+    requirement = get_object_or_404(Requirement, id=requirement_id)
+
+    if request.method == 'POST':
+        requirement.contact_name = request.POST['contact-person']
+        requirement.date = request.POST['date']
+        requirement.requirement_type = request.POST['requirement-category']
+        requirement.service = request.POST['service']
+        requirement.brand = request.POST['brand']
+        requirement.product_name = request.POST['product']
+        requirement.requirement_description = request.POST['message']
+        requirement.currency = request.POST['currency']
+        requirement.price = request.POST['price']
+        requirement.progress = request.POST['progress']
+        requirement.save()
+
+        return redirect('companydetails')
+    
+    return redirect('companydetails')
 
 # Update Partner
 def update_partner(request, partner_id):

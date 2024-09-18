@@ -279,237 +279,34 @@
                         </div>
                     </div>
                 </div>
-            </header>            
-            
-            <main class="h-full overflow-y-auto" id="main-company-content">
-                <div class="container px-6 mx-auto grid">
-                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">{{ company.company_name }}</h2>
-
-                    <!-- New Table -->
-                    <div class="w-full overflow-hidden rounded-lg shadow-xs">
-                        <div class="w-full mb-8 overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
-                                <thead>
-                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">City</th>
-                                        <th class="px-4 py-3">Contact Person</th>
-                                        <th class="px-4 py-3">Email</th>
-                                        <th class="px-4 py-3">Contact Number</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {% if contacts %}
-                                        {% for contact in contacts %}
-                                        <tr class="text-gray-700 dark:text-gray-400">
-                                            {% if forloop.first %}
-                                            <td class="px-4 py-3 align-top" rowspan="{{ contacts|length }}">
-                                                <p class="font-medium text-sm">{{ company.city|default:"-" }}</p>
-                                            </td>
-                                            {% endif %}
-                                            <td class="px-4 py-3">
-                                                <p class="font-medium text-sm">{{ contact.contact_name|default:"-" }}</p>
-                                            </td>
-                                            <td class="px-4 py-3">
-                                                <p class="font-medium text-sm">{{ contact.email|default:"-" }}</p>
-                                            </td>
-                                            <td class="px-4 py-3">
-                                                <p class="font-medium text-sm">{{ contact.phone_number|default:"-" }}</p>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="4" class="font-medium text-sm text-center dark:text-gray-400">No contacts found.</td>
-                                    </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="flex justify-end items-center">
-                            <button type="button" id="add-requirement-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] text-center dark:bg-purple-600 dark:hover:bg-purple-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="w-full overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
-                                <thead>
-                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">Requirement Type</th>
-                                        <th class="px-4 py-3">Brand</th>
-                                        <th class="px-4 py-3">Product Name</th>
-                                        <th class="px-4 py-3">Service</th>
-                                        <th class="px-4 py-3">Price</th>
-                                        <th class="px-4 py-3"></th>
-                                        <th class="px-4 py-3"></th>
-                                    </tr>
-                                </thead>
-
-                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                                    {% for requirement in requirements %}
-                                    <tr class="text-gray-700 dark:text-gray-400">
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">{{ requirement.requirement_type }}</p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if requirement.requirement_type == "Product" %}
-                                                    {{ requirement.brand|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if requirement.requirement_type == "Product" %}
-                                                    {{ requirement.product_name|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if requirement.requirement_type == "Service" %}
-                                                    {{ requirement.service|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if requirement.currency == 'USD' %}
-                                                    $ {{ requirement.price }}
-                                                {% elif requirement.currency == 'NPR' %}
-                                                    ₹ {{ requirement.price }}
-                                                {% elif requirement.currency == 'INR' %}
-                                                    ₹ {{ requirement.price }}
-                                                {% else %}
-                                                    {{ requirement.price }}
-                                                {% endif %}
-                                            </p>
-                                        </td>                                        
-                                        <td class="px-4 py-3">
-                                            <a href="{% url 'requirementeditform' requirement.id %}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                                </svg>
-                                            </a>    
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <a href="{% url 'requirementdetails' company.id requirement.id %}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                </svg>    
-                                            </a>  
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="6" class="font-medium text-sm text-center dark:text-gray-400">No requirements found.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                
-                    <div class="grid mt-2 px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase sm:grid-cols-9 dark:text-gray-400">
-                        <span class="flex items-center col-span-3">Showing {{ requirements_page_obj.start_index }}-{{ requirements_page_obj.end_index }} of {{ requirements_page_obj.paginator.count }}</span>
-                        <span class="col-span-2"></span>
-                    
-                        <!-- Pagination -->
-                        <span class="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
-                            <nav aria-label="Table navigation">
-                                <ul class="inline-flex items-center">
-                                    {% if requirements_page_obj.has_previous %}
-                                    <li>
-                                        <a href="?requirements_page=1" class="px-3 py-1 rounded-md rounded-l-lg focus:outline-none" aria-label="Previous">
-                                            <svg aria-hidden="true" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                                <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    {% else %}
-                                    <li>
-                                        <span class="px-3 py-1 rounded-md rounded-l-lg opacity-50 cursor-not-allowed" aria-label="Previous">
-                                            <svg aria-hidden="true" class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                                <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </span>
-                                    </li>
-                                    {% endif %}
-                                    
-                                    {% for num in requirements_page_obj.paginator.page_range %}
-                                        {% if num == requirements_page_obj.number %}
-                                        <li>
-                                            <span class="px-3 py-1 text-white transition-colors duration-150 bg-purple-600 border border-r-0 border-purple-600 rounded-md focus:outline-none">{{ num }}</span>
-                                        </li>
-                                        {% else %}
-                                        <li>
-                                            <a href="?requirements_page={{ num }}" class="px-3 py-1 rounded-md focus:outline-none">{{ num }}</a>
-                                        </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% if requirements_page_obj.has_next %}
-                                    <li>
-                                        <a href="?requirements_page={{ requirements_page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-md rounded-r-lg focus:outline-none" aria-label="Next">
-                                            <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
-                                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </a>
-                                    </li>
-                                    {% else %}
-                                    <li>
-                                        <span class="px-3 py-1 rounded-md rounded-r-lg opacity-50 cursor-not-allowed" aria-label="Next">
-                                            <svg class="w-4 h-4 fill-current" aria-hidden="true" viewBox="0 0 20 20">
-                                                <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" fill-rule="evenodd"></path>
-                                            </svg>
-                                        </span>
-                                    </li>
-                                    {% endif %}
-                                </ul>
-                            </nav>
-                        </span>
-                    </div>        
-                </div>
-            </main>
+            </header>
 
             <!-- New Requirement Form -->
-            <div id="new-requirement-form" style="display: none;">
+            <div id="new-requirement-form">
                 <main class="h-full pb-16 overflow-y-auto">
-                    <form id="requirementForm" action="{% url 'add_newrequirement' %}" method="POST">
+                    <form id="requirementForm" action="{% url 'update_requirement' %}" method="POST">
                         <div class="container px-6 mx-auto grid">
-                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">New Requirement Form</h2>
+                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Edit Requirement Form</h2>
                   
                             <!-- Requirement Inputs -->
                             {% csrf_token %}
                             <!-- <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement Information</h4> -->
                             <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                                <input type="hidden" id="company-name" name="company-name" value="{{ company.id }}">
+                                <input type="hidden" name="requirement-id" value="{{ requirement.id }}">
 
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div class="mb-4">
                                         <label for="contact-person" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person</label>
                                         <select id="contact-person" name="contact-person" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                            <option value="" selected>Choose a contact person</option>
                                             {% for contact in contacts %}
-                                                <option value="{{ contact.id }}">{{ contact.contact_name }}</option>
+                                                <option value="{{ contact.id }}" {% if requirement.contact_name == contact %}selected{% endif %}>{{ contact.contact_name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
 
                                     <div>
                                         <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
-                                        <input id="date" name="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" required>
+                                        <input id="date" name="date" value="{{ requirement.date|date:'Y-m-d' }}" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" required>
                                     </div>
                                 </div>
 
@@ -517,9 +314,9 @@
                                     <div class="flex-grow w-1/2">
                                         <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
                                         <select id="requirement-category" name="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                            <option value="" selected>Choose a requirement category</option>
-                                            <option value="Service">Service</option>
-                                            <option value="Product">Product</option>
+                                            <option value="">Choose a requirement category</option>
+                                            <option value="Service" {% if requirement.requirement_type == "Service" %} selected {% endif %}>Service</option>
+                                            <option value="Product" {% if requirement.requirement_type == "Product" %} selected {% endif %}>Product</option>
                                         </select>
                                     </div>
     
@@ -528,7 +325,7 @@
                                         <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                             <option value="" selected>Choose a service</option>
                                             {% for service in services %}
-                                                <option value="{{ service.id }}">{{ service.service_name }}</option>
+                                                <option value="{{ service.id }}" {% if requirement.service_name == service %}selected{% endif %}>{{ service.service_name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -540,7 +337,7 @@
                                                 <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option value="" selected>Choose a brand</option>
                                                     {% for brand in brands %}
-                                                        <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
+                                                        <option value="{{ brand.id }}" {% if requirement.brand_name == brand %}selected{% endif %}>{{ brand.brand_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -550,7 +347,7 @@
                                                 <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option value="" selected>Choose a product</option>
                                                     {% for product in products %}
-                                                        <option value="{{ product.id }}">{{ product.product_name }}</option>
+                                                        <option value="{{ product.id }}" {% if requirement.product_name == product %}selected{% endif %}>{{ product.product_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -560,7 +357,7 @@
 
                                 <div>
                                     <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
-                                    <textarea id="message" name="message" rows="5" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement..."></textarea>
+                                    <textarea id="message" name="message" rows="5" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement...">{{ requirement.message }}</textarea>
                                 </div>
 
                                 <div class="grid gap-4 md:grid-cols-2">
@@ -568,15 +365,15 @@
                                         <label for="price" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
                                         <div class="flex items-center">
                                             <div class="relative w-24">
-                                                <select id="currency" name="currency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-1 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="USD">USD</option>
-                                                    <option value="NPR">NPR</option>
-                                                    <option value="INR">INR</option>
+                                                <select id="currency" name="currency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="USD" {% if requirement.currency == "USD" %} selected {% endif %}>USD</option>
+                                                    <option value="NPR" {% if requirement.currency == "NPR" %} selected {% endif %}>NPR</option>
+                                                    <option value="INR" {% if requirement.currency == "INR" %} selected {% endif %}>INR</option>
                                                 </select>
                                             </div>
                                                 
                                             <div class="relative w-full">
-                                                <input type="number" id="price" name="price" min="0" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
+                                                <input type="number" id="price" value="{{ requirement.price }}" name="price" min="0" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
                                             </div>
                                         </div>
                                     </div>
@@ -584,11 +381,11 @@
                                     <div>
                                         <label for="progress" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
                                         <select id="progress" name="progress" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                            <option value="" selected>Choose a status</option>
-                                            <option value="Initiated">Initiated</option>
-                                            <option value="Pipeline">Pipeline</option>
-                                            <option value="Completed">Completed</option>
-                                            <option value="Rejected">Rejected</option>
+                                            <option value="">Choose a status</option>
+                                            <option value="Initiated" {% if requirement.progress == "Initiated" %} selected {% endif %}>Initiated</option>
+                                            <option value="Pipeline" {% if requirement.progress == "Pipeline" %} selected {% endif %}>Pipeline</option>
+                                            <option value="Completed" {% if requirement.progress == "Completed" %} selected {% endif %}>Completed</option>
+                                            <option value="Rejected" {% if requirement.progress == "Rejected" %} selected {% endif %}>Rejected</option>
                                         </select>
                                     </div>
                                 </div>
@@ -601,43 +398,6 @@
             </div>
         </div>
     </div>
-
-    <!-- New Requirement Form Toggle -->
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            var urlParams = new URLSearchParams(window.location.search);
-
-            if (urlParams.has('add-requirement')) {
-                document.getElementById('main-company-content').style.display = 'none';
-                document.getElementById('new-requirement-form').style.display = 'block';
-
-                if (urlParams.has('error_message')) {
-                    var errorMessage = urlParams.get('error_message');
-                    alert(errorMessage);
-                }
-
-                if (urlParams.has('company_name')) {
-                    document.getElementById('company-name').value = urlParams.get('company_name');
-                }
-            }
-        });
-
-        document.getElementById('add-requirement-button').addEventListener('click', () => {
-            document.getElementById('main-company-content').style.display = 'none';
-            document.getElementById('new-requirement-form').style.display = 'block';
-            window.history.pushState({page: 'add-requirement'}, '', '?add-requirement');
-        });
-
-        window.onpopstate = (event) => {
-            if (event.state && event.state.page === 'add-requirement') {
-                document.getElementById('main-company-content').style.display = 'none';
-                document.getElementById('new-requirement-form').style.display = 'block';
-            } else {
-                document.getElementById('new-requirement-form').style.display = 'none';
-                document.getElementById('main-company-content').style.display = 'block';
-            }
-        };
-    </script>
 
     <script>
         var requirementDropdown = document.getElementById("requirement-category");
