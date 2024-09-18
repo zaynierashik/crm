@@ -284,15 +284,14 @@
             <!-- New Requirement Form -->
             <div id="new-requirement-form">
                 <main class="h-full pb-16 overflow-y-auto">
-                    <form id="requirementForm" action="{% url 'update_requirement' %}" method="POST">
+                    <form id="requirementForm" action="{% url 'update_requirement' requirement.id %}" method="POST">
                         <div class="container px-6 mx-auto grid">
-                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Edit Requirement Form</h2>
+                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Requirement Edit Form</h2>
                   
                             <!-- Requirement Inputs -->
                             {% csrf_token %}
                             <!-- <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Requirement Information</h4> -->
                             <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                                <input type="hidden" name="requirement-id" value="{{ requirement.id }}">
 
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div class="mb-4">
@@ -325,7 +324,7 @@
                                         <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                             <option value="" selected>Choose a service</option>
                                             {% for service in services %}
-                                                <option value="{{ service.id }}" {% if requirement.service_name == service %}selected{% endif %}>{{ service.service_name }}</option>
+                                                <option value="{{ service.id }}" {% if requirement.service_name == service_name %}selected{% endif %}>{{ service.service_name }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -337,7 +336,7 @@
                                                 <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option value="" selected>Choose a brand</option>
                                                     {% for brand in brands %}
-                                                        <option value="{{ brand.id }}" {% if requirement.brand_name == brand %}selected{% endif %}>{{ brand.brand_name }}</option>
+                                                        <option value="{{ brand.id }}" {% if requirement.brand_name == brand_name %}selected{% endif %}>{{ brand.brand_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -347,7 +346,7 @@
                                                 <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option value="" selected>Choose a product</option>
                                                     {% for product in products %}
-                                                        <option value="{{ product.id }}" {% if requirement.product_name == product %}selected{% endif %}>{{ product.product_name }}</option>
+                                                        <option value="{{ product.id }}" {% if requirement.product_name and requirement.product_name.id == product.id %}selected{% endif %}>{{ product.product_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -357,7 +356,7 @@
 
                                 <div>
                                     <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
-                                    <textarea id="message" name="message" rows="5" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement...">{{ requirement.message }}</textarea>
+                                    <textarea id="message" name="message" rows="5" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement...">{{ requirement.requirement_description }}</textarea>
                                 </div>
 
                                 <div class="grid gap-4 md:grid-cols-2">
@@ -373,8 +372,8 @@
                                             </div>
                                                 
                                             <div class="relative w-full">
-                                                <input type="number" id="price" value="{{ requirement.price }}" name="price" min="0" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
-                                            </div>
+                                                <input type="number" id="price" value="{{ requirement.price }}" name="price" min="0" step="0.01" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
+                                            </div>                                            
                                         </div>
                                     </div>
                                     
@@ -400,24 +399,37 @@
     </div>
 
     <script>
-        var requirementDropdown = document.getElementById("requirement-category");
-        var serviceDiv = document.getElementById("serviceDiv");
-        var productDiv = document.getElementById("productDiv");
-
-        requirementDropdown.addEventListener("change", function(){
-            var selectedRequirement = requirementDropdown.value;
-            if(selectedRequirement === "Service"){
-                serviceDiv.style.display = "block";
-                productDiv.style.display = "none";
-            }else if(selectedRequirement === "Product"){
-                serviceDiv.style.display = "none";
-                productDiv.style.display = "block";
-            }else{
-                serviceDiv.style.display = "none";
-                productDiv.style.display = "none";
+        document.addEventListener("DOMContentLoaded", function(){
+            var requirementDropdown = document.getElementById("requirement-category");
+            var serviceDiv = document.getElementById("serviceDiv");
+            var productDiv = document.getElementById("productDiv");
+    
+            // Function to show/hide fields based on the selected requirement type
+            function updateFieldsBasedOnRequirementType(requirementType) {
+                if(requirementType === "Service"){
+                    serviceDiv.style.display = "block";
+                    productDiv.style.display = "none";
+                } else if(requirementType === "Product"){
+                    serviceDiv.style.display = "none";
+                    productDiv.style.display = "block";
+                } else {
+                    serviceDiv.style.display = "none";
+                    productDiv.style.display = "none";
+                }
             }
+    
+            // Check the requirement type from the loaded data
+            var initialRequirementType = requirementDropdown.value;
+            updateFieldsBasedOnRequirementType(initialRequirementType);
+    
+            // Add event listener to update fields when the user changes the selection
+            requirementDropdown.addEventListener("change", function(){
+                var selectedRequirement = requirementDropdown.value;
+                updateFieldsBasedOnRequirementType(selectedRequirement);
+            });
         });
     </script>
+    
 
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>
