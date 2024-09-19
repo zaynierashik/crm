@@ -2701,6 +2701,10 @@ video {
   max-width: 72rem;
 }
 
+.max-w-7xl {
+  max-width: 80rem;
+}
+
 .max-w-full {
   max-width: 100%;
 }
@@ -8401,11 +8405,6 @@ video {
   color: rgb(144 97 249 / var(--tw-text-opacity));
 }
 
-.hover\:bg-\[\#B00020\]:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(176 0 32 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-gray-100:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(244 245 247 / var(--tw-bg-opacity));
@@ -8424,6 +8423,16 @@ video {
 .hover\:bg-purple-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(85 33 181 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-gray-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(36 38 45 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-red-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(200 30 30 / var(--tw-bg-opacity));
 }
 
 .hover\:text-gray-800:hover {
@@ -8492,6 +8501,14 @@ video {
   --tw-ring-color: rgb(202 191 253 / var(--tw-ring-opacity));
 }
 
+.focus\:shadow-outline-gray:focus {
+  box-shadow: 0 0 0 3px hsla(210, 2.4%, 83.9%, 0.45);
+}
+
+.focus\:shadow-outline-red:focus {
+  box-shadow: 0 0 0 3px hsla(0, 82.9%, 83.9%, 0.45);
+}
+
 .focus\:shadow-outline-purple:focus {
   box-shadow: 0 0 0 3px hsla(250.60000000000002, 93.9%, 87.1%, 0.45);
 }
@@ -8501,17 +8518,60 @@ video {
   background-color: rgb(126 58 242 / var(--tw-bg-opacity));
 }
 
+.active\:bg-gray-600:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(76 79 82 / var(--tw-bg-opacity));
+}
+
+.active\:bg-red-600:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(224 36 36 / var(--tw-bg-opacity));
+}
+
 @media (min-width: 640px) {
+  .sm\:mx-0 {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+
   .sm\:mt-auto {
     margin-top: auto;
+  }
+
+  .sm\:ml-4 {
+    margin-left: 1rem;
+  }
+
+  .sm\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .sm\:flex {
+    display: flex;
+  }
+
+  .sm\:h-10 {
+    height: 2.5rem;
   }
 
   .sm\:w-auto {
     width: auto;
   }
 
+  .sm\:w-10 {
+    width: 2.5rem;
+  }
+
   .sm\:grid-cols-9 {
     grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  .sm\:flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .sm\:items-start {
+    align-items: flex-start;
   }
 
   .sm\:items-center {
@@ -8528,6 +8588,10 @@ video {
 
   .sm\:p-12 {
     padding: 3rem;
+  }
+
+  .sm\:text-left {
+    text-align: left;
   }
 }
 

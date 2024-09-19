@@ -359,10 +359,15 @@ def contract(request):
     staff_id = request.session.get('staff_id')
     user = Staff.objects.get(id=staff_id)
     
-    requirements = Requirement.objects.all().order_by('-date')
+    requirements = Requirement.objects.select_related('company').all().order_by('-date')
     services = Service.objects.values('id', 'service_name').order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').order_by('brand_name')
     products = Product.objects.values('id', 'product_name').order_by('product_name')
+
+    total_request = Request.objects.count()
+    total_requirement = Requirement.objects.count()
+    pipeline_count = Requirement.objects.filter(progress="Pipeline").count()
+    completed_count = Requirement.objects.filter(progress="Completed").count()
 
     paginator = Paginator(requirements, 10)
     page = request.GET.get('requirements_page')
@@ -374,7 +379,8 @@ def contract(request):
     except EmptyPage:
         requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'user': user, 'services': services, 'brands': brands, 'products': products, 'requirements': requirements, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
+    context = {'user': user, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'total_request': total_request, 'total_requirement': total_requirement, 
+               'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
     
     return render(request, 'contract.html', context)
 
@@ -727,12 +733,19 @@ def update_request(request):
 
 # Delete Requirement Request
 def delete_request(request, id):
+    # Get the request object or raise a 404 error if not found
     request_to_delete = get_object_or_404(Request, id=id)
+
     if request.method == "POST":
+        # Delete the request object
         request_to_delete.delete()
+        # Display a success message
         messages.success(request, f"Request '{request_to_delete.requirement_type}' has been deleted.")
-        return redirect('your-redirect-url')  # Replace with your actual redirect
-    return redirect('your-redirect-url')
+        # Redirect to the requirement page or wherever you'd like after deletion
+        return redirect('requirement')  # Update with your redirect URL name
+    
+    # If the request is not POST, redirect to a safe page (e.g., requirement page)
+    return redirect('requirement')
     
 # New Requirement Submission
 def add_newrequirement(request):
@@ -839,7 +852,7 @@ def add_transaction(request, company_id, requirement_id):
         remark = request.POST.get('remarks')
 
         Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
-        return redirect('requirementdetails', company_id=company_id, requirement_id=requirement_id)
+        return redirect('contractdetails', company_id=company_id, requirement_id=requirement_id)
     
 # New Sector Submission
 def add_newsector(request):
@@ -905,8 +918,13 @@ def toggle_staff_status(request, staff_id):
 
 # View Company Details
 def companydetails(request, company_id):
-    company = get_object_or_404(Company, id=company_id)
+    if 'staff_id' not in request.session:
+        return redirect('login')
     
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
+
+    company = get_object_or_404(Company, id=company_id)
     requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
     contacts = Contact.objects.filter(company=company)
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
@@ -918,13 +936,16 @@ def companydetails(request, company_id):
     requirements_page_number = request.GET.get('requirements_page', 1)
     requirements_page_obj = requirements_paginator.get_page(requirements_page_number)
 
-    context = {'company': company, 'requirements': requirements, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products, 'requirements_page_obj': requirements_page_obj}
+    context = {'user': user, 'company': company, 'requirements': requirements, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products, 'requirements_page_obj': requirements_page_obj}
     return render(request, 'companydetails.html', context)
 
 # View Requirement Details
-def requirementdetails(request, company_id, requirement_id):
+def contractdetails(request, company_id, requirement_id):
     if 'staff_id' not in request.session:
         return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
     
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
@@ -943,8 +964,8 @@ def requirementdetails(request, company_id, requirement_id):
         transactions = transactions.filter(date__range=[start_date, end_date])
 
     contacts = Contact.objects.filter(company=company)
-    context = {'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
-    return render(request, 'requirementdetails.html', context)
+    context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
+    return render(request, 'contractdetails.html', context)
 
 # View Partner Details
 def partnerdetails(request, partner_id):
@@ -988,6 +1009,9 @@ def companyeditform(request, company_id):
 def requirementeditform(request, requirement_id):
     if 'staff_id' not in request.session:
         return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
 
     requirement = get_object_or_404(Requirement, id=requirement_id)
     company = requirement.company
@@ -996,7 +1020,7 @@ def requirementeditform(request, requirement_id):
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
 
-    return render(request, 'requirementeditform.html', {'requirement': requirement, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products})
+    return render(request, 'requirementeditform.html', {'user': user, 'requirement': requirement, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products})
 
 # Edit Partner Details
 def partnereditform(request, partner_id):

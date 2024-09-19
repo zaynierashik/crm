@@ -54,7 +54,7 @@ urlpatterns = [
 
     path('update-request/', views.update_request, name='update_request'),
     path('update-contact/', views.update_contact, name='update_contact'),
-    path('requests/delete/<int:id>/', views.delete_request, name='delete_request'),
+    path('delete-request/<int:id>/', views.delete_request, name='delete_request'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),
@@ -68,7 +68,7 @@ urlpatterns = [
     
 
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
-    path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
+    path('contract-details/<int:company_id>/<int:requirement_id>/', views.contractdetails, name='contractdetails'),
     path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
 
     # path('send-email/', views.send_email, name='send_email'),
