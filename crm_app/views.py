@@ -482,15 +482,15 @@ def update_contact(request):
         contact_obj.designation = request.POST.get('designation')
         contact_obj.email = request.POST.get('email-address')
         contact_obj.phone_number = request.POST.get('contact-number')
-        contact_obj.DOB = request.POST.get('date')
+        # contact_obj.DOB = request.POST.get('date')
 
-        dob = request.POST.get('date')
-        if dob:
-            contact_obj.DOB = dob
-        else:
-            contact_obj.DOB = None
+        # dob = request.POST.get('date')
+        # if dob:
+        #     contact_obj.DOB = dob
+        # else:
+        #     contact_obj.DOB = None
             
-        contact_obj.religion = request.POST.get('religion')
+        # contact_obj.religion = request.POST.get('religion')
         contact_obj.save()
         messages.success(request, "Contact updated successfully.")
         
@@ -939,7 +939,7 @@ def companydetails(request, company_id):
     context = {'user': user, 'company': company, 'requirements': requirements, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products, 'requirements_page_obj': requirements_page_obj}
     return render(request, 'companydetails.html', context)
 
-# View Requirement Details
+# View Contract Details
 def contractdetails(request, company_id, requirement_id):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -952,7 +952,7 @@ def contractdetails(request, company_id, requirement_id):
     requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
     transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
 
-    transactions_count = Transaction.objects.filter(company=company).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
+    transactions_count = Transaction.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
     transactions_paginator = Paginator(transactions_count, 10)
     transactions_page_number = request.GET.get('transactions_page', 1)
     transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
@@ -966,6 +966,34 @@ def contractdetails(request, company_id, requirement_id):
     contacts = Contact.objects.filter(company=company)
     context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'contractdetails.html', context)
+
+# View Requirement Details
+def requirementdetails(request, company_id, requirement_id):
+    if 'user_id' not in request.session:
+        return redirect('login')
+    
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(User, id=user_id)
+    
+    company = get_object_or_404(Company, id=company_id)
+    requirement = get_object_or_404(Requirement, id=requirement_id)
+    requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
+    transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
+
+    transactions_count = Transaction.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
+    transactions_paginator = Paginator(transactions_count, 10)
+    transactions_page_number = request.GET.get('transactions_page', 1)
+    transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
+
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        transactions = transactions.filter(date__range=[start_date, end_date])
+
+    contacts = Contact.objects.filter(company=company)
+    context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
+    return render(request, 'requirementdetails.html', context)
 
 # View Partner Details
 def partnerdetails(request, partner_id):
@@ -1082,6 +1110,7 @@ def update_company(request, company_id):
 
     return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
 
+# Add New Requirement
 def add_newrequirement(request):
     if request.method == 'POST':
         company_id = request.POST.get('company-name')

@@ -17,6 +17,10 @@ urlpatterns = [
     path('service/', views.service, name='service'),
     path('brand/', views.brand, name='brand'),
 
+    path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
+    path('contract-details/<int:company_id>/<int:requirement_id>/', views.contractdetails, name='contractdetails'),
+    path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
+
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
     path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
@@ -48,6 +52,8 @@ urlpatterns = [
     path('requirement/', views.requirement, name='requirement'),
     path('contact/', views.contact, name='contact'),
 
+    path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
+
     path('add-company-profile/', views.add_companyprofile, name='add_companyprofile'),
     path('add-new-request/', views.add_newrequest, name='add_newrequest'),
     path('add-new-contact/', views.add_newcontact, name='add_newcontact'),
@@ -66,11 +72,6 @@ urlpatterns = [
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
     
-
-    path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
-    path('contract-details/<int:company_id>/<int:requirement_id>/', views.contractdetails, name='contractdetails'),
-    path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
-
     # path('send-email/', views.send_email, name='send_email'),
     path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
 

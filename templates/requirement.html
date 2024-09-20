@@ -200,7 +200,7 @@
 
             <main class="h-full overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
-                    <div class="grid gap-4 my-6 md:grid-cols-2 xl:grid-cols-4">
+                    <div class="grid gap-4 mt-8 mb-3 md:grid-cols-2 xl:grid-cols-4">
                         <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                             <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -415,6 +415,8 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <p class="text-xs mt-3"><sup>*</sup>Requests will be added to requirements after final discussion and approval.</p>
                     </div>
 
                     <!-- Request Edit Form -->
@@ -510,14 +512,9 @@
                     
                                 <div class="p-4 md:p-5">
                                     <div class="flex gap-4 mb-4">
-                                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </div>
                                         <div class="text-center sm:text-left">
                                             <p class="text-sm text-gray-500">
-                                                Are you sure you want to delete the request "<span id="request-name"></span>"? This action cannot be undone.
+                                                Are you sure you want to delete the request?
                                             </p>
                                         </div>
                                     </div>
@@ -528,9 +525,6 @@
                                                 Delete
                                             </button>
                                         </form>
-                                        <button id="cancel-btn" class="mt-3 flex items-center justify-center w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-gray-600 border border-transparent rounded-md active:bg-gray-600 hover:bg-gray-700 focus:outline-none focus:shadow-outline-gray">
-                                            Cancel
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -590,13 +584,12 @@
                                             <p class="font-medium text-sm">{{ requirement.progress }}</p>
                                         </td>
                                         <td class="px-4 py-3 text-sm">
-                                            <button type="button" id="edit-requirement-button-{{ requirement.id }}" x-on:click="openRequestEditModal({{ requirement.id }}, '{{ requirement.requirement_type }}', '{{ requirement.brand.id }}', '{{ requirement.product_name.id }}', '{{ requirement.service.id }}', '{{ requirement.requirement_description }}')"
-                                                data-modal-target="requirement-edit-crud-modal" data-modal-toggle="requirement-edit-crud-modal">
+                                            <a href="{% url 'requirementdetails' requirement.company.id requirement.id %}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                </svg>  
-                                            </button>                                        
+                                                </svg>    
+                                            </a>                                        
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -702,40 +695,26 @@
         }
     </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get modal elements
-        const modal = document.getElementById('delete-modal');
-        const requestName = document.getElementById('request-name');
-        const deleteForm = document.getElementById('delete-form');
-        const cancelBtn = document.getElementById('cancel-btn');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('delete-modal');
+            const deleteForm = document.getElementById('delete-form');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const deleteButtons = document.querySelectorAll('.delete-btn');
 
-        // Get all delete buttons
-        const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const requestId = button.getAttribute('data-id');
+                    deleteForm.action = `/delete-request/${requestId}/`;
+                    modal.classList.remove('hidden');
+                });
+            });
 
-        // Loop through all delete buttons and add click event listener
-        deleteButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                const requestId = button.getAttribute('data-id');
-                const requestTypeName = button.getAttribute('data-name');
-
-                // Set the modal's request name and form action
-                requestName.textContent = requestTypeName;
-                deleteForm.action = `/delete-request/${requestId}/`;
-
-                // Show the modal
-                modal.classList.remove('hidden');
+            cancelBtn.addEventListener('click', function () {
+                modal.classList.add('hidden');
             });
         });
-
-        // Close modal on cancel button click
-        cancelBtn.addEventListener('click', function () {
-            modal.classList.add('hidden');
-        });
-    });
-</script>
-
-
+    </script>
     
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>
