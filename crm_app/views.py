@@ -522,11 +522,11 @@ def partner(request):
     return render(request, 'partner.html', context)
 
 def staff(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
+    # if 'staff_id' not in request.session:
+    #     return redirect('login')
     
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    # staff_id = request.session.get('staff_id')
+    # user = Staff.objects.get(id=staff_id)
 
     staffs = Staff.objects.order_by('full_name')
     employee_count = Staff.objects.count()
