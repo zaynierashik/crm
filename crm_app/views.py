@@ -15,6 +15,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
 from openpyxl import Workbook # type: ignore
 from openpyxl.styles import Alignment, Font, Border, Side # type: ignore
+from .utils import get_exchange_rates
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -162,8 +163,24 @@ def dashboard(request):
     staffs = Staff.objects.all()
 
     company_count = Company.objects.count()
+    pending_contracts = Requirement.objects.filter(progress='Pending').count()
 
-    total_revenue = Requirement.objects.filter(status='Completed').aggregate(total_revenue=Sum('price'))['total_revenue'] or 0.00
+    exchange_rates = get_exchange_rates()
+
+    company_requirements = []
+    total_revenue = 0
+
+    for company in companies:
+        requirements = Requirement.objects.filter(company=company)
+        company_revenue = 0  # Initialize company_revenue for each company
+
+        for req in requirements.filter(progress='Completed'):
+            conversion_rate = exchange_rates.get(req.currency, 1)
+            company_revenue += (req.price or 0) / conversion_rate
+        
+        company_revenue = round(company_revenue, 2)
+        total_revenue += company_revenue  # Accumulate total revenue
+        company_requirements.append({'company': company, 'revenue': company_revenue})
 
     city_filter = request.GET.get('city', None)
     status_filter = request.GET.get('status', 'active')
@@ -189,7 +206,7 @@ def dashboard(request):
     predicted_revenue = predict_revenue_for_company(company_id)
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'total_revenue': total_revenue, 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_revenue': predicted_revenue[0]}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_revenue': predicted_revenue[0]}
 
     return render(request, 'index.html', context)
 
@@ -1010,12 +1027,23 @@ def partnerdetails(request, partner_id):
     except EmptyPage:
         paginated_companies = paginator.page(paginator.num_pages)
 
+    exchange_rates = get_exchange_rates()
+
     company_requirements = []
     for company in companies:
-        total_revenue = Requirement.objects.filter(company=company, status='Completed').aggregate(total=Sum('price'))['total'] or 0.00
-        pending_revenue = Requirement.objects.filter(company=company, status__in=['Pipeline', 'Initiated']).aggregate(total=Sum('price'))['total'] or 0.00
+        requirements = Requirement.objects.filter(company=company)
+        total_revenue = 0
+
+        for req in requirements.filter(progress='Completed'):
+            conversion_rate = exchange_rates.get(req.currency, 1)
+            total_revenue += (req.price or 0) / conversion_rate
         
-        company_requirements.append({'company': company, 'total_revenue': total_revenue, 'pending_revenue': pending_revenue})
+        total_revenue = round(total_revenue, 2)
+
+        completed_contracts_count = Requirement.objects.filter(company=company, progress='Completed').count()
+        pending_contracts_count = Requirement.objects.filter(company=company, progress__in=['Pipeline', 'Initiated']).count()
+        
+        company_requirements.append({'company': company, 'total_revenue': total_revenue, 'completed_contracts': completed_contracts_count, 'pending_contracts': pending_contracts_count})
 
     context = {'partner': partner, 'company_requirements': company_requirements, 'requirements_page_obj': paginated_companies}
     return render(request, 'partnerdetails.html', context)
@@ -1285,7 +1313,7 @@ def export_excel(request, company_id):
         cell.border = thin_border
 
     # Set column widths
-    column_widths = {'A': 23, 'B': 30, 'C': 35, 'D': 20, 'E': 50, 'F': 50}
+    column_widths = {'A': 30, 'B': 30, 'C': 35, 'D': 20, 'E': 50, 'F': 50}
     for column, width in column_widths.items():
         ws.column_dimensions[column].width = width
 
