@@ -733,19 +733,20 @@ def update_request(request):
 
 # Delete Requirement Request
 def delete_request(request, id):
-    # Get the request object or raise a 404 error if not found
     request_to_delete = get_object_or_404(Request, id=id)
 
     if request.method == "POST":
-        # Delete the request object
         request_to_delete.delete()
-        # Display a success message
         messages.success(request, f"Request '{request_to_delete.requirement_type}' has been deleted.")
-        # Redirect to the requirement page or wherever you'd like after deletion
-        return redirect('requirement')  # Update with your redirect URL name
+        return redirect('requirement')
     
-    # If the request is not POST, redirect to a safe page (e.g., requirement page)
     return redirect('requirement')
+
+# Delete Contact
+def delete_contact(request, contact_id):
+    contact = get_object_or_404(Contact, id=contact_id)
+    contact.delete()
+    return redirect('contact')
     
 # New Requirement Submission
 def add_newrequirement(request):

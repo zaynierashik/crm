@@ -60,7 +60,9 @@ urlpatterns = [
 
     path('update-request/', views.update_request, name='update_request'),
     path('update-contact/', views.update_contact, name='update_contact'),
+
     path('delete-request/<int:id>/', views.delete_request, name='delete_request'),
+    path('delete_contact/<int:contact_id>/', views.delete_contact, name='delete_contact'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),
