@@ -66,6 +66,6 @@ class RequestAdmin(admin.ModelAdmin):
             # Delete the original request after creating the Requirement
             req.delete()
 
-@admin.register(Transaction)
-class TransactionAdmin(admin.ModelAdmin):
+@admin.register(Minute)
+class MinuteAdmin(admin.ModelAdmin):
     list_display = ('date', 'company', 'requirement', 'contact', 'action', 'remark')

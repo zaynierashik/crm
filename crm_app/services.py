@@ -1,26 +1,52 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from django.db.models import Sum
-from .models import Requirement, Company
+from .models import Requirement
+from .utils import get_exchange_rates  # Import the exchange rates function
 
-def prepare_company_revenue_data():
-    # Aggregate the revenue (sum of price) by company
+def prepare_total_revenue_data():
+    # Retrieve exchange rates
+    exchange_rates = get_exchange_rates()
+
+    # Aggregate the total revenue for each company
     company_revenue_data = (
         Requirement.objects.values('company')
         .annotate(total_revenue=Sum('price'))
         .order_by('company')
     )
 
-    # Extract features and targets for the model
-    X = np.array([item['company'] for item in company_revenue_data]).reshape(-1, 1)
-    y = np.array([item['total_revenue'] for item in company_revenue_data])
+    X = []
+    y = []
 
-    print(f'Value of X = {X}')
-    print(f'Value of Y = {y}')
+    # Convert each company's total revenue to USD
+    for item in company_revenue_data:
+        company_id = item['company']
+        total_revenue = item['total_revenue'] or 0
+        
+        # Convert all company's requirements to USD
+        requirements = Requirement.objects.filter(company=company_id)
+        total_revenue_usd = 0
+        for req in requirements:
+            conversion_rate = exchange_rates.get(req.currency, 1)
+            total_revenue_usd += (req.price or 0) / conversion_rate
+        
+        X.append([len(requirements)])  # Using the number of requirements as a feature
+        y.append(total_revenue_usd)  # Total revenue in USD
+
+    X = np.array(X)
+    y = np.array(y)
+
+    print(f'Features (X) = {X}')
+    print(f'Target (y) = {y}')
     return X, y
 
-def train_revenue_prediction_model():
-    X, y = prepare_company_revenue_data()
+def train_total_revenue_prediction_model():
+    X, y = prepare_total_revenue_data()
+
+    # Check if we have enough data to train
+    if len(X) < 2:
+        print("Not enough data points to train the model.")
+        return None
 
     # Create and train the linear regression model
     model = LinearRegression()
@@ -28,10 +54,15 @@ def train_revenue_prediction_model():
 
     return model
 
-def predict_revenue_for_company(company_id):
-    model = train_revenue_prediction_model()
+def predict_total_revenue():
+    model = train_total_revenue_prediction_model()
 
-    # Predict revenue for a specific company
-    predicted_revenue = model.predict([[company_id]])
+    # Ensure the model was trained before attempting prediction
+    if not model:
+        return "Insufficient data for prediction."
+
+    # Predict based on the current number of companies and their requirements
+    company_count = Requirement.objects.values('company').distinct().count()
+    predicted_revenue = model.predict([[company_count]])
 
     return predicted_revenue

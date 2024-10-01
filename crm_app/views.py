@@ -1,13 +1,14 @@
 import io
+import numpy as np
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
 from django.utils.timezone import now
 from datetime import datetime
 from django.urls import reverse
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from .models import *
-from .services import predict_revenue_for_company
+from .services import predict_total_revenue
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
@@ -16,6 +17,7 @@ from django.contrib.auth import login as auth_login, authenticate, logout as aut
 from openpyxl import Workbook # type: ignore
 from openpyxl.styles import Alignment, Font, Border, Side # type: ignore
 from .utils import get_exchange_rates
+from django.utils.dateformat import DateFormat
 
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -163,7 +165,7 @@ def dashboard(request):
     staffs = Staff.objects.all()
 
     company_count = Company.objects.count()
-    pending_contracts = Requirement.objects.filter(progress='Pending').count()
+    pending_contracts = Requirement.objects.filter(progress='Pipeline').count()
 
     exchange_rates = get_exchange_rates()
 
@@ -172,41 +174,29 @@ def dashboard(request):
 
     for company in companies:
         requirements = Requirement.objects.filter(company=company)
-        company_revenue = 0  # Initialize company_revenue for each company
+        company_revenue = 0
 
         for req in requirements.filter(progress='Completed'):
-            conversion_rate = exchange_rates.get(req.currency, 1)
+            conversion_rate = exchange_rates.get(req.currency, 1)  # Use exchange rate
             company_revenue += (req.price or 0) / conversion_rate
-        
+
         company_revenue = round(company_revenue, 2)
         total_revenue += company_revenue  # Accumulate total revenue
         company_requirements.append({'company': company, 'revenue': company_revenue})
 
-    city_filter = request.GET.get('city', None)
-    status_filter = request.GET.get('status', 'active')
+    predicted_revenue = predict_total_revenue()
 
-    if city_filter:
-        companies = companies.filter(city=city_filter)
+    progress_counts = Requirement.objects.values('progress').annotate(count=Count('id')).filter(progress__in=['Initiated', 'Pipeline', 'Completed'])
+    progress_labels = [entry['progress'] for entry in progress_counts]
+    progress_data = [entry['count'] for entry in progress_counts]
 
-    if status_filter:
-        status_value = status_filter.lower() == 'active'
-        companies = companies.filter(status=status_value)
-
-    paginator = Paginator(companies, 15)
-    page = request.GET.get('page')
-
-    try:
-        companies_page = paginator.page(page)
-    except PageNotAnInteger:
-        companies_page = paginator.page(1)
-    except EmptyPage:
-        companies_page = paginator.page(paginator.num_pages)
-
-    company_id = Company.objects.first().id
-    predicted_revenue = predict_revenue_for_company(company_id)
+    company_trends = (Company.objects.values('date').annotate(count=Count('id')).order_by('date'))
+    dates = [DateFormat(entry['date']).format('Y-m-d') for entry in company_trends]
+    counts = [entry['count'] for entry in company_trends]
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 'company_count': company_count, 'companies': companies_page, 'paginator': paginator, 'page_obj': companies_page, 'user': user,'predicted_revenue': predicted_revenue[0]}
+               'partners': partners, 'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 
+               'company_count': company_count, 'user': user, 'predicted_revenue': round(predicted_revenue[0], 2) if isinstance(predicted_revenue, np.ndarray) else predicted_revenue, 'progress_labels': progress_labels, 'progress_data': progress_data, 'chart_dates': dates, 'chart_counts': counts}
 
     return render(request, 'index.html', context)
 
@@ -584,7 +574,7 @@ def transaction(request):
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
                'partners': partners, 'cities': cities, 'staffs': staffs, 'user': user}
 
-    return render(request, 'transaction.html', context)
+    return render(request, 'minute.html', context)
 
 def sector(request):
     if 'staff_id' not in request.session:
@@ -842,7 +832,7 @@ def add_newstaff(request):
 
     return render(request, 'staff.html')
 
-# New Transaction Submission
+# New Minute Submission
 def add_newtransaction(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -852,10 +842,10 @@ def add_newtransaction(request):
         requirement = get_object_or_404(Requirement, id=request.POST.get('requirement'))
         contact = get_object_or_404(Contact, id=request.POST.get('contact-person'))
 
-        Transaction.objects.create(date=request.POST.get('date'), company=company, requirement=requirement, contact=contact, action=request.POST.get('action'), remark=request.POST.get('remarks'))
+        Minute.objects.create(date=request.POST.get('date'), company=company, requirement=requirement, contact=contact, action=request.POST.get('action'), remark=request.POST.get('remarks'))
         return redirect('transaction')
 
-# Add Transaction
+# Add Minute
 def add_transaction(request, company_id, requirement_id):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -869,7 +859,7 @@ def add_transaction(request, company_id, requirement_id):
         action = request.POST.get('action')
         remark = request.POST.get('remarks')
 
-        Transaction.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
+        Minute.objects.create(date=date, company=company, requirement=requirement, contact=contact, action=action, remark=remark )
         return redirect('contractdetails', company_id=company_id, requirement_id=requirement_id)
     
 # New Sector Submission
@@ -968,9 +958,9 @@ def contractdetails(request, company_id, requirement_id):
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
     requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
-    transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
+    transactions = Minute.objects.filter(company=company, requirement=requirement).order_by('-date')
 
-    transactions_count = Transaction.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
+    transactions_count = Minute.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
     transactions_paginator = Paginator(transactions_count, 10)
     transactions_page_number = request.GET.get('transactions_page', 1)
     transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
@@ -996,9 +986,9 @@ def requirementdetails(request, company_id, requirement_id):
     company = get_object_or_404(Company, id=company_id)
     requirement = get_object_or_404(Requirement, id=requirement_id)
     requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
-    transactions = Transaction.objects.filter(company=company, requirement=requirement).order_by('-date')
+    transactions = Minute.objects.filter(company=company, requirement=requirement).order_by('-date')
 
-    transactions_count = Transaction.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
+    transactions_count = Minute.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
     transactions_paginator = Paginator(transactions_count, 10)
     transactions_page_number = request.GET.get('transactions_page', 1)
     transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
@@ -1015,6 +1005,12 @@ def requirementdetails(request, company_id, requirement_id):
 
 # View Partner Details
 def partnerdetails(request, partner_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
+
     partner = get_object_or_404(Partner, id=partner_id)
     companies = Company.objects.filter(partner_name=partner)
 
@@ -1045,7 +1041,7 @@ def partnerdetails(request, partner_id):
         
         company_requirements.append({'company': company, 'total_revenue': total_revenue, 'completed_contracts': completed_contracts_count, 'pending_contracts': pending_contracts_count})
 
-    context = {'partner': partner, 'company_requirements': company_requirements, 'requirements_page_obj': paginated_companies}
+    context = {'user': user, 'partner': partner, 'company_requirements': company_requirements, 'requirements_page_obj': paginated_companies}
     return render(request, 'partnerdetails.html', context)
 
 # Edit Company Details
@@ -1083,9 +1079,12 @@ def requirementeditform(request, requirement_id):
 def partnereditform(request, partner_id):
     if 'staff_id' not in request.session:
         return redirect('login')
+
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
     
     partner = Partner.objects.get(pk=partner_id)
-    return render(request, 'partnereditform.html', {'partner': partner})
+    return render(request, 'partnereditform.html', {'user': user, 'partner': partner})
 
 # Update Company
 def update_company(request, company_id):
@@ -1244,7 +1243,7 @@ def update_brand(request):
 
     return redirect('brand')
 
-# Get AJAX Contacts for Transaction Form
+# Get AJAX Contacts for Minute Form
 def get_contacts(request):
     company_id = request.GET.get('company_id')
     contacts = Contact.objects.filter(company_id=company_id).values('id', 'contact_name')
@@ -1277,7 +1276,7 @@ def export_excel(request, company_id):
     except Company.DoesNotExist:
         return HttpResponse("Company not found.", status=404)
 
-    transactions = Transaction.objects.filter(company_id=company_id).select_related('requirement').order_by('requirement__id', '-date')
+    transactions = Minute.objects.filter(company_id=company_id).select_related('requirement').order_by('requirement__id', '-date')
 
     wb = Workbook()
     ws = wb.active
@@ -1373,10 +1372,9 @@ def export_excel(request, company_id):
     return response
 
 # Linear Regression Call
-def predict_revenue(request):
-    company_id = Company.objects.first().id
-    predicted_revenue = predict_revenue_for_company(company_id)
-    return JsonResponse({'predicted_revenue': predicted_revenue[0]})
+def predict_total_revenue_view(request):
+    predicted_revenue = predict_total_revenue()
+    return JsonResponse({'predicted_total_revenue': predicted_revenue[0]})
 
 # Extra Views
 def approve_request_view(request, request_id):

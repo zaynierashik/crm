@@ -75,7 +75,7 @@ urlpatterns = [
 
     
     # path('send-email/', views.send_email, name='send_email'),
-    path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
+    path('predict-revenue/', views.predict_total_revenue_view, name='predict_revenue'),
 
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),

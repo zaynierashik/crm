@@ -101,6 +101,7 @@ class Company(models.Model):
     partner_name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='partner_companies')
     website = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_company')
+    date = models.DateField(default=now)
     status = models.BooleanField(default=True)
 
     def __str__(self):
@@ -121,7 +122,7 @@ class Contact(models.Model):
     def __str__(self):
         return self.contact_name
 
-class Transaction(models.Model):
+class Minute(models.Model):
     date = models.DateField()
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='company_transactions')
     requirement = models.ForeignKey(Requirement, on_delete=models.SET_NULL, null=True, blank=True, related_name='requirement_transactions')
@@ -130,4 +131,4 @@ class Transaction(models.Model):
     remark = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"Transaction for {self.company} on {self.date}"
+        return f"Minute for {self.company} on {self.date}"
