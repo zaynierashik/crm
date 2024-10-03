@@ -71,8 +71,7 @@ urlpatterns = [
     path('toggle-staff-status/<int:staff_id>/', views.toggle_staff_status, name='toggle_staff_status'),
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
-    
-    # path('send-email/', views.send_email, name='send_email'),
+    path('send-email/', views.send_email, name='send_email'),
     path('predict-revenue/', views.predict_total_revenue_view, name='predict_revenue'),
 
     # AJAX
