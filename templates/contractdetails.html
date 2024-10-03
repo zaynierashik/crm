@@ -12,6 +12,7 @@
     <link rel="manifest" href="{% static '/favicon/site.webmanifest' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
 </head>
 <body>
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
@@ -332,7 +333,17 @@
                                         </td>
                                         {% endif %}
                                         <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">{{ requirement.price }}0</p>
+                                            <p class="font-medium text-sm">
+                                                {% if requirement.currency == 'USD' %}
+                                                    $ {{ requirement.price }}
+                                                {% elif requirement.currency == 'NPR' %}
+                                                    ₹ {{ requirement.price }}
+                                                {% elif requirement.currency == 'INR' %}
+                                                    ₹ {{ requirement.price }}
+                                                {% else %}
+                                                    {{ requirement.price }}
+                                                {% endif %}
+                                            </p>
                                         </td>
                                     </tr>
                                 </tbody>

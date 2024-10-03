@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from django.db.models import Sum
 from .models import Requirement
 from .utils import get_exchange_rates  # Import the exchange rates function
@@ -48,9 +49,28 @@ def train_total_revenue_prediction_model():
         print("Not enough data points to train the model.")
         return None
 
+    # Split data into training and validation sets (e.g., 80% training, 20% validation)
+    train_size = int(0.8 * len(X))
+    X_train, X_val = X[:train_size], X[train_size:]
+    y_train, y_val = y[:train_size], y[train_size:]
+
     # Create and train the linear regression model
     model = LinearRegression()
-    model.fit(X, y)
+    model.fit(X_train, y_train)
+
+    # Predict on the validation set
+    y_pred = model.predict(X_val)
+
+    # Calculate accuracy metrics
+    mae = mean_absolute_error(y_val, y_pred)
+    mse = mean_squared_error(y_val, y_pred)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_val, y_pred)
+
+    print(f"Mean Absolute Error (MAE): {mae}")
+    print(f"Mean Squared Error (MSE): {mse}")
+    print(f"Root Mean Squared Error (RMSE): {rmse}")
+    print(f"R² Score: {r2}")
 
     return model
 

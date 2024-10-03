@@ -3,8 +3,6 @@ from crm_app import views
 
 urlpatterns = [
     path('', views.login, name='login'),
-    path('profile/', views.profile, name='profile'),
-    path('setting/', views.setting, name='setting'),
     
     # Admin/Staff
     path('dashboard/', views.dashboard, name='dashboard'),

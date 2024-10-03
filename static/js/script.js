@@ -19,6 +19,36 @@ function toggleLoginPasswordVisibility() {
     }
 }
 
+// User Login Error
+function showErrorToast(message) {
+    const toastContainer = document.getElementById('toast-container');
+    const toastTemplate = document.getElementById('error-toast-template').cloneNode(true);
+    toastTemplate.classList.remove('hidden');
+    toastTemplate.querySelector('#toast-message').textContent = message;
+
+    toastContainer.appendChild(toastTemplate);
+
+    setTimeout(() => {
+        hideToast(toastTemplate);
+    }, 3000);
+}
+
+function hideToast(toastElement) {
+    toastElement.remove();
+}
+
+// Trigger an error toast if there's an error message passed from the backend
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMessage = urlParams.get('error_message');
+    if (errorMessage) {
+        showErrorToast(errorMessage);
+
+        // Clean the URL by removing the error message after it's displayed
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
 // Company & Partner Search
 function searchTable(inputId, tableId){
     var input, filter, table, tr, td, i, txtValue;

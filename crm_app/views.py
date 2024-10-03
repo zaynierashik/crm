@@ -41,11 +41,11 @@ def login_authentication(request):
         try:
             user = Staff.objects.get(email=email)
         except Staff.DoesNotExist:
-            error_message = "Invalid email or password!"
+            error_message = "Admin/Staff does not exist!"
             return HttpResponseRedirect(reverse('login') + f'?error_message={error_message}')
 
         if not check_password(password, user.password):
-            error_message = "Invalid email or password!"
+            error_message = "Invalid password!"
             return HttpResponseRedirect(reverse('login') + f'?error_message={error_message}')
 
         if not user.status:
@@ -63,7 +63,7 @@ def login_authentication(request):
 
 def user(request):
     if 'user_id' in request.session:
-        return redirect('user_dashboard')
+        return redirect('company_profile')
     
     if request.method == 'POST':
         return user_authentication(request)
@@ -76,10 +76,6 @@ def add_newuser(request):
         full_name = request.POST.get('user-name')
         email = request.POST.get('email-address')
         password = request.POST.get('password')
-        
-        if not full_name or not email or not password:
-            error_message = "All fields are required!"
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
 
         if User.objects.filter(email=email).exists():
             error_message = "Email is already in use!"
@@ -105,15 +101,15 @@ def user_authentication(request):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            error_message = "Invalid email or password!"
+            error_message = "User does not exist!"
+            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
+        
+        if not user.status:
+            error_message = "Your account is inactive. Please contact support."
             return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
 
         if not check_password(password, user.password):
-            error_message = "Invalid email or password!"
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
-
-        if not user.status:
-            error_message = "Your account is inactive. Please contact support."
+            error_message = "Invalid password!"
             return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
 
         request.session['user_id'] = user.id
@@ -121,27 +117,9 @@ def user_authentication(request):
         request.session['user_full_name'] = user.full_name
 
         request.session.set_expiry(7200)
-        return redirect('user_dashboard')
+        return redirect('company_profile')
 
     return redirect('user')
-
-def profile(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-
-    return render(request, 'profile.html', {'user': user})
-
-def setting(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-
-    return render(request, 'setting.html', {'user': user})
 
 def logout(request):
     request.session.flush()
@@ -529,11 +507,14 @@ def partner(request):
     return render(request, 'partner.html', context)
 
 def staff(request):
-    # if 'staff_id' not in request.session:
-    #     return redirect('login')
+    if 'staff_id' not in request.session:
+        return redirect('login')
     
-    # staff_id = request.session.get('staff_id')
-    # user = Staff.objects.get(id=staff_id)
+    staff_role = Staff.objects.filter(id=request.session['staff_id']).first()
+    
+    # Check if the current staff member exists and is an admin
+    if not staff_role or staff_role.role.lower() != 'admin':
+        return redirect('login')
 
     staffs = Staff.objects.order_by('full_name')
     employee_count = Staff.objects.count()
@@ -809,6 +790,15 @@ def add_newpartner(request):
     
 # New Staff Submission
 def add_newstaff(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_role = Staff.objects.filter(id=request.session['staff_id']).first()
+    
+    # Check if the current staff member exists and is an admin
+    if not staff_role or staff_role.role.lower() != 'admin':
+        return redirect('login')
+        
     if request.method == 'POST':
         full_name = request.POST.get('staff-name')
         role = request.POST.get('role')
