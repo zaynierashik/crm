@@ -50,7 +50,7 @@ function data() {
 			this.isProfileMenuOpen = false
 		},
 
-		isPagesMenuOpen: true,
+		isPagesMenuOpen: false,
 		togglePagesMenu() {
 			this.isPagesMenuOpen = !this.isPagesMenuOpen
 		},

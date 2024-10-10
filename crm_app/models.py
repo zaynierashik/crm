@@ -88,6 +88,19 @@ class Requirement(models.Model):
 
     def __str__(self):
         return self.requirement_type
+    
+class Task(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    assigned_to = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='tasks')
+    priority = models.CharField(max_length=50, choices=[('Low', 'Low'), ('Medium', 'Medium'), ('High', 'High')])
+    due_date = models.DateField()
+    status = models.CharField(max_length=50, choices=[('Pending', 'Pending'), ('In Progress', 'In Progress'), ('Completed', 'Completed')], default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} assigned to {self.assigned_to.full_name}"
 
 class Company(models.Model):
     company_name = models.CharField(max_length=100, unique=True)
@@ -132,3 +145,4 @@ class Minute(models.Model):
 
     def __str__(self):
         return f"Minute for {self.company} on {self.date}"
+    

@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from django.urls import reverse
 from django.db.models import Sum, Count
 from .models import *
-from .services import predict_total_revenue
+from .services import predict_total_revenue_for_all_companies
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
@@ -23,6 +23,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+# Login Page
 def login(request):
     if 'staff_id' in request.session:
         return redirect('dashboard')
@@ -61,6 +62,7 @@ def login_authentication(request):
 
     return render(request, 'login.html')
 
+# Userpage
 def user(request):
     if 'user_id' in request.session:
         return redirect('company_profile')
@@ -121,10 +123,12 @@ def user_authentication(request):
 
     return redirect('user')
 
+# Logout
 def logout(request):
     request.session.flush()
     return redirect('login')
 
+# Dashboard
 def dashboard(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -162,7 +166,7 @@ def dashboard(request):
         total_revenue += company_revenue  # Accumulate total revenue
         company_requirements.append({'company': company, 'revenue': company_revenue})
 
-    predicted_revenue = predict_total_revenue()
+    predicted_revenue = predict_total_revenue_for_all_companies()
 
     progress_counts = Requirement.objects.values('progress').annotate(count=Count('id')).filter(progress__in=['Initiated', 'Pipeline', 'Completed'])
     progress_labels = [entry['progress'] for entry in progress_counts]
@@ -178,6 +182,7 @@ def dashboard(request):
 
     return render(request, 'index.html', context)
 
+# User Dashboard
 def user_dashboard(request):
     if 'user_id' not in request.session:
         return redirect('user')
@@ -191,6 +196,7 @@ def user_dashboard(request):
 
     return render(request, 'userdashboard.html', context)
 
+# Company Page
 def company(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -256,6 +262,7 @@ def company(request):
 
     return render(request, 'company.html', context)
 
+# Add New Company
 def add_newcompany(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -320,6 +327,7 @@ def add_newcompany(request):
     else:
         return HttpResponse("Form Submission Error!")
 
+# Company Profile
 def company_profile(request):
     if 'user_id' not in request.session:
         return redirect('user')
@@ -336,7 +344,8 @@ def company_profile(request):
         return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'edit_mode': True})
     else:
         return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'partners': partners, 'edit_mode': False})
-    
+
+# Contract Page
 def contract(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -369,6 +378,80 @@ def contract(request):
     
     return render(request, 'contract.html', context)
 
+# Tasks Page
+def task(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    if user.role == 'Staff':
+        tasks = Task.objects.filter(assigned_to=user)
+    else:
+        tasks = Task.objects.all()
+
+    total_tasks = tasks.count()
+
+    # Separate completed and pending tasks
+    pending_tasks = tasks.filter(status__in=['Pending', 'In Progress'])
+    completed_tasks = tasks.filter(status='Completed')
+
+    # Count tasks
+    pending_tasks_count = pending_tasks.count()
+    completed_tasks_count = completed_tasks.count()
+
+    # Paginate pending tasks
+    pending_paginator = Paginator(pending_tasks, 10)
+    pending_page = request.GET.get('pending_page')
+    try:
+        pending_tasks_page = pending_paginator.page(pending_page)
+    except PageNotAnInteger:
+        pending_tasks_page = pending_paginator.page(1)
+    except EmptyPage:
+        pending_tasks_page = pending_paginator.page(pending_paginator.num_pages)
+
+    # Paginate completed tasks
+    completed_paginator = Paginator(completed_tasks, 10)
+    completed_page = request.GET.get('completed_page')
+    try:
+        completed_tasks_page = completed_paginator.page(completed_page)
+    except PageNotAnInteger:
+        completed_tasks_page = completed_paginator.page(1)
+    except EmptyPage:
+        completed_tasks_page = completed_paginator.page(completed_paginator.num_pages)
+
+    context = {
+        'user': user,
+        'staffs': Staff.objects.filter(role='Staff'),
+        'total_tasks': total_tasks,
+        'pending_tasks_count': pending_tasks_count,
+        'completed_tasks_count': completed_tasks_count,
+        'pending_tasks': pending_tasks_page,
+        'completed_tasks': completed_tasks_page,
+        'pending_paginator': pending_paginator,
+        'completed_paginator': completed_paginator,
+    }
+
+    return render(request, 'task.html', context)
+
+# Assign Task
+def assign_newtask(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        assigned_to_id = request.POST.get('full-name')
+        priority = request.POST.get('priority')
+        due_date = request.POST.get('date')
+        
+        assigned_to = Staff.objects.get(id=assigned_to_id)
+        
+        task = Task.objects.create(title=title, description=description, due_date=due_date, priority=priority, assigned_to=assigned_to)
+        return redirect('task')
+
+    return render(request, 'task.html')
+
+# Requirement Page
 def requirement(request):
     if 'user_id' not in request.session:
         return redirect('user')
@@ -384,10 +467,10 @@ def requirement(request):
     requests = Request.objects.filter(company=company).order_by('-date')
     requirements = Requirement.objects.filter(company=company).order_by('-date')
 
-    total_request = Request.objects.count()
-    total_requirement = Requirement.objects.count()
-    pipeline_count = Requirement.objects.filter(progress="Pipeline").count()
-    completed_count = Requirement.objects.filter(progress="Completed").count()
+    total_request = Request.objects.filter(company=company).count()
+    total_requirement = Requirement.objects.filter(company=company).count()
+    pipeline_count = Requirement.objects.filter(company=company, progress="Pipeline").count()
+    completed_count = Requirement.objects.filter(company=company, progress="Completed").count()
 
     paginator = Paginator(requirements, 10)
     page = request.GET.get('requirements_page')
@@ -404,6 +487,7 @@ def requirement(request):
 
     return render(request, 'requirement.html', context)
 
+# Contact Page
 def contact(request):
     if 'user_id' not in request.session:
         return redirect('user')
@@ -427,6 +511,7 @@ def contact(request):
     context = {'user': user, 'company': company, 'contacts': contacts, 'contact_count': contacts.count(), 'contacts_page': contacts_page, 'paginator': paginator}
     return render(request, 'contact.html', context)
 
+# Add New Contact
 def add_newcontact(request):
     if 'user_id' not in request.session:
         return redirect('login')
@@ -457,6 +542,7 @@ def add_newcontact(request):
     
     return render(request, 'contact.html', {'user': user, 'company': company})
 
+# Update Contact
 @require_POST
 def update_contact(request):
     if request.method == 'POST':
@@ -483,6 +569,7 @@ def update_contact(request):
 
     return redirect('contact')
 
+# Partner Page
 def partner(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -506,6 +593,7 @@ def partner(request):
 
     return render(request, 'partner.html', context)
 
+# Staff Page
 def staff(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -535,6 +623,7 @@ def staff(request):
 
     return render(request, 'staff.html', context)
 
+# Transaction Page
 def transaction(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -557,6 +646,7 @@ def transaction(request):
 
     return render(request, 'minute.html', context)
 
+# Sector Page
 def sector(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -580,6 +670,7 @@ def sector(request):
 
     return render(request, 'sector.html', context)
 
+# Service Page
 def service(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -603,6 +694,7 @@ def service(request):
 
     return render(request, 'service.html', context)
 
+# Brand Page
 def brand(request):
     if 'staff_id' not in request.session:
         return redirect('login')
@@ -1363,8 +1455,17 @@ def export_excel(request, company_id):
 
 # Linear Regression Call
 def predict_total_revenue_view(request):
-    predicted_revenue = predict_total_revenue()
-    return JsonResponse({'predicted_total_revenue': predicted_revenue[0]})
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    predictions = predict_total_revenue_for_all_companies()
+    company_names = {company.id: company.company_name for company in Company.objects.all()}
+    predictions_with_names = {company_names[company_id]: round(revenue, 2) for company_id, revenue in predictions.items()}
+    
+    return render(request, 'prediction.html', {'user': user, 'predictions': predictions_with_names})
 
 # Extra Views
 def approve_request_view(request, request_id):

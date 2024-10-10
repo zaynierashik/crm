@@ -39,7 +39,11 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(Requirement)
 class RequirementAdmin(admin.ModelAdmin):
-    list_display = ('requirement_type', 'company', 'contact_name', 'brand', 'product_name', 'service', 'progress')
+    list_display = ('requirement_type', 'company', 'price', 'brand', 'product_name', 'service', 'progress')
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('title', 'assigned_to', 'due_date', 'status')
 
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):

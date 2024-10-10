@@ -8,6 +8,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('company/', views.company, name='company'),
     path('contract/', views.contract, name='contract'),
+    path('task/', views.task, name='task'),
     path('partner/', views.partner, name='partner'),
     path('staff/', views.staff, name='staff'),
     path('transaction/', views.transaction, name='transaction'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
 
     path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
+    path('assign-task/', views.assign_newtask, name='assign_newtask'),
 
     path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
     path('edit-requirement/<int:requirement_id>/', views.requirementeditform, name='requirementeditform'),
