@@ -407,6 +407,8 @@ def task(request):
 
     total_tasks = tasks.count()
 
+    staffs = Staff.objects.filter(role='Staff')
+
     # Separate tasks into pending and completed
     pending_tasks = tasks.filter(status__in=['Pending', 'In Progress']).order_by('-created_at')
     completed_tasks = tasks.filter(status='Completed').order_by('-created_at')
@@ -445,16 +447,8 @@ def task(request):
         completed_tasks_page = completed_paginator.page(completed_paginator.num_pages)
 
     context = {
-        'user': user,
-        'tasks': total_tasks_page,  # Paginated total tasks
-        'pending_tasks': pending_tasks_page,  # Paginated pending tasks
-        'completed_tasks': completed_tasks_page,  # Paginated completed tasks
-        'pending_tasks_count': pending_tasks_count,
-        'completed_tasks_count': completed_tasks_count,
-        'total_tasks': total_tasks_page,  # Make total tasks accessible in template
-        'pending_paginator': pending_paginator,
-        'completed_paginator': completed_paginator,
-    }
+        'user': user, 'staffs': staffs, 'tasks': total_tasks_page, 'pending_tasks': pending_tasks_page, 'completed_tasks': completed_tasks_page, 'pending_tasks_count': pending_tasks_count,
+        'completed_tasks_count': completed_tasks_count, 'total_tasks': total_tasks_page, 'pending_paginator': pending_paginator, 'completed_paginator': completed_paginator}
 
     return render(request, 'task.html', context)
 
