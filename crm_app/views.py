@@ -1425,22 +1425,3 @@ def add_sector(request):
         return redirect('company_profile')
     else:
         return render(request, 'companyprofile.html')
-    
-# Send Email
-def send_email(request):
-    now = timezone.now()
-    today = now.date()
-    users = Contact.objects.filter(DOB__month=today.month, DOB__day=today.day)
-
-    for user in users:
-        subject = "Happy Birthday!"
-        html_content = render_to_string('email.html', {'name': user.contact_name, 'email': user.email})
-        from_email = 'zaynierashik@gmail.com'
-        to = [user.email]
-
-        text_content = strip_tags(html_content)
-        email = EmailMultiAlternatives(subject, text_content, from_email, to)
-        email.attach_alternative(html_content, "text/html")
-        email.send(fail_silently=False)
-
-    return redirect('dashboard')
