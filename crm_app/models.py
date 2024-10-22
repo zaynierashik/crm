@@ -44,20 +44,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
-
-class Partner(models.Model):
-    partner_name = models.CharField(max_length=100)
-    address = models.CharField(max_length=100, null=True, blank=True)
-    city = models.CharField(max_length=100, null=True, blank=True)
-    state = models.CharField(max_length=100, null=True, blank=True)
-    country = models.CharField(max_length=100, null=True, blank=True)
-    contact_person = models.CharField(max_length=100, null=True, blank=True)
-    designation = models.CharField(max_length=100, null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-
-    def __str__(self):
-        return self.partner_name
     
 class Request(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_requests')
@@ -111,7 +97,6 @@ class Company(models.Model):
     country = models.CharField(max_length=100, null=True, blank=True)
     via = models.CharField(max_length=100, null=True, blank=True)
     referral_name = models.CharField(max_length=100, null=True, blank=True)
-    partner_name = models.ForeignKey(Partner, on_delete=models.SET_NULL, null=True, blank=True, related_name='partner_companies')
     website = models.CharField(max_length=255, null=True, blank=True)
     created_by = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_company')
     date = models.DateField(default=now)
@@ -145,4 +130,3 @@ class Minute(models.Model):
 
     def __str__(self):
         return f"Minute for {self.company} on {self.date}"
-    

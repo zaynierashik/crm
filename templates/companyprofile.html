@@ -254,24 +254,13 @@
                                                     <option value="">Choose a via</option>
                                                     <option value="Direct" {% if company.via == "Direct" %} selected {% endif %}>Direct</option>
                                                     <option value="Referral" {% if company.via == "Referral" %} selected {% endif %}>Referral</option>
-                                                    <option value="Partner" {% if company.via == "Partner" %} selected {% endif %}>Partner Company</option>
                                                 </select>
                                             </div>
                         
-                                            <div id="referralDiv" class="w-1/2" style="display: none">
+                                            <div id="referralDiv" class="w-full" style="display: none">
                                                 <label for="referral_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
                                                 <input type="text" id="referral_name" value="{{ company.referral_name }}" name="referral_name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
-                                            </div>
-                        
-                                            <div id="partnerDiv" class="w-1/2" style="display: none">
-                                                <label for="partner_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
-                                                <select id="partner_name" name="partner_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="">Choose a partner</option>
-                                                    {% for partner in partners %}
-                                                        <option value="{{ partner.id }}" {% if partner.id == company.partner_name.id %} selected {% endif %}>{{ partner.partner_name }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>                                       
+                                            </div>                                  
                                         </div>
                                     </div>
 
@@ -347,29 +336,18 @@
             
                                     <div class="grid gap-4 mb-4 md:grid-cols-1">
                                         <div class="flex gap-4">
-                                            <div class="flex-grow w-1/2">
+                                            <div class="w-full">
                                                 <label for="via" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Via</label>
                                                 <select id="via" name="via" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                                                     <option value="" selected>Choose a via</option>
                                                     <option value="Direct">Direct</option>
                                                     <option value="Referral">Referral</option>
-                                                    <option value="Partner">Partner Company</option>
                                                 </select>
                                             </div>
             
-                                            <div id="referralDiv" class="w-1/2" style="display: none;">
+                                            <div id="referralDiv" class="w-full" style="display: none;">
                                                 <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
                                                 <input type="text" id="referral" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
-                                            </div>
-            
-                                            <div id="partnerDiv" class="w-1/2" style="display: none;">
-                                                <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner Name</label>
-                                                <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option selected>Choose a partner</option>
-                                                    {% for partner in partners %}
-                                                        <option value="{{ partner.id }}">{{ partner.partner_name }}</option>
-                                                    {% endfor %}
-                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -427,19 +405,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             const viaSelect = document.getElementById('via');
             const referralDiv = document.getElementById('referralDiv');
-            const partnerDiv = document.getElementById('partnerDiv');
 
             function updateVisibility() {
                 const selectedVia = viaSelect.value;
                 if (selectedVia === 'Referral') {
                     referralDiv.style.display = 'block';
-                    partnerDiv.style.display = 'none';
-                } else if (selectedVia === 'Partner') {
-                    referralDiv.style.display = 'none';
-                    partnerDiv.style.display = 'block';
                 } else {
                     referralDiv.style.display = 'none';
-                    partnerDiv.style.display = 'none';
                 }
             }
 

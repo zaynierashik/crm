@@ -8,15 +8,16 @@ from datetime import datetime, timezone
 from django.urls import reverse
 from django.db.models import Sum, Count
 from .models import *
-from .services import predict_total_revenue_for_all_companies
+import json
+from .services import predict_revenue_for_company
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout, update_session_auth_hash
 from openpyxl import Workbook # type: ignore
 from openpyxl.styles import Alignment, Font, Border, Side # type: ignore
-from .utils import get_exchange_rates
 from django.utils.dateformat import DateFormat
 
 from django.core.mail import EmailMultiAlternatives
@@ -142,31 +143,16 @@ def dashboard(request):
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
     company_count = Company.objects.count()
     pending_contracts = Requirement.objects.filter(progress='Pipeline').count()
 
-    exchange_rates = get_exchange_rates()
-
-    company_requirements = []
     total_revenue = 0
 
-    for company in companies:
-        requirements = Requirement.objects.filter(company=company)
-        company_revenue = 0
-
-        for req in requirements.filter(progress='Completed'):
-            conversion_rate = exchange_rates.get(req.currency, 1)  # Use exchange rate
-            company_revenue += (req.price or 0) / conversion_rate
-
-        company_revenue = round(company_revenue, 2)
-        total_revenue += company_revenue  # Accumulate total revenue
-        company_requirements.append({'company': company, 'revenue': company_revenue})
-
-    predicted_revenue = predict_total_revenue_for_all_companies()
+    company_id = Company.objects.first().id
+    predicted_revenue = predict_revenue_for_company(company_id)
 
     progress_counts = Requirement.objects.values('progress').annotate(count=Count('id')).filter(progress__in=['Initiated', 'Pipeline', 'Completed'])
     progress_labels = [entry['progress'] for entry in progress_counts]
@@ -177,7 +163,7 @@ def dashboard(request):
     counts = [entry['count'] for entry in company_trends]
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 
+               'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 
                'company_count': company_count, 'user': user, 'predicted_revenue': round(predicted_revenue[0], 2) if isinstance(predicted_revenue, np.ndarray) else predicted_revenue, 'progress_labels': progress_labels, 'progress_data': progress_data, 'chart_dates': dates, 'chart_counts': counts}
 
     return render(request, 'index.html', context)
@@ -210,7 +196,6 @@ def company(request):
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
@@ -256,7 +241,7 @@ def company(request):
     except EmptyPage:
         inactive_companies_page = paginator_inactive.page(paginator_inactive.num_pages)
 
-    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'partners': partners, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
+    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
                 'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
                 'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive, 'user': user}
 
@@ -296,18 +281,10 @@ def add_newcompany(request):
         
         if via == 'Referral':
             referral = request.POST.get('referral')
-            partner_name = None
-        elif via == 'Partner':
-            partner_id = request.POST.get('partner')
-            partner_name = Partner.objects.filter(id=partner_id).first()
-            if partner_name:
-                partner = partner_name
-                referral = None
         else:
             referral = None
-            partner = None
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, created_by=user)
         company.save()
 
         contact_names = request.POST.getlist('contact-name[]')
@@ -336,14 +313,13 @@ def company_profile(request):
     user = User.objects.get(id=user_id)
 
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
-    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     user_company = Company.objects.filter(created_by=user).first()
 
     if user_company:
         contacts = Contact.objects.filter(company=user_company)
-        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'edit_mode': True})
+        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'edit_mode': True})
     else:
-        return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'partners': partners, 'edit_mode': False})
+        return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'edit_mode': False})
 
 # Contract Page
 def contract(request):
@@ -357,6 +333,8 @@ def contract(request):
     services = Service.objects.values('id', 'service_name').order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').order_by('brand_name')
     products = Product.objects.values('id', 'product_name').order_by('product_name')
+
+    requests = Request.objects.all()
 
     total_request = Request.objects.count()
     total_requirement = Requirement.objects.count()
@@ -373,10 +351,41 @@ def contract(request):
     except EmptyPage:
         requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'user': user, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'total_request': total_request, 'total_requirement': total_requirement, 
+    context = {'user': user, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'requests': requests, 'total_request': total_request, 'total_requirement': total_requirement, 
                'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
     
     return render(request, 'contract.html', context)
+
+# Request Decision Part
+@csrf_exempt
+def handle_decision(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        request_id = data.get('request_id')
+        decision = data.get('decision')
+
+        try:
+            req = Request.objects.get(id=request_id)
+            if decision == 'approve':
+                # Move the request to Requirement
+                Requirement.objects.create(
+                    company=req.company,
+                    date=req.date,
+                    requirement_type=req.requirement_type,
+                    brand=req.brand,
+                    product_name=req.product_name,
+                    service=req.service,
+                    requirement_description=req.requirement_description,
+                    status="Approved",
+                    progress="Initiated"
+                )
+                req.delete()  # Delete the original request after approval
+            elif decision == 'reject':
+                req.delete()  # Delete the request if rejected
+            return JsonResponse({'status': 'success'})
+        except Request.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Request not found'}, status=404)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 # Tasks Page
 def task(request):
@@ -386,22 +395,36 @@ def task(request):
     staff_id = request.session.get('staff_id')
     user = Staff.objects.get(id=staff_id)
 
+    task_status = request.GET.get('status', None)
+
     if user.role == 'Staff':
-        tasks = Task.objects.filter(assigned_to=user)
+        tasks = Task.objects.filter(assigned_to=user).order_by('-created_at')
     else:
-        tasks = Task.objects.all()
+        tasks = Task.objects.all().order_by('-created_at')
+
+    if task_status:
+        tasks = tasks.filter(status=task_status)
 
     total_tasks = tasks.count()
 
-    # Separate completed and pending tasks
-    pending_tasks = tasks.filter(status__in=['Pending', 'In Progress'])
-    completed_tasks = tasks.filter(status='Completed')
+    # Separate tasks into pending and completed
+    pending_tasks = tasks.filter(status__in=['Pending', 'In Progress']).order_by('-created_at')
+    completed_tasks = tasks.filter(status='Completed').order_by('-created_at')
 
-    # Count tasks
     pending_tasks_count = pending_tasks.count()
     completed_tasks_count = completed_tasks.count()
 
-    # Paginate pending tasks
+    # Total tasks pagination
+    total_paginator = Paginator(tasks, 10)
+    page = request.GET.get('page')
+    try:
+        total_tasks_page = total_paginator.page(page)
+    except PageNotAnInteger:
+        total_tasks_page = total_paginator.page(1)
+    except EmptyPage:
+        total_tasks_page = total_paginator.page(total_paginator.num_pages)
+
+    # Pending tasks pagination
     pending_paginator = Paginator(pending_tasks, 10)
     pending_page = request.GET.get('pending_page')
     try:
@@ -411,7 +434,7 @@ def task(request):
     except EmptyPage:
         pending_tasks_page = pending_paginator.page(pending_paginator.num_pages)
 
-    # Paginate completed tasks
+    # Completed tasks pagination
     completed_paginator = Paginator(completed_tasks, 10)
     completed_page = request.GET.get('completed_page')
     try:
@@ -423,12 +446,12 @@ def task(request):
 
     context = {
         'user': user,
-        'staffs': Staff.objects.filter(role='Staff'),
-        'total_tasks': total_tasks,
+        'tasks': total_tasks_page,  # Paginated total tasks
+        'pending_tasks': pending_tasks_page,  # Paginated pending tasks
+        'completed_tasks': completed_tasks_page,  # Paginated completed tasks
         'pending_tasks_count': pending_tasks_count,
         'completed_tasks_count': completed_tasks_count,
-        'pending_tasks': pending_tasks_page,
-        'completed_tasks': completed_tasks_page,
+        'total_tasks': total_tasks_page,  # Make total tasks accessible in template
         'pending_paginator': pending_paginator,
         'completed_paginator': completed_paginator,
     }
@@ -569,30 +592,6 @@ def update_contact(request):
 
     return redirect('contact')
 
-# Partner Page
-def partner(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-
-    partners = Partner.objects.order_by('partner_name')
-    partner_count = Partner.objects.count()
-    paginator = Paginator(partners, 10)
-    page = request.GET.get('page')
-
-    try:
-        partners_page = paginator.page(page)
-    except PageNotAnInteger:
-        partners_page = paginator.page(1)
-    except EmptyPage:
-        partners_page = paginator.page(paginator.num_pages)
-
-    context = {'partners': partners, 'partner_count': partner_count, 'partners': partners_page, 'paginator': paginator, 'page_obj': partners_page, 'user': user}
-
-    return render(request, 'partner.html', context)
-
 # Staff Page
 def staff(request):
     if 'staff_id' not in request.session:
@@ -637,12 +636,11 @@ def transaction(request):
     services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
     brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
     products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    partners = Partner.objects.values('id', 'partner_name').order_by('partner_name')
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
-               'partners': partners, 'cities': cities, 'staffs': staffs, 'user': user}
+                'cities': cities, 'staffs': staffs, 'user': user}
 
     return render(request, 'minute.html', context)
 
@@ -750,17 +748,12 @@ def add_companyprofile(request):
         via = request.POST.get('via')
         website = request.POST.get('website')
 
-        partner = None
         referral = None
         
         if via == 'Referral':
             referral = request.POST.get('referral')
-            partner_name = None
-        elif via == 'Partner':
-            partner_id = request.POST.get('partner')
-            partner = Partner.objects.filter(id=partner_id).first()
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_name=partner, website=website, created_by=user)
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, created_by=user)
         company.save()
                 
         return HttpResponseRedirect(reverse('company_profile') + f'?company_added=true&company_id={company.id}')
@@ -852,33 +845,6 @@ def add_newrequirement(request):
         Requirement.objects.create(company=company, date=now(), contact_name=contact, requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description, currency=currency, price=price, status=status, progress=progress)
 
         return redirect(reverse('contract'))
-    
-# New Partner Submission
-def add_newpartner(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-
-    if request.method == 'POST':
-        partner_name = request.POST.get('partner-name')
-
-        if Partner.objects.filter(partner_name=partner_name).exists():
-            error_message = "Partner with this name already exists!"
-            return HttpResponseRedirect(reverse('partner') + f'?add-partner&error_message={error_message}&partner_name={partner_name}')
-        
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        country = request.POST.get('country')
-        contact_name = request.POST.get('contact-name')
-        designation = request.POST.get('designation')
-        email = request.POST.get('email-address')
-        contact_number = request.POST.get('contact-number')
-
-        Partner.objects.create(partner_name=partner_name, address=address, city=city, state=state, country=country, contact_person=contact_name, designation=designation, email=email, phone_number=contact_number)
-                
-        return redirect(reverse('partner'))
-    else:
-        return HttpResponse("Form Submission Error!")
     
 # New Staff Submission
 def add_newstaff(request):
@@ -1085,46 +1051,17 @@ def requirementdetails(request, company_id, requirement_id):
     context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'requirementdetails.html', context)
 
-# View Partner Details
-def partnerdetails(request, partner_id):
+# View Task Details
+def taskdetails(request, task_id):
     if 'staff_id' not in request.session:
         return redirect('login')
     
     staff_id = request.session.get('staff_id')
     user = get_object_or_404(Staff, id=staff_id)
+    task = get_object_or_404(Task, id=task_id)
 
-    partner = get_object_or_404(Partner, id=partner_id)
-    companies = Company.objects.filter(partner_name=partner)
-
-    paginator = Paginator(companies, 10)
-    page = request.GET.get('page')
-    try:
-        paginated_companies = paginator.page(page)
-    except PageNotAnInteger:
-        paginated_companies = paginator.page(1)
-    except EmptyPage:
-        paginated_companies = paginator.page(paginator.num_pages)
-
-    exchange_rates = get_exchange_rates()
-
-    company_requirements = []
-    for company in companies:
-        requirements = Requirement.objects.filter(company=company)
-        total_revenue = 0
-
-        for req in requirements.filter(progress='Completed'):
-            conversion_rate = exchange_rates.get(req.currency, 1)
-            total_revenue += (req.price or 0) / conversion_rate
-        
-        total_revenue = round(total_revenue, 2)
-
-        completed_contracts_count = Requirement.objects.filter(company=company, progress='Completed').count()
-        pending_contracts_count = Requirement.objects.filter(company=company, progress__in=['Pipeline', 'Initiated']).count()
-        
-        company_requirements.append({'company': company, 'total_revenue': total_revenue, 'completed_contracts': completed_contracts_count, 'pending_contracts': pending_contracts_count})
-
-    context = {'user': user, 'partner': partner, 'company_requirements': company_requirements, 'requirements_page_obj': paginated_companies}
-    return render(request, 'partnerdetails.html', context)
+    context = {'user': user, 'task': task}
+    return render(request, 'taskdetails.html', context)
 
 # Edit Company Details
 def companyeditform(request, company_id):
@@ -1134,11 +1071,10 @@ def companyeditform(request, company_id):
     company = Company.objects.get(pk=company_id)
     contacts = Contact.objects.filter(company=company)
     sectors = Sector.objects.all()
-    partners = Partner.objects.all()
 
     countries = ["Nepal", "USA", "India", "Singapore"]
     religions = ["Hinduism", "Buddhism", "Christianity"]
-    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'partners': partners, 'countries': countries, 'religions': religions})
+    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'countries': countries, 'religions': religions})
 
 # Edit Requirement Details
 def requirementeditform(request, requirement_id):
@@ -1157,17 +1093,6 @@ def requirementeditform(request, requirement_id):
 
     return render(request, 'requirementeditform.html', {'user': user, 'requirement': requirement, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products})
 
-# Edit Partner Details
-def partnereditform(request, partner_id):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-
-    staff_id = request.session.get('staff_id')
-    user = get_object_or_404(Staff, id=staff_id)
-    
-    partner = Partner.objects.get(pk=partner_id)
-    return render(request, 'partnereditform.html', {'user': user, 'partner': partner})
-
 # Update Company
 def update_company(request, company_id):
     company = get_object_or_404(Company, id=company_id)
@@ -1181,7 +1106,6 @@ def update_company(request, company_id):
         company.country = request.POST['country']
         company.via = request.POST['via']
         company.referral_name = request.POST.get('referral_name', '')
-        company.partner_name_id = request.POST.get('partner_name', '')
         company.website = request.POST['website']
         company.save()
 
@@ -1215,10 +1139,37 @@ def update_company(request, company_id):
         return redirect('company_profile')
 
     sectors = Sector.objects.all()
-    partners = Partner.objects.all()
     contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'partners': partners, 'contacts': contacts})
+    return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'contacts': contacts})
+
+# Update Task Status
+def update_task_status(request, task_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    # Get the task to be updated
+    task = get_object_or_404(Task, id=task_id)
+
+    # Check if the request method is POST
+    if request.method == 'POST':
+        # Prevent status change if task is already completed
+        if task.status == 'Completed':
+            messages.error(request, "This task has already been completed and cannot be updated.")
+            return redirect('taskdetails', task_id=task.id)
+
+        # Get the new status from the form
+        new_status = request.POST.get('status')
+
+        # Update the task's status if it's not completed
+        task.status = new_status
+        task.save()
+
+        # Redirect to the task details page after update
+        messages.success(request, "Task status updated successfully.")
+        return redirect('taskdetails', task_id=task.id)
+
+    return HttpResponse("Invalid request")
 
 # Add New Requirement
 def add_newrequirement(request):
@@ -1268,26 +1219,6 @@ def update_requirement(request, requirement_id):
         return redirect('requirementeditform', requirement_id=requirement.id)
 
     return redirect('requirementeditform', requirement_id=requirement.id)
-
-# Update Partner
-def update_partner(request, partner_id):
-    partner = get_object_or_404(Partner, id=partner_id)
-
-    if request.method == 'POST':
-        partner.partner_name = request.POST['partner-name']
-        partner.address = request.POST['address']
-        partner.city = request.POST['city']
-        partner.state = request.POST['state']
-        partner.country = request.POST['country']
-        partner.contact_person = request.POST['contact-name']
-        partner.designation = request.POST['designation']
-        partner.email = request.POST['email']
-        partner.phone_number = request.POST['contact-number']
-        partner.save()
-
-        return redirect('partnereditform', partner_id=partner.id)
-    
-    return redirect('partnereditform', partner_id=partner.id)
 
 # Update Sector
 @require_POST
@@ -1454,18 +1385,10 @@ def export_excel(request, company_id):
     return response
 
 # Linear Regression Call
-def predict_total_revenue_view(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-
-    predictions = predict_total_revenue_for_all_companies()
-    company_names = {company.id: company.company_name for company in Company.objects.all()}
-    predictions_with_names = {company_names[company_id]: round(revenue, 2) for company_id, revenue in predictions.items()}
-    
-    return render(request, 'prediction.html', {'user': user, 'predictions': predictions_with_names})
+def predict_revenue(request):
+    company_id = Company.objects.first().id
+    predicted_revenue = predict_revenue_for_company(company_id)
+    return JsonResponse({'predicted_revenue': predicted_revenue[0]})
 
 # Extra Views
 def approve_request_view(request, request_id):

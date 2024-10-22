@@ -73,7 +73,7 @@ function searchTable(inputId, tableId){
 
 document.addEventListener("DOMContentLoaded", function(){
     var companySearchInput = document.getElementById("company-search");
-    var partnerSearchInput = document.getElementById("partner-search");
+    var taskSearchInput = document.getElementById("task-search");
 
     if(companySearchInput){
         companySearchInput.addEventListener("input", function(){
@@ -81,10 +81,33 @@ document.addEventListener("DOMContentLoaded", function(){
         });
     }
 
-    if(partnerSearchInput){
-        partnerSearchInput.addEventListener("input", function(){
-            searchTable('partner-search', 'partner-name-table');
+    if(taskSearchInput){
+        taskSearchInput.addEventListener("input", function(){
+            searchTable('task-search', 'task-name-table');
         });
+    }
+
+    function searchTable(inputId, tableId) {
+        var input, filter, table, tr, td, i, txtValue, txtValueAssigned;
+        input = document.getElementById(inputId);
+        filter = input.value.toLowerCase();
+        table = document.getElementById(tableId);
+        tr = table.getElementsByTagName("tr");
+
+        // Loop through all table rows and search in both Title and Assigned To
+        for (i = 1; i < tr.length; i++) {
+            tdTitle = tr[i].getElementsByTagName("td")[0]; // Task title is in the first column
+            tdAssigned = tr[i].getElementsByTagName("td")[1]; // Assigned to is in the second column
+            if (tdTitle || tdAssigned) {
+                txtValueTitle = tdTitle.textContent || tdTitle.innerText;
+                txtValueAssigned = tdAssigned.textContent || tdAssigned.innerText;
+                if (txtValueTitle.toLowerCase().indexOf(filter) > -1 || txtValueAssigned.toLowerCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
     }
 });
 

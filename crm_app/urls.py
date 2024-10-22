@@ -9,7 +9,6 @@ urlpatterns = [
     path('company/', views.company, name='company'),
     path('contract/', views.contract, name='contract'),
     path('task/', views.task, name='task'),
-    path('partner/', views.partner, name='partner'),
     path('staff/', views.staff, name='staff'),
     path('transaction/', views.transaction, name='transaction'),
     path('sector/', views.sector, name='sector'),
@@ -18,11 +17,10 @@ urlpatterns = [
 
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('contract-details/<int:company_id>/<int:requirement_id>/', views.contractdetails, name='contractdetails'),
-    path('partner-details/<int:partner_id>/', views.partnerdetails, name='partnerdetails'),
+    path('task-details/<int:task_id>/', views.taskdetails, name='taskdetails'),
 
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
-    path('add-new-partner/', views.add_newpartner, name='add_newpartner'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
     path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
     path('add-new-sector/', views.add_newsector, name='add_newsector'),
@@ -34,14 +32,16 @@ urlpatterns = [
 
     path('edit-company/<int:company_id>/', views.companyeditform, name='companyeditform'),
     path('edit-requirement/<int:requirement_id>/', views.requirementeditform, name='requirementeditform'),
-    path('edit-partner/<int:partner_id>/', views.partnereditform, name='partnereditform'),
 
     path('update-company/<int:company_id>', views.update_company, name='update_company'),
     path('update-requirement/<int:requirement_id>', views.update_requirement, name='update_requirement'),
-    path('update-partner/<int:partner_id>', views.update_partner, name='update_partner'),
+    path('task/<int:task_id>/update_status/', views.update_task_status, name='update_task_status'),
     path('update-sector/', views.update_sector, name='update_sector'),
     path('update-service/', views.update_service, name='update_service'),
     path('update-brand/', views.update_brand, name='update_brand'),
+
+    path('handle-decision/', views.handle_decision, name='handle_decision'),
+
 
     # User
     path('user/', views.user, name='user'),
@@ -74,7 +74,7 @@ urlpatterns = [
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
     path('send-email/', views.send_email, name='send_email'),
-    path('predict-revenue/', views.predict_total_revenue_view, name='predict_revenue'),
+    path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
 
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),
