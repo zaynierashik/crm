@@ -78,4 +78,10 @@ urlpatterns = [
 
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),
+
+    # Clustering
+    path('cluster-companies/', views.cluster_companies, name='cluster_companies'),
+    path('forecasting-companies/<int:company_id>/', views.forecast_company_revenue, name='forecasting_companies'),
+    path('forecasting-all-companies/', views.forecast_all_company_revenues, name='forecasting_companies'),
+
 ]

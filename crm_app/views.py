@@ -24,6 +24,13 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+from django.http import JsonResponse
+from .clustering import perform_kmeans_clustering
+
+import pandas as pd
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+
 # Login Page
 def login(request):
     if 'staff_id' in request.session:
@@ -1383,6 +1390,87 @@ def predict_revenue(request):
     company_id = Company.objects.first().id
     predicted_revenue = predict_revenue_for_company(company_id)
     return JsonResponse({'predicted_revenue': predicted_revenue[0]})
+
+#K-means ALgorithm
+def cluster_companies(request):
+    clusters = perform_kmeans_clustering()
+    return JsonResponse({'clusters': clusters.tolist()})
+
+#ARIMA Algorithm
+def fetch_company_revenue(company_id):
+    # Fetch data for the selected company, ordered by date
+    queryset = CompanyPerformance.objects.filter(company_id=company_id).order_by('date')
+    data = pd.DataFrame(list(queryset.values('date', 'revenue')))
+    
+    # Set the date as the index for time series analysis
+    data.set_index('date', inplace=True)
+    return data['revenue']
+
+def apply_arima_model(time_series_data, order=(1, 1, 1)):
+    # Fit ARIMA model
+    model = ARIMA(time_series_data, order=order)
+    model_fit = model.fit()
+    
+    # Print the summary (optional) and return predictions
+    print(model_fit.summary())
+    
+    # Forecast next 5 periods
+    forecast = model_fit.forecast(steps=5)
+    return forecast
+
+def apply_sarima_model(time_series_data, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)):
+    # Fit SARIMA model
+    model = SARIMAX(time_series_data, order=order, seasonal_order=seasonal_order)
+    model_fit = model.fit()
+    
+    # Print the summary (optional) and return predictions
+    print(model_fit.summary())
+    
+    # Forecast the next 5 periods
+    forecast = model_fit.forecast(steps=5)
+    return forecast
+
+def forecast_company_revenue(request, company_id):
+    time_series_data = fetch_company_revenue(company_id)
+    
+    # Choose ARIMA or SARIMA based on data characteristics
+    forecast = apply_arima_model(time_series_data)
+    # forecast = apply_sarima_model(time_series_data)
+    
+    # Convert forecast results to JSON response
+    return JsonResponse({"forecast": forecast.tolist()})
+
+def get_all_company_ids():
+    # Fetch all unique company IDs from the CompanyPerformance model
+    queryset = CompanyPerformance.objects.values_list('company_id', flat=True).distinct()
+    return list(queryset)
+
+
+def forecast_all_company_revenues(request):
+    company_ids = get_all_company_ids()  # Function to fetch all company IDs
+    total_forecast = 0
+    debug = []
+    value = []
+    i = 0
+    
+    for company_id in company_ids:
+        time_series_data = fetch_company_revenue(company_id)
+        
+        # Choose ARIMA or SARIMA based on data characteristics
+        forecast = apply_arima_model(time_series_data)
+        # forecast = apply_sarima_model(time_series_data
+
+        print(f"Forecast for Company {company_id}: {forecast.index.tolist()} -> {forecast.values.tolist()}")
+        debug.append(f"Forecast for Company {company_id}: Index = {forecast.index.tolist()}, Values = {forecast.values.tolist()}")
+
+        value.append(forecast.values.tolist()[0])
+            
+
+        output = sum(value)  # Sum the forecasted values
+
+    # Return the total forecast as a JSON response
+    return JsonResponse({"debug": debug, "value": value, "output": output})
+
 
 # Extra Views
 def approve_request_view(request, request_id):
