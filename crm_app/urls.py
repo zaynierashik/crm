@@ -74,7 +74,6 @@ urlpatterns = [
     path('export-excel/<int:company_id>/', views.export_excel, name='export_excel'),
 
     # path('send-email/', views.send_email, name='send_email'),
-    path('predict-revenue/', views.predict_revenue, name='predict_revenue'),
 
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),
@@ -82,6 +81,5 @@ urlpatterns = [
     # Clustering
     path('cluster-companies/', views.cluster_companies, name='cluster_companies'),
     path('forecasting-companies/<int:company_id>/', views.forecast_company_revenue, name='forecasting_companies'),
-    path('forecasting-all-companies/', views.forecast_all_company_revenues, name='forecasting_companies'),
-
+    path('forecasting-all-companies/', views.forecast_all_company_revenues, name='forecasting_all_companies'),
 ]

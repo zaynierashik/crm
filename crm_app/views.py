@@ -1,5 +1,6 @@
 import io
-import numpy as np
+import json
+import pandas as pd
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import *
@@ -8,8 +9,6 @@ from datetime import datetime, timezone
 from django.urls import reverse
 from django.db.models import Sum, Count
 from .models import *
-import json
-from .services import predict_revenue_for_company
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -27,9 +26,8 @@ from django.utils.html import strip_tags
 from django.http import JsonResponse
 from .clustering import perform_kmeans_clustering
 
-import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.statespace.sarimax import SARIMAX
+from dateutil.relativedelta import relativedelta
 
 # Login Page
 def login(request):
@@ -158,9 +156,6 @@ def dashboard(request):
 
     total_revenue = 0
 
-    company_id = Company.objects.first().id
-    predicted_revenue = predict_revenue_for_company(company_id)
-
     progress_counts = Requirement.objects.values('progress').annotate(count=Count('id')).filter(progress__in=['Initiated', 'Pipeline', 'Completed'])
     progress_labels = [entry['progress'] for entry in progress_counts]
     progress_data = [entry['count'] for entry in progress_counts]
@@ -171,7 +166,7 @@ def dashboard(request):
 
     context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 
                'cities': cities, 'staffs': staffs, 'pending_contracts': pending_contracts, 'total_revenue': round(total_revenue, 2), 
-               'company_count': company_count, 'user': user, 'predicted_revenue': round(predicted_revenue[0], 2) if isinstance(predicted_revenue, np.ndarray) else predicted_revenue, 'progress_labels': progress_labels, 'progress_data': progress_data, 'chart_dates': dates, 'chart_counts': counts}
+               'company_count': company_count, 'user': user, 'progress_labels': progress_labels, 'progress_data': progress_data, 'chart_dates': dates, 'chart_counts': counts}
 
     return render(request, 'index.html', context)
 
@@ -1385,12 +1380,6 @@ def export_excel(request, company_id):
     response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
     return response
 
-# Linear Regression Call
-def predict_revenue(request):
-    company_id = Company.objects.first().id
-    predicted_revenue = predict_revenue_for_company(company_id)
-    return JsonResponse({'predicted_revenue': predicted_revenue[0]})
-
 #K-means ALgorithm
 def cluster_companies(request):
     clusters = perform_kmeans_clustering()
@@ -1418,59 +1407,53 @@ def apply_arima_model(time_series_data, order=(1, 1, 1)):
     forecast = model_fit.forecast(steps=5)
     return forecast
 
-def apply_sarima_model(time_series_data, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)):
-    # Fit SARIMA model
-    model = SARIMAX(time_series_data, order=order, seasonal_order=seasonal_order)
-    model_fit = model.fit()
-    
-    # Print the summary (optional) and return predictions
-    print(model_fit.summary())
-    
-    # Forecast the next 5 periods
-    forecast = model_fit.forecast(steps=5)
-    return forecast
-
 def forecast_company_revenue(request, company_id):
     time_series_data = fetch_company_revenue(company_id)
-    
-    # Choose ARIMA or SARIMA based on data characteristics
-    forecast = apply_arima_model(time_series_data)
-    # forecast = apply_sarima_model(time_series_data)
-    
-    # Convert forecast results to JSON response
-    return JsonResponse({"forecast": forecast.tolist()})
+    forecast_data = apply_arima_model(time_series_data)  # This gives the forecasted values
+
+    # Get the last date in the time series data to calculate future months
+    last_date = time_series_data.index[-1]
+    forecast = []
+
+    # Generate month names with revenue values
+    for i, revenue in enumerate(forecast_data.tolist()):
+        forecast_month = (last_date + relativedelta(months=i+1)).strftime('%B %Y')
+        forecast.append((forecast_month, revenue))
+
+    # Pass the forecast data to the template
+    return render(request, "forecastingdetails.html", {"forecast": forecast})
 
 def get_all_company_ids():
     # Fetch all unique company IDs from the CompanyPerformance model
     queryset = CompanyPerformance.objects.values_list('company_id', flat=True).distinct()
     return list(queryset)
 
-
 def forecast_all_company_revenues(request):
-    company_ids = get_all_company_ids()  # Function to fetch all company IDs
-    total_forecast = 0
-    debug = []
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    company_ids = get_all_company_ids()
+    predictions = []  # List of dictionaries to store company ID, name, and revenue
     value = []
-    i = 0
     
     for company_id in company_ids:
         time_series_data = fetch_company_revenue(company_id)
-        
-        # Choose ARIMA or SARIMA based on data characteristics
         forecast = apply_arima_model(time_series_data)
-        # forecast = apply_sarima_model(time_series_data
+        
+        # Get company details
+        company = Company.objects.get(id=company_id)
+        first_month_forecast = forecast.values.tolist()[0]
+        
+        # Add details to predictions and value list
+        predictions.append({"id": company.id, "name": company.company_name, "revenue": first_month_forecast})
+        value.append(first_month_forecast)
+    
+    output = sum(value)
 
-        print(f"Forecast for Company {company_id}: {forecast.index.tolist()} -> {forecast.values.tolist()}")
-        debug.append(f"Forecast for Company {company_id}: Index = {forecast.index.tolist()}, Values = {forecast.values.tolist()}")
-
-        value.append(forecast.values.tolist()[0])
-            
-
-        output = sum(value)  # Sum the forecasted values
-
-    # Return the total forecast as a JSON response
-    return JsonResponse({"debug": debug, "value": value, "output": output})
-
+    return render(request, "forecasting.html", {"output": output, "predictions": predictions, "user": user})
 
 # Extra Views
 def approve_request_view(request, request_id):
