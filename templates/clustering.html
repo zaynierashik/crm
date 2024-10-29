@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Clusters</title>
+    <link rel="stylesheet" href="{% static 'your_stylesheet.css' %}">
+</head>
+<body>
+    <h1>Company Clusters</h1>
+
+    <form method="GET" action="{% url 'cluster_companies' %}">
+        <label for="sector">Select Sector:</label>
+        <select name="sector" id="sector">
+            <option value="">All Sectors</option>
+            {% for sector in sectors %}
+                <option value="{{ sector.id }}">{{ sector.sector_name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="country">Select Country:</label>
+        <select name="country" id="country">
+            <option value="">All Countries</option>
+            {% for country in countries %}
+                <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="address">Select Address:</label>
+        <input type="text" name="address" id="address" placeholder="Enter Address">
+
+        <button type="submit">Filter</button>
+    </form>
+
+    {% for cluster, companies in cluster_data.items %}
+        <h2>Cluster {{ cluster }}</h2>
+        <ul>
+            {% for company in companies %}
+                <li>
+                    <strong>{{ company.company_name }}</strong><br>
+                    Sector: {{ company.sector.sector_name }}<br>
+                    Address: {{ company.address }}<br>
+                    City: {{ company.city }}<br>
+                    State: {{ company.state }}<br>
+                    Country: {{ company.country }}<br>
+                    Website: {{ company.website }}<br>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>
