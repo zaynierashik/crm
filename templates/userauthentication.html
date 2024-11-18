@@ -45,6 +45,9 @@
                         <p class="text-end">
                             <a @click="showLogin = false" class="text-sm font-normal text-purple-600 dark:text-purple-400" style="cursor: pointer;">Create Account</a>
                         </p>
+                        <p class="text-end mt-3">
+                            <a @click="showLogin = true" class="text-sm font-normal text-purple-600 dark:text-purple-400" style="cursor: pointer;" href="{% url 'reset_code' %}">Forgot Password</a>
+                        </p>
                     </div>
                 </div>
 

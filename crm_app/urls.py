@@ -82,4 +82,9 @@ urlpatterns = [
     path('cluster-companies/', views.cluster_companies, name='cluster_companies'),
     path('forecasting-companies/<int:company_id>/', views.forecast_company_revenue, name='forecasting_companies'),
     path('forecasting-all-companies/', views.forecast_all_company_revenues, name='forecasting_all_companies'),
+
+    #forgot password
+    path('reset_password/',views.reset_password, name='reset_password'),
+    path('reset_code/',views.reset_code, name='reset_code'),
+    path('reset_passwordDone/',views.reset_passwordDone, name='reset_passwordDone'),
 ]

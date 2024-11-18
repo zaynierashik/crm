@@ -1,5 +1,6 @@
 import io
 import json
+import random
 import pandas as pd
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -1490,3 +1491,101 @@ def add_sector(request):
         return redirect('company_profile')
     else:
         return render(request, 'companyprofile.html')
+
+
+def forget_pass(request):
+    return render(request, "forget_pass.html")
+
+
+def reset_code(request):
+    message = ""
+    if request.method == "POST":
+        email = request.POST['email']
+        message = None
+        print(email)  # in future we will send the code to the provided if it exist
+        # generate code and send via email
+        if User.objects.filter(email=email).exists():
+            random_float = random.randint(100000, 999999)
+            print(random_float)
+            c_details = User.objects.get(email=email)
+
+            # saving the generated password reset code to database
+            c_details.resetcode = random_float
+            c_details.save()
+
+            # creating the session to send email of user to change password in reset_passwordDone method
+            request.session['customer_email'] = c_details.email
+
+            #sending forget password code to user mail
+
+            user = User.objects.get(email = email)
+
+            subject = "Reset Password"
+            html_content = render_to_string('forgetpass_email.html',{
+                                            'fname': user.full_name, 'lname': user.full_name, 'email': user.email,'code':random_float})
+            from_email = 'zaynierashik@gmail.com'
+            to = [c_details.email]
+
+            text_content = strip_tags(html_content)
+            email = EmailMultiAlternatives(
+                subject,
+                text_content,
+                from_email,
+                to,
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+            return render(request, "code_reset.html", {'fname': c_details.full_name,'code':c_details.resetcode})
+        else:
+            message = "This email doesn't exist."
+            print("This email doesn't exist.")
+    return render(request, "forget_pass.html",{
+        "message" : message,
+    })
+
+
+def reset_password(request):
+
+    email = request.session.get('customer_email') # accessing the session
+    print(email)
+    customer_detail = User.objects.get(email=email)
+    if request.method == "POST":
+        username = request.POST['username']
+        code = request.POST['code']
+        print(customer_detail.email)
+        if (int(customer_detail.resetcode) == int(code) and customer_detail.email == username):  # validate the generated code and user type code
+            customer_detail.resetcode = None
+            customer_detail.save()
+            return render(request, "reset_password.html")
+        else:
+            message = "Invalid Code provided"
+            print("Invalid Code provided")
+    return render(request, "code_reset.html", {
+        "message" : message,
+    })
+
+
+def reset_passwordDone(request):
+    if request.method == "POST":
+        password = request.POST['password']
+        c_password = request.POST['c_password']
+        email = request.session.get('customer_email')
+        # now we can access every data of that user via email
+        customer_detail = User.objects.get(email=email)
+
+        if password == c_password:
+            if password != customer_detail.password:
+                customer_detail.password = make_password(password)
+                customer_detail.save()
+                print("Password Updated")
+                return render(request, "login.html")
+            else:
+                print("Password can't be same with old one")
+                message = "Password can't be same with old one"
+        else:
+            print("Confirm password didn't match")
+            message = "Password can't be same with old one"
+    return render(request, "reset_password.html",{
+        "message" : message,
+    })
