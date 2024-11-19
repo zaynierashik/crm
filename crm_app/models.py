@@ -7,6 +7,7 @@ class Staff(models.Model):
     password = models.CharField(max_length=255)
     role = models.CharField(max_length=100)
     status = models.BooleanField(default=True)
+    resetcode = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.full_name

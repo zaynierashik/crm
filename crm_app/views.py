@@ -1409,6 +1409,12 @@ def apply_arima_model(time_series_data, order=(1, 1, 1)):
     return forecast
 
 def forecast_company_revenue(request, company_id):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+    
     time_series_data = fetch_company_revenue(company_id)
     forecast_data = apply_arima_model(time_series_data)  # This gives the forecasted values
 
@@ -1422,7 +1428,7 @@ def forecast_company_revenue(request, company_id):
         forecast.append((forecast_month, revenue))
 
     # Pass the forecast data to the template
-    return render(request, "forecastingdetails.html", {"forecast": forecast})
+    return render(request, "forecastingdetails.html", {"forecast": forecast, 'user': user})
 
 def get_all_company_ids():
     # Fetch all unique company IDs from the CompanyPerformance model
@@ -1492,10 +1498,9 @@ def add_sector(request):
     else:
         return render(request, 'companyprofile.html')
 
-
+# Client Forgot Password
 def forget_pass(request):
     return render(request, "forget_pass.html")
-
 
 def reset_code(request):
     message = ""
@@ -1521,8 +1526,8 @@ def reset_code(request):
             user = User.objects.get(email = email)
 
             subject = "Reset Password"
-            html_content = render_to_string('forgetpass_email.html',{
-                                            'fname': user.full_name, 'lname': user.full_name, 'email': user.email,'code':random_float})
+            html_content = render_to_string('email.html',{
+                                            'fname': user.full_name, 'email': user.email,'code':random_float})
             from_email = 'zaynierashik@gmail.com'
             to = [c_details.email]
 
@@ -1541,51 +1546,174 @@ def reset_code(request):
             message = "This email doesn't exist."
             print("This email doesn't exist.")
     return render(request, "forget_pass.html",{
-        "message" : message,
+        "toast_message" : message,
     })
 
 
 def reset_password(request):
-
-    email = request.session.get('customer_email') # accessing the session
+    email = request.session.get('customer_email')
     print(email)
     customer_detail = User.objects.get(email=email)
+    message = None  # Initialize the message variable
+
     if request.method == "POST":
-        username = request.POST['username']
-        code = request.POST['code']
+        entered_email = request.POST['email']
+        entered_code = request.POST['code']
         print(customer_detail.email)
-        if (int(customer_detail.resetcode) == int(code) and customer_detail.email == username):  # validate the generated code and user type code
+
+        # Validate the provided email and code
+        if customer_detail.email != entered_email and int(customer_detail.resetcode) != int(entered_code):
+            message = "Both Email and Code are incorrect."
+            print("Both Email and Code are incorrect.")
+        elif customer_detail.email != entered_email:
+            message = "Invalid Email provided."
+            print("Invalid Email provided.")
+        elif int(customer_detail.resetcode) != int(entered_code):
+            message = "Invalid Code provided."
+            print("Invalid Code provided.")
+        else:
             customer_detail.resetcode = None
             customer_detail.save()
             return render(request, "reset_password.html")
-        else:
-            message = "Invalid Code provided"
-            print("Invalid Code provided")
+
     return render(request, "code_reset.html", {
-        "message" : message,
+        "toast_message": message,
     })
 
 
 def reset_passwordDone(request):
+    message = None
     if request.method == "POST":
         password = request.POST['password']
         c_password = request.POST['c_password']
         email = request.session.get('customer_email')
-        # now we can access every data of that user via email
+        # Access the user data via email
         customer_detail = User.objects.get(email=email)
 
-        if password == c_password:
-            if password != customer_detail.password:
-                customer_detail.password = make_password(password)
-                customer_detail.save()
-                print("Password Updated")
-                return render(request, "login.html")
-            else:
-                print("Password can't be same with old one")
-                message = "Password can't be same with old one"
+        if password != c_password:
+            message = "Confirm password didn't match."
+            print("Confirm password didn't match.")
+        elif check_password(password, customer_detail.password):
+            message = "Password can't be same as the old one."
+            print("Password can't be same as the old one.")
         else:
-            print("Confirm password didn't match")
-            message = "Password can't be same with old one"
-    return render(request, "reset_password.html",{
-        "message" : message,
+            # Save the new password
+            customer_detail.password = make_password(password)
+            customer_detail.save()
+            print("Password Updated.")
+            return render(request, "userauthentication.html")
+
+    return render(request, "reset_password.html", {
+        "toast_message": message,
+    })
+
+
+# Admin Forgot Password
+def admin_forget_pass(request):
+    return render(request, "forget_pass copy.html")
+
+
+def admin_reset_code(request):
+    message = ""
+    if request.method == "POST":
+        email = request.POST['email']
+        message = None
+        print(email)  # in future we will send the code to the provided if it exist
+        # generate code and send via email
+        if Staff.objects.filter(email=email).exists():
+            random_float = random.randint(100000, 999999)
+            print(random_float)
+            c_details = Staff.objects.get(email=email)
+
+            # saving the generated password reset code to database
+            c_details.resetcode = random_float
+            c_details.save()
+
+            # creating the session to send email of user to change password in reset_passwordDone method
+            request.session['customer_email'] = c_details.email
+
+            #sending forget password code to user mail
+
+            user = Staff.objects.get(email = email)
+
+            subject = "Reset Password"
+            html_content = render_to_string('email.html',{
+                                            'fname': user.full_name, 'email': user.email,'code':random_float})
+            from_email = 'zaynierashik@gmail.com'
+            to = [c_details.email]
+
+            text_content = strip_tags(html_content)
+            email = EmailMultiAlternatives(
+                subject,
+                text_content,
+                from_email,
+                to,
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+            return render(request, "code_reset copy.html", {'fname': c_details.full_name,'code':c_details.resetcode})
+        else:
+            message = "This email doesn't exist."
+            print("This email doesn't exist.")
+    return render(request, "forget_pass copy.html",{
+        "toast_message" : message,
+    })
+
+
+def admin_reset_password(request):
+    email = request.session.get('customer_email')
+    print(email)
+    customer_detail = Staff.objects.get(email=email)
+    message = None  # Initialize the message variable
+
+    if request.method == "POST":
+        entered_email = request.POST['email']
+        entered_code = request.POST['code']
+        print(customer_detail.email)
+
+        # Validate the provided email and code
+        if customer_detail.email != entered_email and int(customer_detail.resetcode) != int(entered_code):
+            message = "Both Email and Code are incorrect."
+            print("Both Email and Code are incorrect.")
+        elif customer_detail.email != entered_email:
+            message = "Invalid Email provided."
+            print("Invalid Email provided.")
+        elif int(customer_detail.resetcode) != int(entered_code):
+            message = "Invalid Code provided."
+            print("Invalid Code provided.")
+        else:
+            customer_detail.resetcode = None
+            customer_detail.save()
+            return render(request, "reset_password copy.html")
+
+    return render(request, "code_reset copy.html", {
+        "toast_message": message,
+    })
+
+
+def admin_reset_passwordDone(request):
+    message = None
+    if request.method == "POST":
+        password = request.POST['password']
+        c_password = request.POST['c_password']
+        email = request.session.get('customer_email')
+        # Access the user data via email
+        customer_detail = Staff.objects.get(email=email)
+
+        if password != c_password:
+            message = "Confirm password didn't match."
+            print("Confirm password didn't match.")
+        elif check_password(password, customer_detail.password):
+            message = "Password can't be same as the old one."
+            print("Password can't be same as the old one.")
+        else:
+            # Save the new password
+            customer_detail.password = make_password(password)
+            customer_detail.save()
+            print("Password Updated.")
+            return render(request, "login.html")
+
+    return render(request, "reset_password copy.html", {
+        "toast_message": message,
     })

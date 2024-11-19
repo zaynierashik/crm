@@ -87,4 +87,8 @@ urlpatterns = [
     path('reset_password/',views.reset_password, name='reset_password'),
     path('reset_code/',views.reset_code, name='reset_code'),
     path('reset_passwordDone/',views.reset_passwordDone, name='reset_passwordDone'),
+
+    path('admin_reset_password/',views.admin_reset_password, name='admin_reset_password'),
+    path('admin_reset_code/',views.admin_reset_code, name='admin_reset_code'),
+    path('admin_reset_passwordDone/',views.admin_reset_passwordDone, name='admin_reset_passwordDone'),
 ]

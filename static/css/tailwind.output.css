@@ -2288,6 +2288,10 @@ video {
   margin-top: 1px;
 }
 
+.mt-44 {
+  margin-top: 11rem;
+}
+
 .box-border {
   box-sizing: border-box;
 }
@@ -2318,6 +2322,10 @@ video {
 
 .table {
   display: table;
+}
+
+.inline-table {
+  display: inline-table;
 }
 
 .table-caption {
@@ -8531,12 +8539,20 @@ video {
     margin-top: auto;
   }
 
+  .sm\:grid {
+    display: grid;
+  }
+
   .sm\:w-auto {
     width: auto;
   }
 
   .sm\:grid-cols-9 {
     grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  .sm\:grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
   .sm\:items-center {

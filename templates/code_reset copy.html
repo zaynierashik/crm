@@ -70,7 +70,7 @@
                 <div class="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
                     <div class="w-full">
                         <h1 class="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Forgot Password</h1>
-                        <form id="staffForm" action="{% url 'reset_password' %}" method="POST">
+                        <form id="staffForm" action="{% url 'admin_reset_password' %}" method="POST">
                             {% csrf_token %}
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                             <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full mb-4 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@example.com" required>
@@ -115,6 +115,7 @@
           }
       });
   </script>
+  
 
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>

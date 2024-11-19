@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
@@ -320,58 +321,115 @@
                         </div>
                     </div>
                 </div>
-            </main>
 
-            <div class="w-full max-w-lg mx-auto my-8">
-                <canvas id="forecastChart"></canvas>
-            </div>
+                <div class="grid grid-cols-2 mt-32">
+                    <div class="w-full max-w-xl px-6">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                    <div class="w-full max-w-xl px-6">
+                        <canvas id="forecastDonut"></canvas>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
     <script>
-        // Prepare data for the chart
-        const forecastLabels = [];
-        const forecastData = [];
-
-        // Iterate through the forecast data to extract month names and revenue values
+        // Line Chart Data
+        const lineLabels = [];
+        const lineData = [];
+        
         {% for month, revenue in forecast %}
-            forecastLabels.push("{{ month }}");  // Add month name
-            forecastData.push({{ revenue|floatformat:2 }});  // Add revenue value
+            lineLabels.push("{{ month }}");  // Add month name
+            lineData.push({{ revenue|floatformat:2 }});  // Add revenue value
         {% endfor %}
-
-        // Configure and render the chart
-        const ctx = document.getElementById('forecastChart').getContext('2d');
-        new Chart(ctx, {
+        
+        // Line Chart Configuration
+        const ctxLine = document.getElementById('forecastChart').getContext('2d');
+        new Chart(ctxLine, {
             type: 'line',
             data: {
-                labels: forecastLabels,
+                labels: lineLabels,
                 datasets: [{
                     label: 'Expected Revenue (NPR)',
-                    data: forecastData,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    data: lineData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,   // Space above the graph
+                        bottom: 20, // Space below the graph
+                        left: 10,  // Space on the left
+                        right: 10  // Space on the right
+                    }
+                },
                 scales: {
                     x: {
                         title: { display: true, text: 'Month' },
+                        ticks: {
+                            padding: 10 // Space between the x-axis labels and the chart
+                        }
                     },
                     y: {
                         title: { display: true, text: 'Revenue (NPR)' },
                         beginAtZero: true,
+                        ticks: {
+                            padding: 10 // Space between the y-axis labels and the chart
+                        }
+                    }
+                }
+            }
+        });
+    
+        // Donut Chart Data
+        const donutLabels = [];
+        const donutData = [];
+        
+        {% for month, revenue in forecast %}
+            donutLabels.push("{{ month }}");  // Add month name
+            donutData.push({{ revenue|floatformat:2 }});  // Add revenue value
+        {% endfor %}
+        
+        // Donut Chart Configuration
+        const ctxDonut = document.getElementById('forecastDonut').getContext('2d');
+        new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: donutLabels,
+                datasets: [{
+                    data: donutData,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 20,   // Space above the donut chart
+                        bottom: 20, // Space below the donut chart
+                        left: 10,  // Space on the left
+                        right: 10  // Space on the right
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom', // Position the legend below the chart
+                        labels: {
+                            padding: 20 // Space between the legend labels and chart
+                        }
                     }
                 }
             }
         });
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/script.js' %}"></script>
     <script src="{% static 'js/init-alpine.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
