@@ -174,6 +174,10 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("ajax-sector-button").addEventListener("click", function(){
         handleFormSubmission("sectorForm", "sector", "crud-modal", "sector_name");
     });
+
+    document.getElementById("ajax-service-button").addEventListener("click", function(){
+        handleFormSubmission("serviceForm", "service", "service-crud-modal", "service_name");
+    });
 });
 
 // Toggle Via Fields

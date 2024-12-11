@@ -48,5 +48,3 @@ class RequestAdmin(admin.ModelAdmin):
 @admin.register(Minute)
 class MinuteAdmin(admin.ModelAdmin):
     list_display = ('date', 'company', 'requirement', 'contact', 'action', 'remark')
-
-admin.site.register(CompanyPerformance)

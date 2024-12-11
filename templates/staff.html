@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Staff</title>
+    <title>Employees</title>
     <link rel="apple-touch-icon" sizes="180x180" href="{% static '/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static '/favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static '/favicon/favicon-16x16.png' %}">
@@ -65,7 +65,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                             </svg>
-                            <span class="ml-4">Staff</span>
+                            <span class="ml-4">Employees</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -74,14 +74,6 @@
                                 <path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
                             </svg>
                             <span class="ml-4">Meeting Minutes</span>
-                        </a>
-                    </li>
-                    <li class="relative px-6 py-3">
-                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'forecasting_all_companies' %}">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-                            </svg>                              
-                            <span class="ml-4">Expected Revenue</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -176,7 +168,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                             </svg>
-                            <span class="ml-4">Staff</span>
+                            <span class="ml-4">Employees</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -291,7 +283,7 @@
             
             <main class="h-full overflow-y-auto" id="main-staff-content">
                 <div class="container px-6 mx-auto grid">
-                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Staff</h2>
+                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Employees</h2>
 
                     <!-- Requirement -->
                     <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
@@ -325,17 +317,6 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Total Staff</p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">{{ staff_count }}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-                            <div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <div>
                                 <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Inactive Account</p>
                                 <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">{{ inactive_count }}</p>
                             </div>
@@ -344,7 +325,7 @@
 
                     <div class="flex justify-end mb-2">
                         <button type="button" id="add-staff-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="flex items-center justify-between w-52 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                            Add Staff
+                            Add Employees
                             <span class="ml-2" aria-hidden="true">+</span>
                         </button>
                     </div>
@@ -445,20 +426,20 @@
                 </div>
             </main>
 
-            <!-- New Staff Form -->
+            <!-- New Employees Form -->
             <div id="new-staff-form" style="display: none;">
                 <main class="h-full pb-16 overflow-y-auto">
                     <form id="staffForm" action="{% url 'add_newstaff' %}" method="POST">
                         <div class="container px-6 mx-auto grid">
-                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">New Staff Form</h2>
+                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">New Employees Form</h2>
                   
-                            <!-- Staff Inputs -->
+                            <!-- Employees Inputs -->
                             {% csrf_token %}
-                            <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Staff Information</h4>
+                            <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Employees Information</h4>
                             <div class="px-4 py-5 mb-8 flex items-center justify-center bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <div class="w-[400px] grid gap-4">
                                     <div>
-                                        <label for="staff-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Staff Name</label>
+                                        <label for="staff-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Employees Name</label>
                                         <input type="text" id="staff-name" name="staff-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter staff name" required/>
                                     </div>
             
@@ -468,7 +449,7 @@
                                             <select id="role" name="role" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                                 <option value="" selected>Choose a role</option>
                                                 <option value="Admin">Admin</option>
-                                                <option value="Staff">Staff</option>
+                                                <option value="Staff">Employee</option>
                                             </select>
                                         </div>
                                     </div>
@@ -501,7 +482,7 @@
     </div>
     
     <script>
-        // New Staff Form Toggle
+        // New Employees Form Toggle
         window.addEventListener('DOMContentLoaded', () => {
             var urlParams = new URLSearchParams(window.location.search);
 
@@ -538,7 +519,7 @@
     </script>
 
     <script>
-        // Staff Status Toggle
+        // Employees Status Toggle
         document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('.status-checkbox');
             

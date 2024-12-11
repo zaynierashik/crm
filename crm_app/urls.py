@@ -42,7 +42,6 @@ urlpatterns = [
 
     path('handle-decision/', views.handle_decision, name='handle_decision'),
 
-
     # User
     path('user/', views.user, name='user'),
     path('add-new-user/', views.add_newuser, name='add_newuser'),
@@ -62,7 +61,8 @@ urlpatterns = [
     path('update-contact/', views.update_contact, name='update_contact'),
 
     path('delete-request/<int:id>/', views.delete_request, name='delete_request'),
-    path('delete_contact/<int:contact_id>/', views.delete_contact, name='delete_contact'),
+    path('delete-contact/<int:id>/', views.delete_contact, name='delete_contact'),
+    # path('delete_contact/<int:contact_id>/', views.delete_contact, name='delete_contact'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),
@@ -77,13 +77,9 @@ urlpatterns = [
 
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),
+    path('add-service/', views.add_service, name='add_service'),
 
-    # Clustering
-    path('cluster-companies/', views.cluster_companies, name='cluster_companies'),
-    path('forecasting-companies/<int:company_id>/', views.forecast_company_revenue, name='forecasting_companies'),
-    path('forecasting-all-companies/', views.forecast_all_company_revenues, name='forecasting_all_companies'),
-
-    #forgot password
+    #Reset Password
     path('reset_password/',views.reset_password, name='reset_password'),
     path('reset_code/',views.reset_code, name='reset_code'),
     path('reset_passwordDone/',views.reset_passwordDone, name='reset_passwordDone'),

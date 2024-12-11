@@ -14,7 +14,11 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
 </head>
 <body>
-    <div class="flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900" x-data="{ showLogin: true }">
+    <div class="min-h-screen p-6 bg-gray-50 dark:bg-gray-900" x-data="{ showLogin: true }">
+        <div class="flex justify-center mt-7 mb-16" id="company-logo">
+            <img class="w-24 h-2w-24" src="{% static 'img/logo.png' %}" alt="Green Tech Concern Pvt. Ltd."/>
+        </div>
+        
         <div class="flex-1 h-full max-w-4xl mx-auto overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
             <div class="flex flex-col overflow-y-auto md:flex-row">
                 <div class="h-32 md:h-auto md:w-1/2">
@@ -40,11 +44,12 @@
                             </div>
                             <button type="submit" class="text-white bg-purple-600 hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full mt-6 py-2.5 shadow-lg text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">Log In</button>
                         </form>
-                        <hr class="mt-7 mb-3" />
 
-                        <p class="text-end">
+                        <p class="text-start mt-3">
                             <a @click="showLogin = false" class="text-sm font-normal text-purple-600 dark:text-purple-400" style="cursor: pointer;">Create Account</a>
                         </p>
+
+                        <hr class="my-3" />
                         <p class="text-end mt-3">
                             <a @click="showLogin = true" class="text-sm font-normal text-purple-600 dark:text-purple-400" style="cursor: pointer;" href="{% url 'reset_code' %}">Forgot Password</a>
                         </p>

@@ -103,7 +103,6 @@ class Company(models.Model):
     created_by = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_company')
     date = models.DateField(default=now)
     status = models.BooleanField(default=True)
-    cluster = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.company_name
@@ -133,8 +132,3 @@ class Minute(models.Model):
 
     def __str__(self):
         return f"Minute for {self.company} on {self.date}"
-    
-class CompanyPerformance(models.Model):
-    company = models.ForeignKey('Company', on_delete=models.CASCADE)
-    date = models.DateField()  # Date of performance record
-    revenue = models.FloatField()  # Metric we want to analyze (e.g., revenue)

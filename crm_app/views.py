@@ -25,10 +25,6 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from django.http import JsonResponse
-from .clustering import perform_kmeans_clustering
-
-from statsmodels.tsa.arima.model import ARIMA
-from dateutil.relativedelta import relativedelta
 
 # Login Page
 def login(request):
@@ -545,18 +541,10 @@ def add_newcontact(request):
         designation = request.POST.get('designation')
         email = request.POST.get('email-address')
         contact_number = request.POST.get('contact-number')
-        dob = request.POST.get('date')
-        religion = request.POST.get('religion')
+        # dob = request.POST.get('date')
+        # religion = request.POST.get('religion')
 
-        if dob:
-            try:
-                dob = datetime.strptime(dob, '%Y-%m-%d').date()
-            except ValueError:
-                dob = None
-        else:
-            dob = None
-
-        contact = Contact(company=company, contact_name=contact_name, designation=designation, email=email, phone_number=contact_number, DOB=dob, religion=religion)
+        contact = Contact(company=company, contact_name=contact_name, designation=designation, email=email, phone_number=contact_number)
         contact.save()
         return redirect(reverse('contact'))
     
@@ -573,15 +561,15 @@ def update_contact(request):
         contact_obj.designation = request.POST.get('designation')
         contact_obj.email = request.POST.get('email-address')
         contact_obj.phone_number = request.POST.get('contact-number')
-        # contact_obj.DOB = request.POST.get('date')
+        contact_obj.DOB = request.POST.get('date')
 
-        # dob = request.POST.get('date')
-        # if dob:
-        #     contact_obj.DOB = dob
-        # else:
-        #     contact_obj.DOB = None
+        dob = request.POST.get('date')
+        if dob:
+            contact_obj.DOB = dob
+        else:
+            contact_obj.DOB = None
             
-        # contact_obj.religion = request.POST.get('religion')
+        contact_obj.religion = request.POST.get('religion')
         contact_obj.save()
         messages.success(request, "Contact updated successfully.")
         
@@ -807,15 +795,18 @@ def delete_request(request, id):
 
     if request.method == "POST":
         request_to_delete.delete()
-        messages.success(request, f"Request '{request_to_delete.requirement_type}' has been deleted.")
         return redirect('requirement')
     
     return redirect('requirement')
 
 # Delete Contact
-def delete_contact(request, contact_id):
-    contact = get_object_or_404(Contact, id=contact_id)
-    contact.delete()
+def delete_contact(request, id):
+    contact_to_delete = get_object_or_404(Contact, id=id)
+
+    if request.method == "POST":
+        contact_to_delete.delete()
+        return redirect('contact')
+    
     return redirect('contact')
     
 # New Requirement Submission
@@ -1381,87 +1372,6 @@ def export_excel(request, company_id):
     response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
     return response
 
-#K-means ALgorithm
-def cluster_companies(request):
-    clusters = perform_kmeans_clustering()
-    return JsonResponse({'clusters': clusters.tolist()})
-
-#ARIMA Algorithm
-def fetch_company_revenue(company_id):
-    # Fetch data for the selected company, ordered by date
-    queryset = CompanyPerformance.objects.filter(company_id=company_id).order_by('date')
-    data = pd.DataFrame(list(queryset.values('date', 'revenue')))
-    
-    # Set the date as the index for time series analysis
-    data.set_index('date', inplace=True)
-    return data['revenue']
-
-def apply_arima_model(time_series_data, order=(1, 1, 1)):
-    # Fit ARIMA model
-    model = ARIMA(time_series_data, order=order)
-    model_fit = model.fit()
-    
-    # Print the summary (optional) and return predictions
-    print(model_fit.summary())
-    
-    # Forecast next 5 periods
-    forecast = model_fit.forecast(steps=5)
-    return forecast
-
-def forecast_company_revenue(request, company_id):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-    
-    time_series_data = fetch_company_revenue(company_id)
-    forecast_data = apply_arima_model(time_series_data)  # This gives the forecasted values
-
-    # Get the last date in the time series data to calculate future months
-    last_date = time_series_data.index[-1]
-    forecast = []
-
-    # Generate month names with revenue values
-    for i, revenue in enumerate(forecast_data.tolist()):
-        forecast_month = (last_date + relativedelta(months=i+1)).strftime('%B %Y')
-        forecast.append((forecast_month, revenue))
-
-    # Pass the forecast data to the template
-    return render(request, "forecastingdetails.html", {"forecast": forecast, 'user': user})
-
-def get_all_company_ids():
-    # Fetch all unique company IDs from the CompanyPerformance model
-    queryset = CompanyPerformance.objects.values_list('company_id', flat=True).distinct()
-    return list(queryset)
-
-def forecast_all_company_revenues(request):
-    if 'staff_id' not in request.session:
-        return redirect('login')
-    
-    staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
-
-    company_ids = get_all_company_ids()
-    predictions = []  # List of dictionaries to store company ID, name, and revenue
-    value = []
-    
-    for company_id in company_ids:
-        time_series_data = fetch_company_revenue(company_id)
-        forecast = apply_arima_model(time_series_data)
-        
-        # Get company details
-        company = Company.objects.get(id=company_id)
-        first_month_forecast = forecast.values.tolist()[0]
-        
-        # Add details to predictions and value list
-        predictions.append({"id": company.id, "name": company.company_name, "revenue": first_month_forecast})
-        value.append(first_month_forecast)
-    
-    output = sum(value)
-
-    return render(request, "forecasting.html", {"output": output, "predictions": predictions, "user": user})
-
 # Extra Views
 def approve_request_view(request, request_id):
     req = get_object_or_404(Request, id=request_id)
@@ -1497,6 +1407,22 @@ def add_sector(request):
         return redirect('company_profile')
     else:
         return render(request, 'companyprofile.html')
+    
+def add_service(request):
+    if 'user_id' not in request.session:
+        return redirect('user')
+
+    if request.method == 'POST':
+        service_name = request.POST.get('service-name')
+
+        if Service.objects.filter(service_name=service_name).exists():
+            return redirect(reverse('requirement'))
+
+        service = Service(service_name=service_name)
+        service.save()
+        return redirect('requirement')
+    else:
+        return render(request, 'requirement.html')
 
 # Client Forgot Password
 def forget_pass(request):
