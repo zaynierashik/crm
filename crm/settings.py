@@ -136,10 +136,3 @@ MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # SMTP
-
-EMAIL_HOST ='smtp-relay.brevo.com'
-EMAIL_PORT =587
-EMAIL_USE_TLS =True
-EMAIL_HOST_USER ='79d424001@smtp-brevo.com'
-EMAIL_HOST_PASSWORD ='xsmtpsib-4d9f18219fb0f5d7854ff7377b51b7766173e2a5a42d2e74d1c82ba430d2c1a0-dZ2cCwFQGPYLBOJp'
-DEFAULT_FROM_EMAIL ='zaynierashik@gmail.com'
