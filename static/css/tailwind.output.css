@@ -6792,6 +6792,10 @@ video {
   padding: 2rem;
 }
 
+.p-\[11\.25px\] {
+  padding: 11.25px;
+}
+
 .p-\[11\.5px\] {
   padding: 11.5px;
 }
@@ -6814,10 +6818,6 @@ video {
 
 .p-px {
   padding: 1px;
-}
-
-.p-\[11\.25px\] {
-  padding: 11.25px;
 }
 
 .px-0 {
@@ -7033,6 +7033,16 @@ video {
 .py-px {
   padding-top: 1px;
   padding-bottom: 1px;
+}
+
+.py-\[11px\] {
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+.py-\[9\.5px\] {
+  padding-top: 9.5px;
+  padding-bottom: 9.5px;
 }
 
 .pb-0 {

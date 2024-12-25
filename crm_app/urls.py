@@ -13,18 +13,22 @@ urlpatterns = [
     path('transaction/', views.transaction, name='transaction'),
     path('sector/', views.sector, name='sector'),
     path('service/', views.service, name='service'),
+    path('product/', views.product, name='product'),
     path('brand/', views.brand, name='brand'),
 
     path('company-details/<int:company_id>/', views.companydetails, name='companydetails'),
     path('contract-details/<int:company_id>/<int:requirement_id>/', views.contractdetails, name='contractdetails'),
     path('task-details/<int:task_id>/', views.taskdetails, name='taskdetails'),
+    path('requirementform/', views.requirementform, name='requirementform'),
 
     path('add-new-company/', views.add_newcompany, name='add_newcompany'),
     path('add-new-requirement/', views.add_newrequirement, name='add_newrequirement'),
+    path('add-requirement/', views.add_requirement, name='add_requirement'),
     path('add-new-staff/', views.add_newstaff, name='add_newstaff'),
     path('add-new-transaction/', views.add_newtransaction, name='add_newtransaction'),
     path('add-new-sector/', views.add_newsector, name='add_newsector'),
     path('add-new-service/', views.add_newservice, name='add_newservice'),
+    path('add-new-product/', views.add_newproduct, name='add_newproduct'),
     path('add-new-brand/', views.add_newbrand, name='add_newbrand'),
 
     path('add-transaction/<int:company_id>/<int:requirement_id>/', views.add_transaction, name='add_transaction'),
@@ -38,9 +42,10 @@ urlpatterns = [
     path('task/<int:task_id>/update_status/', views.update_task_status, name='update_task_status'),
     path('update-sector/', views.update_sector, name='update_sector'),
     path('update-service/', views.update_service, name='update_service'),
+    path('update-product/', views.update_product, name='update_product'),
     path('update-brand/', views.update_brand, name='update_brand'),
 
-    path('handle-decision/', views.handle_decision, name='handle_decision'),
+    # path('handle-decision/', views.handle_decision, name='handle_decision'),
 
     # User
     path('user/', views.user, name='user'),

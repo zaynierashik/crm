@@ -16,7 +16,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <div class="flex h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
+    <div class="flex min-h-screen bg-gray-50 dark:bg-gray-900" :class="{ 'overflow-hidden': isSideMenuOpen }">
         <!-- Desktop sidebar -->
         <aside class="z-20 hidden w-64 overflow-y-auto bg-white dark:bg-gray-800 md:block flex-shrink-0">
             <div class="py-4 text-gray-500 dark:text-gray-400">
@@ -106,6 +106,11 @@
                                 <li class="relative px-6 py-3">
                                     <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'brand' %}">
                                         <span class="ml-4">Brand</span>
+                                    </a>
+                                </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
                                     </a>
                                 </li>
                             </ul>
@@ -210,6 +215,11 @@
                                 <li class="relative px-6 py-3">
                                     <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'brand' %}">
                                         <span class="ml-4">Brand</span>
+                                    </a>
+                                </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
                                     </a>
                                 </li>
                             </ul>
@@ -343,7 +353,7 @@
                         </div>
                     </div>
 
-                    <div class="grid gap-4 mb-2 md:grid-cols-2">
+                    <div class="grid gap-4 mb-2 md:grid-cols-3">
                         <div class="mb-5">
                             <div class="relative w-full focus-within:text-purple-500">
                                 <div class="absolute inset-y-0 flex items-center pl-2">
@@ -364,12 +374,12 @@
                             </select>
                         </div>
 
-                        <!-- <div>
+                        <div>
                             <button id="add-company-button" class="flex items-center justify-between w-full p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                                 Add Company
                                 <span class="ml-2" aria-hidden="true">+</span>
                             </button>
-                        </div> -->
+                        </div>
                     </div>
 
                     <!-- Active Companies -->
@@ -380,7 +390,7 @@
                                     <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
                                         <th class="px-4 py-3">Client</th>
                                         <th class="px-4 py-3">City</th>
-                                        <!-- <th class="px-4 py-3"></th> -->
+                                        <th class="px-4 py-3"></th>
                                         <th class="px-4 py-3"></th>
                                         {% if user and user.role == 'Admin' %}
                                         <th class="px-4 py-3"></th>
@@ -396,13 +406,13 @@
                                         </td>
                                         <td class="px-4 py-3 text-sm">{{ company.city|default:"-" }}</td>
                                         
-                                        <!-- <td class="px-4 py-3 text-sm">
+                                        <td class="px-4 py-3 text-sm">
                                             <a href="{% url 'companyeditform' company.id %}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                                 </svg>
                                             </a>                                       
-                                        </td> -->
+                                        </td>
                                         <td class="px-4 py-3 text-sm">
                                             <a href="{% url 'companydetails' company.id %}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
@@ -615,7 +625,7 @@
                             <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <div class="grid gap-4 mb-4 md:grid-cols-2">
                                     <div>
-                                        <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name</label>
+                                        <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name <span class="text-red-600">*</span></label>
                                         <input type="text" id="company-name" name="company-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
                                     </div>
             
@@ -691,6 +701,12 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Connected Event -->
+                            <div class="mb-2">
+                                <h4 class="mb-2 text-lg font-semibold text-gray-600 dark:text-gray-300">Connected Event/Source</h4>
+                                <textarea id="connection" name="connection" rows="4" class="block p-2.5 mb-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mention the event or source of this connection..."></textarea>
+                            </div>
                     
                             <!-- Contact Inputs -->
                             <div class="grid gap-4 mb-2 md:grid-cols-2">
@@ -709,7 +725,7 @@
                                     <div class="contact-form">
                                         <div class="grid gap-4 mb-4 md:grid-cols-2">
                                             <div>
-                                                <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name</label>
+                                                <label for="contact-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Name <span class="text-red-600">*</span></label>
                                                 <input type="text" id="contact-name" name="contact-name[]" class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter contact name" required />
                                             </div>
 
@@ -783,7 +799,7 @@
                     </button>
                 </div>
 
-                <form id="sectorForm" action="{% url 'add_newsector' %}" method="POST" class="p-4 md:p-5">
+                <form id="sectorForm" action="{% url 'add_sector' %}" method="POST" class="p-4 md:p-5">
                     {% csrf_token %}
                     <div class="grid gap-4 mb-4 grid-cols-2">
                         <div class="col-span-2">

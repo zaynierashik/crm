@@ -108,6 +108,11 @@
                                         <span class="ml-4">Brand</span>
                                     </a>
                                 </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
+                                    </a>
+                                </li>
                             </ul>
                         </template>
                     </li>
@@ -210,6 +215,11 @@
                                 <li class="relative px-6 py-3">
                                     <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'brand' %}">
                                         <span class="ml-4">Brand</span>
+                                    </a>
+                                </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
                                     </a>
                                 </li>
                             </ul>
@@ -353,7 +363,7 @@
                     
                             <div>
                                 <button id="add-task-button" class="flex items-center justify-between w-full p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                                    Assign Task
+                                    Add Task
                                     <span class="ml-2" aria-hidden="true">+</span>
                                 </button>
                             </div>
@@ -477,7 +487,7 @@
                 <main class="h-full overflow-y-auto">
                     <form id="taskForm" action="{% url 'assign_newtask' %}" method="POST">
                         <div class="container px-6 mx-auto grid">
-                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Asssign Task</h2>
+                            <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Add Task</h2>
 
                             {% csrf_token %}
                             <div class="px-4 py-5 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">

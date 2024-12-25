@@ -108,6 +108,11 @@
                                         <span class="ml-4">Brand</span>
                                     </a>
                                 </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
+                                    </a>
+                                </li>
                             </ul>
                         </template>
                     </li>
@@ -339,167 +344,19 @@
                         </div>
                     </div>
 
-                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Requests</h2>
-                    <div class="w-full mb-7 overflow-hidden rounded-lg shadow-xs">
-                        <div class="w-full overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap">
-                                <thead>
-                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">Date</th>
-                                        <th class="px-4 py-3">Requirement Type</th>
-                                        <th class="px-4 py-3">Brand</th>
-                                        <th class="px-4 py-3">Product Name</th>
-                                        <th class="px-4 py-3">Service</th>
-                                        <th class="px-4 py-3"></th>
-                                    </tr>
-                                </thead>
-    
-                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                                    {% for request in requests %}
-                                    <tr class="text-gray-700 dark:text-gray-400">
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">{{ request.date }}</p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">{{ request.requirement_type }}</p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if request.requirement_type == "Product" %}
-                                                    {{ request.brand|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if request.requirement_type == "Product" %}
-                                                    {{ request.product_name|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3">
-                                            <p class="font-medium text-sm">
-                                                {% if request.requirement_type == "Service" %}
-                                                    {{ request.service|default:"-" }}
-                                                {% else %}
-                                                    -
-                                                {% endif %}
-                                            </p>
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            <select class="decision-dropdown dark:bg-gray-800" data-request-id="{{ request.id }}">
-                                                <option value="" disabled selected>Choose an option</option>
-                                                <option value="approve">Approve</option>
-                                                <option value="reject">Reject</option>
-                                            </select>                                 
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="7" class="p-3 font-medium text-sm text-center dark:text-gray-400">No requests found.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Request Edit Form -->
-                    <div id="request-edit-crud-modal" x-data="{ requestId: null, requirementType: '', brand: '', product: '', service: '', message: '' }" x-show="requestId !== null"
-                        @request-edit.window="requestId = $event.detail.id; requirementType = $event.detail.requirement_type; brand = $event.detail.brand; product = $event.detail.product_name; service = $event.detail.service; message = $event.detail.requirement_description;"
-                        tabindex="-1" aria-hidden="true" class="fixed top-0 right-0 left-0 z-50 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-
-                        <!-- Modal Content -->
-                        <div class="relative p-4 w-full max-w-4xl max-h-full">
-                            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                                <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
-                                    <h3 class="ml-3 py-1 text-md font-semibold text-gray-900 dark:text-white">Edit Request</h3>
-                                </div>
-
-                                <form id="requestForm" x-ref="requestEditForm" method="POST" action="{% url 'update_request' %}" class="p-4 md:p-5">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="request-id" x-model="requestId">
-                                    <div class="flex gap-4 mb-4">
-                                        <div class="flex-grow w-1/2">
-                                            <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
-                                            <select x-model="requirementType" id="requirement-category" name="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
-                                                <option value="" selected>Choose a requirement category</option>
-                                                <option value="Service">Service</option>
-                                                <option value="Product">Product</option>
-                                            </select>
-                                        </div>
-
-                                        <div x-show="requirementType === 'Service'" class="w-1/2">
-                                            <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
-                                            <select x-model="service" id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option value="" selected>Choose a service</option>
-                                                {% for service in services %}
-                                                    <option value="{{ service.id }}">{{ service.service_name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-
-                                        <div x-show="requirementType === 'Product'" class="w-1/2">
-                                            <div class="grid gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
-                                                    <select x-model="brand" id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                        <option value="" selected>Choose a brand</option>
-                                                        {% for brand in brands %}
-                                                            <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-
-                                                <div>
-                                                    <label for="product" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product</label>
-                                                    <select x-model="product" id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                        <option value="" selected>Choose a product</option>
-                                                        {% for product in products %}
-                                                            <option value="{{ product.id }}">{{ product.product_name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
-                                        <textarea x-model="message" id="message" name="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement..."></textarea>
-                                    </div>
-
-                                    <div class="flex justify-end mt-4">
-                                        <button type="submit" id="update-request-button" class="flex items-center justify-center w-full px-10 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
-                                            Save Changes
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Request Deletion Modal -->
-                    <div x-data="{ showDeleteModal: false, requestId: null, requestName: '' }" x-show="showDeleteModal" class="fixed inset-0 z-10 flex items-center justify-center">
-                        <div class="bg-white p-6 rounded shadow-lg">
-                            <h3 class="text-lg font-semibold">Confirm Deletion</h3>
-                            <p>Are you sure you want to delete the request "<span x-text="requestName"></span>"?</p>
-                            <div class="mt-4 flex justify-end">
-                                <button @click="showDeleteModal = false" class="mr-2 bg-gray-300 px-4 py-2 rounded">Cancel</button>
-                                <form method="POST" x-bind:action="`/requests/delete/${requestId}/`">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Confirm</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Requirements Table -->
-                    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Requirements</h2>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">Requirements</h2>
+                        <div class="flex justify-end items-center">
+                            <a href="{% url 'requirementform' %}">
+                            <button type="button" class="text-white bg-purple-600 hover:bg-purple-800 focus:outline-none font-medium rounded-lg text-sm w-full sm:w-auto p-[11px] text-center dark:bg-purple-600 dark:hover:bg-purple-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
+                                </svg>
+                            </button>
+                        </a>
+                        </div>
+                    </div>
 
                     <div class="w-full overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
@@ -624,6 +481,104 @@
                         </span>
                     </div>
                 </div>
+
+                <!-- Requirement Modal -->
+                <div id="crud-modal" tabindex="-1" data-modal-backdrop="static" aria-hidden="true" class="{% if show_modal %}block{% else %}hidden{% endif %} overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900 bg-opacity-50">
+                    <div class="relative p-4 w-full max-w-5xl max-h-full">
+                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                            <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
+                                <h3 class="ml-3 py-1 text-md font-semibold text-gray-900 dark:text-white">
+                                    Requirement Form
+                                </h3>
+                                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    </svg>
+                                    <span class="sr-only">Close modal</span>
+                                </button>
+                            </div>
+
+                            <form id="requirementForm" action="{% url 'add_requirement' %}" method="POST" class="p-4 md:p-5">
+                                {% csrf_token %}
+                                <div class="flex gap-4 mb-4">
+                                    <div class="flex-grow w-1/2">
+                                        <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
+                                        <select id="requirement-category" name="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option value="" selected>Choose a requirement category</option>
+                                            <option value="Service">Service</option>
+                                            <option value="Product">Product</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- <div id="serviceDiv" class="w-1/2" style="display: none;">
+                                        <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
+                                        <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <option value="" selected>Choose a service</option>
+                                            {% for service in services %}
+                                                <option value="{{ service.id }}">{{ service.service_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div> -->
+
+                                    <div id="serviceDiv" class="w-1/2" style="display: none;">
+                                        <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
+                                        <div class="flex items-center">
+                                            <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="">Choose a service</option>
+                                                {% for service in services %}
+                                                    <option value="{{ service.id }}" {% if service.id == company.service.id %} selected {% endif %}>{{ service.service_name }}</option>
+                                                {% endfor %}
+                                            </select>                                            
+                                                
+                                            <button type="button" id="ajax-service-button" data-modal-target="service-crud-modal" data-modal-toggle="service-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="productDiv" class="w-1/2" style="display: none;">
+                                        <div class="grid gap-4 md:grid-cols-2">
+                                            <div>
+                                                <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
+                                                <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="" selected>Choose a brand</option>
+                                                    {% for brand in brands %}
+                                                        <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                    
+                                            <div>
+                                                <label for="product" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product</label>
+                                                <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                    <option value="" selected>Choose a product</option>
+                                                    {% for product in products %}
+                                                        <option value="{{ product.id }}">{{ product.product_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Description</label>
+                                    <textarea id="message" name="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write about the requirement..."></textarea>
+                                </div>
+
+                                <p class="text-xs mt-3 dark:text-gray-400"><sup>*</sup>Incase of required requirement not present in options, please mention it in requirement description.</p>
+
+                                <div class="flex justify-end mt-4">
+                                    <button type="submit" id="add-service-button" class="flex items-center justify-center w-full px-10 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                                        Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
@@ -649,9 +604,9 @@
     </script>
 
     <script>
-        function openRequestEditModal(requestId, requirementType, brand, product, service, message) {
-            const event = new CustomEvent('request-edit', { 
-                detail: { id: requestId, requirement_type: requirementType, brand: brand, product_name: product, service: service, requirement_description: message }
+        function openRequestEditModal(requirementId, requirementType, brand, product, service, message) {
+            const event = new CustomEvent('requirement-edit', { 
+                detail: { id: requirementId, requirement_type: requirementType, brand: brand, product_name: product, service: service, requirement_description: message }
             });
             window.dispatchEvent(event);
         }
@@ -660,8 +615,8 @@
     <script>
         function openDeleteModal(id, name) {
             const modal = document.querySelector('[x-data]');
-            modal.__x.$data.requestId = id;
-            modal.__x.$data.requestName = name;
+            modal.__x.$data.requirementId = id;
+            modal.__x.$data.requirementName = name;
             modal.__x.$data.showDeleteModal = true;
         }
     </script>
@@ -669,7 +624,7 @@
     <script>
         document.querySelectorAll('.decision-dropdown').forEach(dropdown => {
             dropdown.addEventListener('change', function () {
-                let requestId = this.getAttribute('data-request-id');
+                let requirementId = this.getAttribute('data-requirement-id');
                 let decision = this.value;
 
                 fetch('/handle-decision/', {
@@ -678,7 +633,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': '{{ csrf_token }}'  // Ensure you have the CSRF token in your template
                     },
-                    body: JSON.stringify({ request_id: requestId, decision: decision })
+                    body: JSON.stringify({ requirement_id: requirementId, decision: decision })
                 })
                 .then(response => response.json())
                 .then(data => {

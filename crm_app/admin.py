@@ -41,10 +41,6 @@ class RequirementAdmin(admin.ModelAdmin):
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('title', 'assigned_to', 'due_date', 'status')
 
-@admin.register(Request)
-class RequestAdmin(admin.ModelAdmin):
-    list_display = ('requirement_type', 'company', 'brand', 'product_name', 'service')
-
 @admin.register(Minute)
 class MinuteAdmin(admin.ModelAdmin):
     list_display = ('date', 'company', 'requirement', 'contact', 'action', 'remark')

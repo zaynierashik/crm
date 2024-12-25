@@ -46,19 +46,6 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
-    
-class Request(models.Model):
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_requests')
-    date = models.DateField(default=now)
-    requirement_type = models.CharField(max_length=100)
-    brand = models.ForeignKey('Brand', on_delete=models.SET_NULL, null=True, blank=True, related_name='brand_requests')
-    product_name = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, blank=True, related_name='product_requests')
-    service = models.ForeignKey('Service', on_delete=models.SET_NULL, null=True, blank=True, related_name='service_requests')
-    requirement_description = models.TextField(null=True, blank=True)
-    is_approved = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.requirement_type
 
 class Requirement(models.Model):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='company_requirements')
@@ -100,7 +87,8 @@ class Company(models.Model):
     via = models.CharField(max_length=100, null=True, blank=True)
     referral_name = models.CharField(max_length=100, null=True, blank=True)
     website = models.CharField(max_length=255, null=True, blank=True)
-    created_by = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_company')
+    connection = models.TextField(null=True, blank=True)
+    created_by = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_companies')
     date = models.DateField(default=now)
     status = models.BooleanField(default=True)
 

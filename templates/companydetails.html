@@ -71,6 +71,14 @@
                     {% endif %}
                     
                     <li class="relative px-6 py-3">
+                        <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'transaction' %}">
+                            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                                <path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
+                            </svg>
+                            <span class="ml-4">Meeting Minutes</span>
+                        </a>
+                    </li>
+                    <li class="relative px-6 py-3">
                         <button class="inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" @click="togglePagesMenu" aria-haspopup="true">
                             <span class="inline-flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -97,6 +105,11 @@
                                 <li class="relative px-6 py-3">
                                     <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'brand' %}">
                                         <span class="ml-4">Brand</span>
+                                    </a>
+                                </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
                                     </a>
                                 </li>
                             </ul>
@@ -173,7 +186,7 @@
                             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
-                            <span class="ml-4">Transaction</span>
+                            <span class="ml-4">Meeting Minutes</span>
                         </a>
                     </li>
                     <li class="relative px-6 py-3">
@@ -201,6 +214,11 @@
                                 <li class="relative px-6 py-3">
                                     <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'brand' %}">
                                         <span class="ml-4">Brand</span>
+                                    </a>
+                                </li>
+                                <li class="relative px-6 py-3">
+                                    <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200" href="{% url 'product' %}">
+                                        <span class="ml-4">Product</span>
                                     </a>
                                 </li>
                             </ul>
@@ -485,7 +503,7 @@
 
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div class="mb-4">
-                                        <label for="contact-person" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person</label>
+                                        <label for="contact-person" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Person <span class="text-red-600">*</span></label>
                                         <select id="contact-person" name="contact-person" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                             <option value="" selected>Choose a contact person</option>
                                             {% for contact in contacts %}
@@ -495,14 +513,14 @@
                                     </div>
 
                                     <div>
-                                        <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
+                                        <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date <span class="text-red-600">*</span></label>
                                         <input id="date" name="date" type="date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date" required>
                                     </div>
                                 </div>
 
                                 <div class="flex gap-4 mb-4">
                                     <div class="flex-grow w-1/2">
-                                        <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category</label>
+                                        <label for="requirement-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Requirement Category <span class="text-red-600">*</span></label>
                                         <select id="requirement-category" name="requirement-category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                             <option value="" selected>Choose a requirement category</option>
                                             <option value="Service">Service</option>
@@ -552,7 +570,7 @@
 
                                 <div class="grid gap-4 md:grid-cols-2">
                                     <div>
-                                        <label for="price" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                                        <label for="price" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Price <span class="text-red-600">*</span></label>
                                         <div class="flex items-center">
                                             <div class="relative w-24">
                                                 <select id="currency" name="currency" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-s-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-1 py-[10px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -563,13 +581,13 @@
                                             </div>
                                                 
                                             <div class="relative w-full">
-                                                <input type="number" id="price" name="price" min="0" class="block ps-2.5 py-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
+                                                <input type="number" id="price" name="price" min="0" class="block ps-2.5 py-[9.5px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-e-lg border-s-0 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter amount" required />
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div>
-                                        <label for="progress" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                                        <label for="progress" class="block mt-4 mb-2 text-sm font-medium text-gray-900 dark:text-white">Status <span class="text-red-600">*</span></label>
                                         <select id="progress" name="progress" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                             <option value="" selected>Choose a status</option>
                                             <option value="Initiated">Initiated</option>

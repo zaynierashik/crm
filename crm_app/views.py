@@ -252,7 +252,7 @@ def add_newcompany(request):
         return redirect('login')
     
     staff_id = request.session.get('staff_id')
-    user = Staff.objects.get(id=staff_id)
+    staff = Staff.objects.get(id=staff_id)
 
     if request.method == 'POST':
         company_name = request.POST.get('company-name')
@@ -277,13 +277,14 @@ def add_newcompany(request):
         country = request.POST.get('country')
         via = request.POST.get('via')
         website = request.POST.get('website')
-        
+        connection = request.POST.get('connection')
+
         if via == 'Referral':
             referral = request.POST.get('referral')
         else:
             referral = None
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, created_by=user)
+        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, connection=connection, created_by=staff)
         company.save()
 
         contact_names = request.POST.getlist('contact-name[]')
@@ -296,7 +297,7 @@ def add_newcompany(request):
         for i in range(len(contact_names)):
             if contact_names[i]:
                 dob = dobs[i] if dobs[i] else None
-                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], dob=dob, religion=religions[i])
+                contact_person = Contact(company=company, contact_name=contact_names[i], designation=designations[i], email=emails[i], phone_number=contact_numbers[i], DOB=dob, religion=religions[i])
                 contact_person.save()
                 
         return redirect(reverse('company'))
@@ -333,9 +334,6 @@ def contract(request):
     brands = Brand.objects.values('id', 'brand_name').order_by('brand_name')
     products = Product.objects.values('id', 'product_name').order_by('product_name')
 
-    requests = Request.objects.all()
-
-    total_request = Request.objects.count()
     total_requirement = Requirement.objects.count()
     pipeline_count = Requirement.objects.filter(progress="Pipeline").count()
     completed_count = Requirement.objects.filter(progress="Completed").count()
@@ -350,41 +348,41 @@ def contract(request):
     except EmptyPage:
         requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'user': user, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'requests': requests, 'total_request': total_request, 'total_requirement': total_requirement, 
+    context = {'user': user, 'requirements': requirements, 'services': services, 'brands': brands, 'products': products, 'total_requirement': total_requirement, 
                'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
     
     return render(request, 'contract.html', context)
 
 # Request Decision Part
-@csrf_exempt
-def handle_decision(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        request_id = data.get('request_id')
-        decision = data.get('decision')
+# @csrf_exempt
+# def handle_decision(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         request_id = data.get('request_id')
+#         decision = data.get('decision')
 
-        try:
-            req = Request.objects.get(id=request_id)
-            if decision == 'approve':
-                # Move the request to Requirement
-                Requirement.objects.create(
-                    company=req.company,
-                    date=req.date,
-                    requirement_type=req.requirement_type,
-                    brand=req.brand,
-                    product_name=req.product_name,
-                    service=req.service,
-                    requirement_description=req.requirement_description,
-                    status="Approved",
-                    progress="Initiated"
-                )
-                req.delete()  # Delete the original request after approval
-            elif decision == 'reject':
-                req.delete()  # Delete the request if rejected
-            return JsonResponse({'status': 'success'})
-        except Request.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Request not found'}, status=404)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+#         try:
+#             req = Request.objects.get(id=request_id)
+#             if decision == 'approve':
+#                 # Move the request to Requirement
+#                 Requirement.objects.create(
+#                     company=req.company,
+#                     date=req.date,
+#                     requirement_type=req.requirement_type,
+#                     brand=req.brand,
+#                     product_name=req.product_name,
+#                     service=req.service,
+#                     requirement_description=req.requirement_description,
+#                     status="Approved",
+#                     progress="Initiated"
+#                 )
+#                 req.delete()  # Delete the original request after approval
+#             elif decision == 'reject':
+#                 req.delete()  # Delete the request if rejected
+#             return JsonResponse({'status': 'success'})
+#         except Request.DoesNotExist:
+#             return JsonResponse({'status': 'error', 'message': 'Request not found'}, status=404)
+#     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 # Tasks Page
 def task(request):
@@ -469,39 +467,39 @@ def assign_newtask(request):
 
 # Requirement Page
 def requirement(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
+    # if 'user_id' not in request.session:
+    #     return redirect('user')
     
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(User, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object_or_404(User, id=user_id)
 
-    company = Company.objects.filter(created_by=user).first()
+    # company = Company.objects.filter(created_by=user).first()
 
-    services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
-    brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
-    products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
-    requests = Request.objects.filter(company=company).order_by('-date')
-    requirements = Requirement.objects.filter(company=company).order_by('-date')
+    # services = Service.objects.values('id', 'service_name').distinct().order_by('service_name')
+    # brands = Brand.objects.values('id', 'brand_name').distinct().order_by('brand_name')
+    # products = Product.objects.values('id', 'product_name').distinct().order_by('product_name')
+    # requests = Request.objects.filter(company=company).order_by('-date')
+    # requirements = Requirement.objects.filter(company=company).order_by('-date')
 
-    total_request = Request.objects.filter(company=company).count()
-    total_requirement = Requirement.objects.filter(company=company).count()
-    pipeline_count = Requirement.objects.filter(company=company, progress="Pipeline").count()
-    completed_count = Requirement.objects.filter(company=company, progress="Completed").count()
+    # total_request = Request.objects.filter(company=company).count()
+    # total_requirement = Requirement.objects.filter(company=company).count()
+    # pipeline_count = Requirement.objects.filter(company=company, progress="Pipeline").count()
+    # completed_count = Requirement.objects.filter(company=company, progress="Completed").count()
 
-    paginator = Paginator(requirements, 10)
-    page = request.GET.get('requirements_page')
+    # paginator = Paginator(requirements, 10)
+    # page = request.GET.get('requirements_page')
 
-    try:
-        requirements_page = paginator.page(page)
-    except PageNotAnInteger:
-        requirements_page = paginator.page(1)
-    except EmptyPage:
-        requirements_page = paginator.page(paginator.num_pages)
+    # try:
+    #     requirements_page = paginator.page(page)
+    # except PageNotAnInteger:
+    #     requirements_page = paginator.page(1)
+    # except EmptyPage:
+    #     requirements_page = paginator.page(paginator.num_pages)
 
-    context = {'services': services, 'brands': brands, 'products': products, 'requests': requests, 'requirements': requirements, 'user': user, 'total_request': total_request, 'total_requirement': total_requirement, 
-               'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
+    # context = {'services': services, 'brands': brands, 'products': products, 'requests': requests, 'requirements': requirements, 'user': user, 'total_request': total_request, 'total_requirement': total_requirement, 
+    #            'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
 
-    return render(request, 'requirement.html', context)
+    return render(request, 'requirement.html')
 
 # Contact Page
 def contact(request):
@@ -677,6 +675,30 @@ def service(request):
 
     return render(request, 'service.html', context)
 
+# Product
+def product(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+    
+    staff_id = request.session.get('staff_id')
+    user = Staff.objects.get(id=staff_id)
+
+    products = Product.objects.order_by('product_name')
+    product_count = Product.objects.count()
+    paginator = Paginator(products, 10)
+    page = request.GET.get('page')
+
+    try:
+        product_page = paginator.page(page)
+    except PageNotAnInteger:
+        product_page = paginator.page(1)
+    except EmptyPage:
+        product_page = paginator.page(paginator.num_pages)
+
+    context = {'products': products, 'product_count': product_count, 'products': product_page, 'paginator': paginator, 'page_obj': product_page, 'user': user}
+
+    return render(request, 'product.html', context)
+
 # Brand Page
 def brand(request):
     if 'staff_id' not in request.session:
@@ -808,9 +830,25 @@ def delete_contact(request, id):
         return redirect('contact')
     
     return redirect('contact')
+
+def requirementform(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
     
+    staff_id = request.session.get('staff_id')
+    user = get_object_or_404(Staff, id=staff_id)
+
+    companies = Company.objects.all()
+    contacts = Contact.objects.select_related('company').all()
+    services = Service.objects.all()
+    brands = Brand.objects.all()
+    products = Product.objects.all()
+
+    context = {'companies': companies, 'contacts': contacts, 'services': services, 'brands': brands, 'products': products, 'user': user}
+    return render(request, 'requirementform.html', context)
+
 # New Requirement Submission
-def add_newrequirement(request):
+def add_requirement(request):
     if request.method == 'POST':
         company_id = request.POST.get('company-name')
         contact_id = request.POST.get('contact-person')
@@ -933,6 +971,24 @@ def add_newservice(request):
         return redirect(reverse('service'))
     else:
         return render(request, 'service.html')
+    
+# New Product Submission
+def add_newproduct(request):
+    if 'staff_id' not in request.session:
+        return redirect('login')
+
+    if request.method == 'POST':
+        product_name = request.POST.get('product-name')
+
+        if Product.objects.filter(product_name=product_name).exists():
+            return redirect(reverse('product'))
+
+        product = Product(product_name=product_name)
+        product.save()
+
+        return redirect(reverse('product'))
+    else:
+        return render(request, 'product.html')
     
 # New Brand Submission
 def add_newbrand(request):
@@ -1095,6 +1151,7 @@ def update_company(request, company_id):
         company.via = request.POST['via']
         company.referral_name = request.POST.get('referral_name', '')
         company.website = request.POST['website']
+        company.connection = request.POST['connection']
         company.save()
 
         contact_ids = request.POST.getlist('contact_id[]')
@@ -1124,12 +1181,12 @@ def update_company(request, company_id):
             contact.religion = religions[i]
             contact.save()
 
-        return redirect('company_profile')
+        return redirect('companyeditform', company_id=company_id)
 
     sectors = Sector.objects.all()
     contacts = Contact.objects.filter(company=company)
 
-    return render(request, 'companyprofile.html', {'company': company, 'sectors': sectors, 'contacts': contacts})
+    return render(request, 'company.html', {'company': company, 'sectors': sectors, 'contacts': contacts})
 
 # Update Task Status
 def update_task_status(request, task_id):
@@ -1231,6 +1288,18 @@ def update_service(request):
     service.save()
 
     return redirect('service')
+
+# Update Product
+@require_POST
+def update_product(request):
+    product_id = request.POST.get('product-id')
+    product_name = request.POST.get('product-name')
+    product = get_object_or_404(Product, id=product_id)
+
+    product.product_name = product_name
+    product.save()
+
+    return redirect('product')
 
 # Update Brand
 @require_POST
@@ -1393,20 +1462,20 @@ def requirement_list_view(request):
 
 # AJAX
 def add_sector(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
+    if 'staff_id' not in request.session:
+        return redirect('staff')
 
     if request.method == 'POST':
         sector_name = request.POST.get('sector-name')
 
         if Sector.objects.filter(sector_name=sector_name).exists():
-            return redirect(reverse('company_profile'))
+            return redirect(reverse('company') + '?add-company')
 
         sector = Sector(sector_name=sector_name)
         sector.save()
-        return redirect('company_profile')
+        return redirect(reverse('company') + '?add-company')
     else:
-        return render(request, 'companyprofile.html')
+        return render(request, 'company.html')
     
 def add_service(request):
     if 'user_id' not in request.session:
