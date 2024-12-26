@@ -628,52 +628,30 @@
                                         <label for="company-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company Name <span class="text-red-600">*</span></label>
                                         <input type="text" id="company-name" name="company-name" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter company name" required />
                                     </div>
-
-                                    <div class="grid gap-4 md:grid-cols-2">
-                                        <div>
-                                            <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Role</label>
-                                            <select id="role" name="role" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                <option value="Client" {% if not role %} selected {% endif %}>Client</option>
-                                                <option value="Partner" {% if role == 'Partner' %} selected {% endif %}>Partner</option>
-                                            </select>
-                                        </div>                                        
-                
-                                        <div>
-                                            <label for="sector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sector</label>
-                                            <div class="flex items-center">
-                                                <select id="sector" name="sector" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="" selected>Choose a sector</option>
-                                                    {% for sector in sectors %}
-                                                    <option value="{{ sector.id }}">{{ sector.sector_name }}</option>
-                                                    {% endfor %}
-                                                </select>                                            
-                                        
-                                                <button type="button" id="ajax-sector-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11px]">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
-                                                    </svg>
-                                                </button>
-                                            </div>
+            
+                                    <div>
+                                        <label for="sector" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sector</label>
+                                        <div class="flex items-center">
+                                            <select id="sector" name="sector" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                <option value="" selected>Choose a sector</option>
+                                                {% for sector in sectors %}
+                                                <option value="{{ sector.id }}">{{ sector.sector_name }}</option>
+                                                {% endfor %}
+                                            </select>                                            
+                                    
+                                            <button type="button" id="ajax-sector-button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11px]">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="grid gap-4 mb-4 md:grid-cols-4">
                                     <div>
-                                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-                                        <select id="country" name="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                            <option value="" selected>Choose a country</option>
-                                            {% for code, name in country_choices %}
-                                                <option value="{{ code }}">{{ name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
-                                        <select id="state" name="state" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                            <option value="" selected>Choose a state</option>
-                                        </select>
+                                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                                        <input type="text" id="address" name="address" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter address" />
                                     </div>
 
                                     <div>
@@ -682,8 +660,19 @@
                                     </div>
 
                                     <div>
-                                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                                        <input type="text" id="address" name="address" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter address" />
+                                        <label for="state" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">State</label>
+                                        <input type="text" id="state" name="state" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter state" />
+                                    </div>
+
+                                    <div>
+                                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                                        <select id="country" name="country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                            <option value="" selected>Choose a country</option>
+                                            <option value="USA">United States</option>
+                                            <option value="Nepal">Nepal</option>
+                                            <option value="India">India</option>
+                                            <option value="Singapore">Singapore</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -696,23 +685,12 @@
                                                     <option value="" selected>Choose a via</option>
                                                     <option value="Direct">Direct</option>
                                                     <option value="Referral">Referral</option>
-                                                    <option value="Partner">Partner</option>
                                                 </select>
                                             </div>
 
                                             <div id="referralDiv" class="w-full" style="display: none;">
                                                 <label for="referral" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Referral Name</label>
                                                 <input type="text" id="referral" name="referral" class="block p-[9px] w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Enter referral name" />
-                                            </div>
-
-                                            <div id="partnerDiv" class="w-full" style="display: none;">
-                                                <label for="partner" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Partner</label>
-                                                <select id="partner" name="partner" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="" selected>Choose a partner</option>
-                                                    {% for partner in partner_companies %}
-                                                        <option value="{{ partner.id }}">{{ partner.company_name }}</option>
-                                                    {% endfor %}
-                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -839,35 +817,6 @@
         </div>
     </div>
 
-    <!-- Get States -->
-    <script>
-        document.getElementById('country').addEventListener('change', function() {
-            const country = this.value;
-            const stateDropdown = document.getElementById('state');
-
-            // Clear existing states
-            stateDropdown.innerHTML = '<option value="" selected>Choose a state</option>';
-
-            if (country) {
-                // Fetch states based on selected country
-                fetch(`/get-states/?country=${country}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Add states to dropdown
-                        data.states.forEach(state => {
-                            const option = document.createElement('option');
-                            option.value = state;
-                            option.textContent = state;
-                            stateDropdown.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error fetching states:', error);
-                    });
-            }
-        });
-    </script>
-
     <!-- New Company Form Toggle -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -903,22 +852,6 @@
                 document.getElementById('main-company-content').style.display = 'block';
             }
         };
-    </script>
-
-    <!-- Clone & Remove Contact Form -->
-    <script>
-        document.getElementById('add-contact-btn').addEventListener('click', function() {
-            const contactContainer = document.getElementById('contact-container');
-            const newContact = document.querySelector('.contact-item').cloneNode(true);
-            newContact.querySelectorAll('input').forEach(input => input.value = '');
-            contactContainer.appendChild(newContact);
-        });
-
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.classList.contains('remove-contact-btn')) {
-                e.target.closest('.contact-item').remove();
-            }
-        });
     </script>
 
     <script src="{% static 'js/script.js' %}"></script>

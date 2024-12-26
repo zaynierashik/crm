@@ -189,6 +189,17 @@ def company(request):
     staff_id = request.session.get('staff_id')
     user = Staff.objects.get(id=staff_id)
 
+    COUNTRY_CHOICES = [
+        ('Nepal', 'Nepal'),
+        ('India', 'India'),
+        ('Singapore', 'Singapore'),
+    ]
+
+    ROLES = [
+        ('Client', 'Client'),
+        ('Partner', 'Partner')
+    ]
+
     companies = Company.objects.order_by('company_name')
     contacts = Contact.objects.select_related('company').all()
     sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
@@ -198,6 +209,7 @@ def company(request):
     cities = Company.objects.values_list('city', flat=True).distinct().order_by('city')
     staffs = Staff.objects.all()
 
+    partner_companies = Company.objects.filter(role='Partner').order_by('company_name')
     active_companies = Company.objects.filter(status=True).order_by('company_name')
     inactive_companies = Company.objects.filter(status=False).order_by('company_name')
 
@@ -240,8 +252,8 @@ def company(request):
     except EmptyPage:
         inactive_companies_page = paginator_inactive.page(paginator_inactive.num_pages)
 
-    context = {'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
-                'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
+    context = {'country_choices': COUNTRY_CHOICES, 'roles': ROLES, 'companies': companies, 'contacts': contacts, 'sectors': sectors, 'services': services, 'brands': brands, 'products': products, 'cities': cities, 'staffs': staffs, 'company_count': company_count,
+                'initiated_count': initiated_count, 'pipeline_count': pipeline_count, 'completed_count': completed_count, 'partner_companies': partner_companies, 'active_companies': active_companies_page, 'inactive_companies': inactive_companies_page,
                 'paginator_active': paginator_active, 'paginator_inactive': paginator_inactive, 'page_active': page_active, 'page_inactive': page_inactive, 'user': user}
 
     return render(request, 'company.html', context)
@@ -256,6 +268,7 @@ def add_newcompany(request):
 
     if request.method == 'POST':
         company_name = request.POST.get('company-name')
+        role = request.POST.get('role') or 'Client'
 
         if Company.objects.filter(company_name=company_name).exists():
             error_message = "Company with this name already exists!"
@@ -284,7 +297,19 @@ def add_newcompany(request):
         else:
             referral = None
 
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, connection=connection, created_by=staff)
+        # Handle partner company assignment when via is Partner
+        partner_company = None
+        if via == 'Partner':
+            partner_id = request.POST.get('partner')  # Get partner company ID from the form
+            if partner_id:
+                try:
+                    partner_company = Company.objects.get(id=partner_id)
+                except Company.DoesNotExist:
+                    partner_company = None
+            else:
+                partner_company = None
+
+        company = Company(company_name=company_name, role=role, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, partner_company=partner_company, website=website, connection=connection, created_by=staff)
         company.save()
 
         contact_names = request.POST.getlist('contact-name[]')
@@ -604,6 +629,9 @@ def staff(request):
     context = {'staffs': staffs, 'employee_count': employee_count, 'admin_count': admin_count, 'staff_count': staff_count, 'inactive_count': inactive_count, 'staffs': staffs_page, 'paginator': paginator, 'page_obj': staffs_page, 'user': user}
 
     return render(request, 'staff.html', context)
+
+def partner(request):
+    return render(request, 'partner.html')
 
 # Transaction Page
 def transaction(request):
@@ -1112,13 +1140,25 @@ def companyeditform(request, company_id):
     if 'staff_id' not in request.session:
         return redirect('login')
     
+    COUNTRY_CHOICES = [
+        ('Nepal', 'Nepal'),
+        ('India', 'India'),
+        ('Singapore', 'Singapore'),
+    ]
+
+    ROLES = [
+        ('Client', 'Client'),
+        ('Partner', 'Partner')
+    ]
+
+    partner_companies = Company.objects.filter(role='Partner').order_by('company_name')
+    
     company = Company.objects.get(pk=company_id)
     contacts = Contact.objects.filter(company=company)
     sectors = Sector.objects.all()
 
-    countries = ["Nepal", "USA", "India", "Singapore"]
     religions = ["Hinduism", "Buddhism", "Christianity"]
-    return render(request, 'companyeditform.html', {'company': company, 'contacts': contacts, 'sectors': sectors, 'countries': countries, 'religions': religions})
+    return render(request, 'companyeditform.html', {'country_choices': COUNTRY_CHOICES, 'roles': ROLES, 'company': company, 'contacts': contacts, 'sectors': sectors, 'partner_companies': partner_companies, 'religions': religions})
 
 # Edit Requirement Details
 def requirementeditform(request, requirement_id):
@@ -1143,6 +1183,7 @@ def update_company(request, company_id):
 
     if request.method == 'POST':
         company.company_name = request.POST['company_name']
+        company.role = request.POST['role']
         company.sector_id = request.POST['sector']
         company.address = request.POST['address']
         company.city = request.POST['city']
@@ -1150,6 +1191,15 @@ def update_company(request, company_id):
         company.country = request.POST['country']
         company.via = request.POST['via']
         company.referral_name = request.POST.get('referral_name', '')
+        partner_id = request.POST.get('partner', None)
+        if partner_id:
+            try:
+                company.partner_company = Company.objects.get(id=partner_id)
+            except Company.DoesNotExist:
+                company.partner_company = None
+        else:
+            company.partner_company = None
+            
         company.website = request.POST['website']
         company.connection = request.POST['connection']
         company.save()
@@ -1712,3 +1762,25 @@ def admin_reset_passwordDone(request):
     return render(request, "reset_password copy.html", {
         "toast_message": message,
     })
+
+# Get states
+def get_states(request):
+    country = request.GET.get('country')
+    
+    states = {
+        'Nepal': ['Province 1', 'Madhesh Pradesh', 'Bagmati', 'Gandaki', 'Lumbini', 'Karnali', 'Sudurpashchim'],
+        'India': [
+            'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
+            'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra',
+            'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim',
+            'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 
+            'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+            'Lakshadweep', 'Delhi', 'Puducherry'
+        ],
+        'Singapore': ['Central Region', 'East Region', 'North Region', 'North-East Region', 'West Region']
+    }
+
+    # Return an empty list if country is not in the predefined countries
+    states_list = states.get(country, [])
+
+    return JsonResponse({'states': states_list})

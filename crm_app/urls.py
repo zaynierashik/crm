@@ -10,6 +10,7 @@ urlpatterns = [
     path('contract/', views.contract, name='contract'),
     path('task/', views.task, name='task'),
     path('staff/', views.staff, name='staff'),
+    path('partner/', views.partner, name='partner'),
     path('transaction/', views.transaction, name='transaction'),
     path('sector/', views.sector, name='sector'),
     path('service/', views.service, name='service'),
@@ -83,6 +84,8 @@ urlpatterns = [
     # AJAX
     path('add-sector/', views.add_sector, name='add_sector'),
     path('add-service/', views.add_service, name='add_service'),
+
+    path('get-states/', views.get_states, name='get_states'),
 
     #Reset Password
     path('reset_password/',views.reset_password, name='reset_password'),

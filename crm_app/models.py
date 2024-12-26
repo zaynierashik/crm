@@ -78,12 +78,23 @@ class Task(models.Model):
         return f"{self.title} assigned to {self.assigned_to.full_name}"
 
 class Company(models.Model):
+    COUNTRY_CHOICES = [
+        ('Nepal', 'Nepal'),
+        ('India', 'India'),
+        ('Singapore', 'Singapore'),
+    ]
+
+    ROLES = [
+        ('Client', 'Client'),
+        ('Partner', 'Partner')
+    ]
+
     company_name = models.CharField(max_length=100, unique=True)
     sector = models.ForeignKey(Sector, on_delete=models.SET_NULL, null=True, blank=True, related_name='sector_companies')
     address = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     state = models.CharField(max_length=100, null=True, blank=True)
-    country = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, choices=COUNTRY_CHOICES, null=True, blank=True)
     via = models.CharField(max_length=100, null=True, blank=True)
     referral_name = models.CharField(max_length=100, null=True, blank=True)
     website = models.CharField(max_length=255, null=True, blank=True)
@@ -91,6 +102,10 @@ class Company(models.Model):
     created_by = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_companies')
     date = models.DateField(default=now)
     status = models.BooleanField(default=True)
+    role = models.CharField(max_length=100, choices=ROLES, null=True, blank=True, default='Client')
+    
+    # ForeignKey to another Company to represent the Partner company
+    partner_company = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='partners', help_text="Select the partner company", limit_choices_to={'role': 'Partner'})
 
     def __str__(self):
         return self.company_name
