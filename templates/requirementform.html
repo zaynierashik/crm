@@ -337,37 +337,61 @@
                                                     <option value="Product">Product</option>
                                                 </select>
                                             </div>
-            
+
                                             <div id="serviceDiv" class="w-1/2" style="display: none;">
                                                 <label for="service" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service</label>
-                                                <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                    <option value="" selected>Choose a service</option>
-                                                    {% for service in services %}
-                                                        <option value="{{ service.id }}">{{ service.service_name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <div class="flex items-center">
+                                                    <select id="service" name="service" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                        <option value="">Choose a service</option>
+                                                        {% for service in services %}
+                                                            <option value="{{ service.id }}" {% if service.id == company.service.id %} selected {% endif %}>{{ service.service_name }}</option>
+                                                        {% endfor %}
+                                                    </select>                                            
+                                                        
+                                                    <button type="button" id="ajax-service-button" data-modal-target="service-crud-modal" data-modal-toggle="service-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </div>
             
                                             <div id="productDiv" class="w-1/2" style="display: none;">
                                                 <div class="grid gap-4 md:grid-cols-2">
-                                                    <div>
+                                                    <div id="brandDiv">
                                                         <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Brand</label>
-                                                        <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                            <option value="" selected>Choose a brand</option>
-                                                            {% for brand in brands %}
-                                                                <option value="{{ brand.id }}">{{ brand.brand_name }}</option>
-                                                            {% endfor %}
-                                                        </select>
+                                                        <div class="flex items-center">
+                                                            <select id="brand" name="brand" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                                <option value="">Choose a brand</option>
+                                                                {% for brand in brands %}
+                                                                    <option value="{{ brand.id }}" {% if brand.id == company.brand.id %} selected {% endif %}>{{ brand.brand_name }}</option>
+                                                                {% endfor %}
+                                                            </select>                                            
+                                                                
+                                                            <button type="button" id="ajax-brand-button" data-modal-target="brand-crud-modal" data-modal-toggle="brand-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                
-                                                    <div>
+
+                                                    <div id="productDiv">
                                                         <label for="product" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product</label>
-                                                        <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                                            <option value="" selected>Choose a product</option>
-                                                            {% for product in products %}
-                                                                <option value="{{ product.id }}">{{ product.product_name }}</option>
-                                                            {% endfor %}
-                                                        </select>
+                                                        <div class="flex items-center">
+                                                            <select id="product" name="product" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-[5px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                                                <option value="">Choose a product</option>
+                                                                {% for product in products %}
+                                                                    <option value="{{ product.id }}" {% if product.id == company.product.id %} selected {% endif %}>{{ product.product_name }}</option>
+                                                                {% endfor %}
+                                                            </select>                                            
+                                                                
+                                                            <button type="button" id="ajax-product-button" data-modal-target="product-crud-modal" data-modal-toggle="product-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -419,6 +443,71 @@
         </div>
     </div>
 
+    <!-- Service Modal -->
+    <div id="service-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Add Service</h2>
+            <input type="text" id="modal-service-name" placeholder="Enter service name" class="w-full p-2 border border-gray-300 rounded mb-4">
+            <div class="flex justify-end space-x-4">
+                <button id="save-service-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
+                <button id="close-service-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="service-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
+                    <h3 class="ml-3 text-md font-semibold text-gray-900 dark:text-white">
+                        Add Service Form
+                    </h3>
+                    <button type="button" id="close-service-modal" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                    <div class="p-4">
+                        <input type="text" name="service-name" id="modal-service-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter sector name" required>
+                
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" id="save-service-button" class="flex items-center justify-between px-10 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand Modal -->
+    <!-- <div id="brand-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Add Brand</h2>
+            <input type="text" id="modal-brand-name" placeholder="Enter brand name" class="w-full p-2 border border-gray-300 rounded mb-4">
+            <div class="flex justify-end space-x-4">
+                <button id="save-brand-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
+                <button id="close-brand-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Product Modal -->
+    <!-- <div id="product-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h2 class="text-lg font-bold mb-4">Add Product</h2>
+            <input type="text" id="modal-product-name" placeholder="Enter product name" class="w-full p-2 border border-gray-300 rounded mb-4">
+            <div class="flex justify-end space-x-4">
+                <button id="save-product-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
+                <button id="close-product-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+            </div>
+        </div>
+    </div> -->
+
     <script>
         var requirementDropdown = document.getElementById("requirement-category");
         var serviceDiv = document.getElementById("serviceDiv");
@@ -462,8 +551,167 @@
             }
         });
     </script>
+
+    <script>
+        document.getElementById('ajax-service-button').addEventListener('click', function () {
+            const modal = document.getElementById('service-crud-modal');
+            modal.classList.remove('hidden');
+            modal.style.zIndex = 100; // Bring modal content on top
+        });
+
+        document.getElementById('close-service-modal').addEventListener('click', function () {
+            const modal = document.getElementById('service-crud-modal');
+            modal.classList.add('hidden');
+            modal.style.zIndex = -1; // Reset z-index when closed
+        });
+
+        document.getElementById('save-service-button').addEventListener('click', function () {
+            const serviceNameInput = document.getElementById('modal-service-name');
+            const serviceName = serviceNameInput.value;
+
+            // Validation: Only show alert if input is required and empty
+            if (serviceName && serviceName.trim() === '') {
+                alert('Service name cannot be empty.');
+                return;
+            }
+
+            // Send AJAX request to save service
+            fetch('/add-service-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ service_name: serviceName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Update dropdown with new service
+                        const serviceDropdown = document.getElementById('service');
+                        const newOption = document.createElement('option');
+                        newOption.value = data.id;
+                        newOption.textContent = data.service_name;
+                        serviceDropdown.appendChild(newOption);
+
+                        // Clear input and hide modal
+                        serviceNameInput.value = '';
+                        document.getElementById('service-crud-modal').classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+    <!-- <script>
+        document.getElementById('ajax-brand-button').addEventListener('click', function () {
+            const modal = document.getElementById('brand-crud-modal');
+            modal.classList.remove('hidden');
+            modal.style.zIndex = 100; // Bring modal content on top
+        });
+
+        document.getElementById('close-brand-modal').addEventListener('click', function () {
+            const modal = document.getElementById('brand-crud-modal');
+            modal.classList.add('hidden');
+            modal.style.zIndex = -1; // Reset z-index when closed
+        });
+
+        document.getElementById('save-brand-button').addEventListener('click', function () {
+            const brandNameInput = document.getElementById('modal-brand-name');
+            const brandName = brandNameInput.value;
+
+            // Validation: Only show alert if input is required and empty
+            if (brandName && brandName.trim() === '') {
+                alert('Brand name cannot be empty.');
+                return;
+            }
+
+            // Send AJAX request to save brand
+            fetch('/add-brand-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ brand_name: brandName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Update dropdown with new brand
+                        const brandDropdown = document.getElementById('brand');
+                        const newOption = document.createElement('option');
+                        newOption.value = data.id;
+                        newOption.textContent = data.brand_name;
+                        brandDropdown.appendChild(newOption);
+
+                        // Clear input and hide modal
+                        brandNameInput.value = '';
+                        document.getElementById('brand-crud-modal').classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+    <script>
+        document.getElementById('ajax-product-button').addEventListener('click', function () {
+            const modal = document.getElementById('product-crud-modal');
+            modal.classList.remove('hidden');
+            modal.style.zIndex = 100; // Bring modal content on top
+        });
+
+        document.getElementById('close-product-modal').addEventListener('click', function () {
+            const modal = document.getElementById('product-crud-modal');
+            modal.classList.add('hidden');
+            modal.style.zIndex = -1; // Reset z-index when closed
+        });
+
+        document.getElementById('save-product-button').addEventListener('click', function () {
+            const productNameInput = document.getElementById('modal-product-name');
+            const productName = productNameInput.value;
+
+            // Validation: Only show alert if input is required and empty
+            if (productName && productName.trim() === '') {
+                alert('Product name cannot be empty.');
+                return;
+            }
+
+            // Send AJAX request to save product
+            fetch('/add-product-ajax/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ product_name: productName })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Update dropdown with new product
+                        const productDropdown = document.getElementById('product');
+                        const newOption = document.createElement('option');
+                        newOption.value = data.id;
+                        newOption.textContent = data.product_name;
+                        productDropdown.appendChild(newOption);
+
+                        // Clear input and hide modal
+                        productNameInput.value = '';
+                        document.getElementById('product-crud-modal').classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script> -->
     
-    <script src="{% static 'js/script.js' %}"></script>
+    <!-- <script src="{% static 'js/script.js' %}"></script> -->
     <script src="{% static 'js/init-alpine.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>

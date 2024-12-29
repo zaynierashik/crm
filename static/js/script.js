@@ -123,63 +123,6 @@ document.getElementById('city-filter').addEventListener('change', function(){
     window.location.href = url.toString();
 });
 
-// AJAX Submission
-document.addEventListener("DOMContentLoaded", function(){
-    function handleFormSubmission(formId, dropdownId, modalId, responseKey){
-        var form = document.getElementById(formId);
-        if(form.checkValidity()){
-            var formData = new FormData(form);
-            var xhr = new XMLHttpRequest();
-                    
-            xhr.onreadystatechange = function(){
-                if(xhr.readyState == XMLHttpRequest.DONE){
-                    if(xhr.status == 200){
-                        var response = JSON.parse(xhr.responseText);
-                        var dropdown = document.getElementById(dropdownId);
-                        var options = dropdown.options;
-                        var exists = false;
-
-                        for(var i = 0; i < options.length; i++){
-                            if(options[i].value === response[responseKey]){
-                                exists = true;
-                                break;
-                            }
-                        }
-
-                        if(!exists){
-                            var option = document.createElement("option");
-                            option.text = response[responseKey];
-                            option.value = response[responseKey];
-                            dropdown.add(option);
-                        }
-                                
-                        $(modalId).modal('hide');
-                    } else if(xhr.status == 400){
-                        var response = JSON.parse(xhr.responseText);
-                        alert(response.error);
-                    } else {
-                        console.error('Error:', xhr.statusText);
-                    }
-                }
-            };
-
-            xhr.open("POST", form.action);
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-            xhr.send(formData);
-        }else{
-            form.classList.add("was-validated");
-        }
-    }
-
-    document.getElementById("ajax-sector-button").addEventListener("click", function(){
-        handleFormSubmission("sectorForm", "sector", "crud-modal", "sector_name");
-    });
-
-    document.getElementById("ajax-service-button").addEventListener("click", function(){
-        handleFormSubmission("serviceForm", "service", "service-crud-modal", "service_name");
-    });
-});
-
 // Toggle Via Fields
 var viaDropdown = document.getElementById("via");
 var referralDiv = document.getElementById("referralDiv");

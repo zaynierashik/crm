@@ -10,7 +10,6 @@ urlpatterns = [
     path('contract/', views.contract, name='contract'),
     path('task/', views.task, name='task'),
     path('staff/', views.staff, name='staff'),
-    path('partner/', views.partner, name='partner'),
     path('transaction/', views.transaction, name='transaction'),
     path('sector/', views.sector, name='sector'),
     path('service/', views.service, name='service'),
@@ -46,29 +45,8 @@ urlpatterns = [
     path('update-product/', views.update_product, name='update_product'),
     path('update-brand/', views.update_brand, name='update_brand'),
 
-    # path('handle-decision/', views.handle_decision, name='handle_decision'),
-
     # User
-    path('user/', views.user, name='user'),
-    path('add-new-user/', views.add_newuser, name='add_newuser'),
-    path('user-authentication/', views.user_authentication, name='user_authentication'),
-    path('user-dashboard/', views.user_dashboard, name='user_dashboard'),
-    path('company-profile/', views.company_profile, name='company_profile'),
     path('requirement/', views.requirement, name='requirement'),
-    path('contact/', views.contact, name='contact'),
-
-    path('requirement-details/<int:company_id>/<int:requirement_id>/', views.requirementdetails, name='requirementdetails'),
-
-    path('add-company-profile/', views.add_companyprofile, name='add_companyprofile'),
-    path('add-new-request/', views.add_newrequest, name='add_newrequest'),
-    path('add-new-contact/', views.add_newcontact, name='add_newcontact'),
-
-    path('update-request/', views.update_request, name='update_request'),
-    path('update-contact/', views.update_contact, name='update_contact'),
-
-    path('delete-request/<int:id>/', views.delete_request, name='delete_request'),
-    path('delete-contact/<int:id>/', views.delete_contact, name='delete_contact'),
-    # path('delete_contact/<int:contact_id>/', views.delete_contact, name='delete_contact'),
 
     path('get-contacts/', views.get_contacts, name='get_contacts'),
     path('get-requirements/', views.get_requirements, name='get_requirements'),
@@ -82,16 +60,14 @@ urlpatterns = [
     # path('send-email/', views.send_email, name='send_email'),
 
     # AJAX
-    path('add-sector/', views.add_sector, name='add_sector'),
-    path('add-service/', views.add_service, name='add_service'),
+    path('add-sector-ajax/', views.add_sector_ajax, name='add_sector_ajax'),
+    path('add-service-ajax/', views.add_service_ajax, name='add_service_ajax'),
+    path('add-brand-ajax/', views.add_brand_ajax, name='add_brand_ajax'),
+    path('add-product-ajax/', views.add_product_ajax, name='add_product_ajax'),
 
     path('get-states/', views.get_states, name='get_states'),
 
     #Reset Password
-    path('reset_password/',views.reset_password, name='reset_password'),
-    path('reset_code/',views.reset_code, name='reset_code'),
-    path('reset_passwordDone/',views.reset_passwordDone, name='reset_passwordDone'),
-
     path('admin_reset_password/',views.admin_reset_password, name='admin_reset_password'),
     path('admin_reset_code/',views.admin_reset_code, name='admin_reset_code'),
     path('admin_reset_passwordDone/',views.admin_reset_passwordDone, name='admin_reset_passwordDone'),

@@ -65,67 +65,6 @@ def login_authentication(request):
 
     return render(request, 'login.html')
 
-# Userpage
-def user(request):
-    if 'user_id' in request.session:
-        return redirect('company_profile')
-    
-    if request.method == 'POST':
-        return user_authentication(request)
-    
-    return render(request, 'userauthentication.html')
-
-# User Registration
-def add_newuser(request):
-    if request.method == 'POST':
-        full_name = request.POST.get('user-name')
-        email = request.POST.get('email-address')
-        password = request.POST.get('password')
-
-        if User.objects.filter(email=email).exists():
-            error_message = "Email is already in use!"
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
-
-        try:
-            new_user = User(full_name=full_name, email=email, password=make_password(password))
-            new_user.save()
-            messages.success(request, "Account created successfully.")
-            return redirect('user')
-        except Exception as e:
-            messages.error(request, f"An error occurred: {e}")
-            return redirect('user')
-
-    return render(request, 'signup.html')
-
-# User Login Authentication
-def user_authentication(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            error_message = "User does not exist!"
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
-        
-        if not user.status:
-            error_message = "Your account is inactive. Please contact support."
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
-
-        if not check_password(password, user.password):
-            error_message = "Invalid password!"
-            return HttpResponseRedirect(reverse('user') + f'?error_message={error_message}')
-
-        request.session['user_id'] = user.id
-        request.session['user_email'] = user.email
-        request.session['user_full_name'] = user.full_name
-
-        request.session.set_expiry(7200)
-        return redirect('company_profile')
-
-    return redirect('user')
-
 # Logout
 def logout(request):
     request.session.flush()
@@ -166,20 +105,6 @@ def dashboard(request):
                'company_count': company_count, 'user': user, 'progress_labels': progress_labels, 'progress_data': progress_data, 'chart_dates': dates, 'chart_counts': counts}
 
     return render(request, 'index.html', context)
-
-# User Dashboard
-def user_dashboard(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
-    
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-
-    company_added = request.GET.get('company_added', False)
-    company = Company.objects.filter(created_by=user)
-    context = {'company_added': company_added, 'company': company, 'user': user}
-
-    return render(request, 'userdashboard.html', context)
 
 # Company Page
 def company(request):
@@ -329,23 +254,6 @@ def add_newcompany(request):
     else:
         return HttpResponse("Form Submission Error!")
 
-# Company Profile
-def company_profile(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
-
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-
-    sectors = Sector.objects.values('id', 'sector_name').order_by('sector_name')
-    user_company = Company.objects.filter(created_by=user).first()
-
-    if user_company:
-        contacts = Contact.objects.filter(company=user_company)
-        return render(request, 'companyprofile.html', {'user': user, 'company': user_company, 'contacts': contacts, 'sectors': sectors, 'edit_mode': True})
-    else:
-        return render(request, 'companyprofile.html', {'user': user, 'sectors': sectors, 'edit_mode': False})
-
 # Contract Page
 def contract(request):
     if 'staff_id' not in request.session:
@@ -377,37 +285,6 @@ def contract(request):
                'pipeline_count': pipeline_count, 'completed_count': completed_count, 'requirement_count': requirements.count(), 'requirements_page': requirements_page, 'paginator': paginator}
     
     return render(request, 'contract.html', context)
-
-# Request Decision Part
-# @csrf_exempt
-# def handle_decision(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         request_id = data.get('request_id')
-#         decision = data.get('decision')
-
-#         try:
-#             req = Request.objects.get(id=request_id)
-#             if decision == 'approve':
-#                 # Move the request to Requirement
-#                 Requirement.objects.create(
-#                     company=req.company,
-#                     date=req.date,
-#                     requirement_type=req.requirement_type,
-#                     brand=req.brand,
-#                     product_name=req.product_name,
-#                     service=req.service,
-#                     requirement_description=req.requirement_description,
-#                     status="Approved",
-#                     progress="Initiated"
-#                 )
-#                 req.delete()  # Delete the original request after approval
-#             elif decision == 'reject':
-#                 req.delete()  # Delete the request if rejected
-#             return JsonResponse({'status': 'success'})
-#         except Request.DoesNotExist:
-#             return JsonResponse({'status': 'error', 'message': 'Request not found'}, status=404)
-#     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 # Tasks Page
 def task(request):
@@ -526,80 +403,6 @@ def requirement(request):
 
     return render(request, 'requirement.html')
 
-# Contact Page
-def contact(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
-    
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(User, id=user_id)
-
-    company = Company.objects.filter(created_by=user).first()
-    contacts = Contact.objects.filter(company=company).order_by('contact_name')
-
-    paginator = Paginator(contacts, 10)
-    page = request.GET.get('contacts_page')
-
-    try:
-        contacts_page = paginator.page(page)
-    except PageNotAnInteger:
-        contacts_page = paginator.page(1)
-    except EmptyPage:
-        contacts_page = paginator.page(paginator.num_pages)
-
-    context = {'user': user, 'company': company, 'contacts': contacts, 'contact_count': contacts.count(), 'contacts_page': contacts_page, 'paginator': paginator}
-    return render(request, 'contact.html', context)
-
-# Add New Contact
-def add_newcontact(request):
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-    company = Company.objects.filter(created_by=user).first()
-
-    if request.method == "POST":
-        contact_name = request.POST.get('contact-name')
-        designation = request.POST.get('designation')
-        email = request.POST.get('email-address')
-        contact_number = request.POST.get('contact-number')
-        # dob = request.POST.get('date')
-        # religion = request.POST.get('religion')
-
-        contact = Contact(company=company, contact_name=contact_name, designation=designation, email=email, phone_number=contact_number)
-        contact.save()
-        return redirect(reverse('contact'))
-    
-    return render(request, 'contact.html', {'user': user, 'company': company})
-
-# Update Contact
-@require_POST
-def update_contact(request):
-    if request.method == 'POST':
-        contact_id = request.POST.get('contact-id')
-        contact_obj = get_object_or_404(Contact, id=contact_id)
-
-        contact_obj.contact_name = request.POST.get('contact-name')
-        contact_obj.designation = request.POST.get('designation')
-        contact_obj.email = request.POST.get('email-address')
-        contact_obj.phone_number = request.POST.get('contact-number')
-        contact_obj.DOB = request.POST.get('date')
-
-        dob = request.POST.get('date')
-        if dob:
-            contact_obj.DOB = dob
-        else:
-            contact_obj.DOB = None
-            
-        contact_obj.religion = request.POST.get('religion')
-        contact_obj.save()
-        messages.success(request, "Contact updated successfully.")
-        
-        return redirect('contact')
-
-    return redirect('contact')
-
 # Staff Page
 def staff(request):
     if 'staff_id' not in request.session:
@@ -626,12 +429,9 @@ def staff(request):
     except EmptyPage:
         staffs_page = paginator.page(paginator.num_pages)
 
-    context = {'staffs': staffs, 'employee_count': employee_count, 'admin_count': admin_count, 'staff_count': staff_count, 'inactive_count': inactive_count, 'staffs': staffs_page, 'paginator': paginator, 'page_obj': staffs_page, 'user': user}
+    context = {'staffs': staffs, 'employee_count': employee_count, 'admin_count': admin_count, 'staff_count': staff_count, 'inactive_count': inactive_count, 'staffs': staffs_page, 'paginator': paginator, 'page_obj': staffs_page}
 
     return render(request, 'staff.html', context)
-
-def partner(request):
-    return render(request, 'partner.html')
 
 # Transaction Page
 def transaction(request):
@@ -750,114 +550,6 @@ def brand(request):
     context = {'brands': brands, 'brand_count': brand_count, 'brands': brand_page, 'paginator': paginator, 'page_obj': brand_page, 'user': user}
 
     return render(request, 'brand.html', context)
-
-# New Company Profile Submission
-def add_companyprofile(request):
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
-    user_id = request.session.get('user_id')
-    user = User.objects.get(id=user_id)
-
-    if request.method == 'POST':
-        company_name = request.POST.get('company-name')
-
-        if Company.objects.filter(company_name=company_name).exists():
-            error_message = "Company with this name already exists!"
-            return HttpResponseRedirect(reverse('company_profile') + f'?add-company&error_message={error_message}&company_name={company_name}')
-
-        sector_id = request.POST.get('sector')
-        if sector_id:
-            try:
-                sector_id = int(sector_id)
-                sector = Sector.objects.get(id=sector_id)
-            except (ValueError, Sector.DoesNotExist):
-                sector = None
-        else:
-            sector = None
-        
-        address = request.POST.get('address')
-        city = request.POST.get('city')
-        state = request.POST.get('state')
-        country = request.POST.get('country')
-        via = request.POST.get('via')
-        website = request.POST.get('website')
-
-        referral = None
-        
-        if via == 'Referral':
-            referral = request.POST.get('referral')
-
-        company = Company(company_name=company_name, sector=sector, address=address, city=city, state=state, country=country, via=via, referral_name=referral, website=website, created_by=user)
-        company.save()
-                
-        return HttpResponseRedirect(reverse('company_profile') + f'?company_added=true&company_id={company.id}')
-    else:
-        return HttpResponse("Form Submission Error!")
-    
-# New Requirement Request Submission
-def add_newrequest(request):
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(User, id=user_id)
-
-    company = Company.objects.filter(created_by=user).first()
-
-    if request.method == 'POST':
-        requirement_type = request.POST.get('requirement-category')
-        brand_id = request.POST.get('brand') if requirement_type == 'Product' else None
-        product_id = request.POST.get('product') if requirement_type == 'Product' else None
-        service_id = request.POST.get('service') if requirement_type == 'Service' else None
-        requirement_description = request.POST.get('message')
-
-        brand = get_object_or_404(Brand, pk=brand_id) if brand_id else None
-        product = get_object_or_404(Product, pk=product_id) if product_id else None
-        service = get_object_or_404(Service, pk=service_id) if service_id else None
-
-        Request.objects.create(company=company, date=now(), requirement_type=requirement_type, brand=brand, product_name=product, service=service, requirement_description=requirement_description)
-
-        return redirect(reverse('requirement'))
-
-# Update Requirement Request
-@require_POST
-def update_request(request):
-    if request.method == 'POST':
-        request_id = request.POST.get('request-id')
-        request_obj = get_object_or_404(Request, id=request_id)
-
-        request_obj.requirement_type = request.POST.get('requirement-category')
-        request_obj.service_id = request.POST.get('service')
-        request_obj.brand_id = request.POST.get('brand')
-        request_obj.product_name_id = request.POST.get('product')
-        request_obj.requirement_description = request.POST.get('message')
-        request_obj.save()
-        messages.success(request, "Request updated successfully.")
-        
-        return redirect('requirement')
-
-    return redirect('requirement')
-
-# Delete Requirement Request
-def delete_request(request, id):
-    request_to_delete = get_object_or_404(Request, id=id)
-
-    if request.method == "POST":
-        request_to_delete.delete()
-        return redirect('requirement')
-    
-    return redirect('requirement')
-
-# Delete Contact
-def delete_contact(request, id):
-    contact_to_delete = get_object_or_404(Contact, id=id)
-
-    if request.method == "POST":
-        contact_to_delete.delete()
-        return redirect('contact')
-    
-    return redirect('contact')
 
 def requirementform(request):
     if 'staff_id' not in request.session:
@@ -1094,34 +786,6 @@ def contractdetails(request, company_id, requirement_id):
     contacts = Contact.objects.filter(company=company)
     context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
     return render(request, 'contractdetails.html', context)
-
-# View Requirement Details
-def requirementdetails(request, company_id, requirement_id):
-    if 'user_id' not in request.session:
-        return redirect('login')
-    
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(User, id=user_id)
-    
-    company = get_object_or_404(Company, id=company_id)
-    requirement = get_object_or_404(Requirement, id=requirement_id)
-    requirements = Requirement.objects.filter(company=company).select_related('brand', 'product_name', 'service').prefetch_related('requirement_transactions')
-    transactions = Minute.objects.filter(company=company, requirement=requirement).order_by('-date')
-
-    transactions_count = Minute.objects.filter(company=company, requirement=requirement).select_related('date', 'action', 'remark').prefetch_related('transaction_transactions')
-    transactions_paginator = Paginator(transactions_count, 10)
-    transactions_page_number = request.GET.get('transactions_page', 1)
-    transactions_page_obj = transactions_paginator.get_page(transactions_page_number)
-
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    if start_date and end_date:
-        transactions = transactions.filter(date__range=[start_date, end_date])
-
-    contacts = Contact.objects.filter(company=company)
-    context = {'user': user, 'company': company, 'requirement': requirement, 'requirements': requirements, 'transactions': transactions, 'transactions_page_obj': transactions_page_obj, 'contacts': contacts}
-    return render(request, 'requirementdetails.html', context)
 
 # View Task Details
 def taskdetails(request, task_id):
@@ -1491,57 +1155,86 @@ def export_excel(request, company_id):
     response['Content-Disposition'] = f'attachment; filename="{company.company_name} - Report.xlsx"'
     return response
 
-# Extra Views
-def approve_request_view(request, request_id):
-    req = get_object_or_404(Request, id=request_id)
-    req.approve()
-    return redirect('requirement')
-
-def reject_request_view(request, request_id):
-    req = get_object_or_404(Request, id=request_id)
-    req.reject()
-    return redirect('requirement')
-
-def request_list_view(request):
-    requests = Request.objects.filter(is_approved=False)
-    return render(request, 'requirement.html', {'requests': requests})
-
 def requirement_list_view(request):
     requirements = Requirement.objects.all()
     return render(request, 'requirement.html', {'requirements': requirements})
 
 # AJAX
-def add_sector(request):
-    if 'staff_id' not in request.session:
-        return redirect('staff')
-
+@csrf_exempt
+def add_sector_ajax(request):
     if request.method == 'POST':
-        sector_name = request.POST.get('sector-name')
+        try:
+            data = json.loads(request.body)
+            sector_name = data.get('sector_name')
 
-        if Sector.objects.filter(sector_name=sector_name).exists():
-            return redirect(reverse('company') + '?add-company')
+            if not sector_name:
+                return JsonResponse({'error': 'Sector name is required'}, status=400)
 
-        sector = Sector(sector_name=sector_name)
-        sector.save()
-        return redirect(reverse('company') + '?add-company')
-    else:
-        return render(request, 'company.html')
+            if Sector.objects.filter(sector_name=sector_name).exists():
+                return JsonResponse({'error': 'Sector already exists'}, status=400)
+
+            sector = Sector.objects.create(sector_name=sector_name)
+            return JsonResponse({'id': sector.id, 'sector_name': sector.sector_name}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
     
-def add_service(request):
-    if 'user_id' not in request.session:
-        return redirect('user')
-
+@csrf_exempt
+def add_service_ajax(request):
     if request.method == 'POST':
-        service_name = request.POST.get('service-name')
+        try:
+            data = json.loads(request.body)
+            service_name = data.get('service_name')
 
-        if Service.objects.filter(service_name=service_name).exists():
-            return redirect(reverse('requirement'))
+            if not service_name:
+                return JsonResponse({'error': 'Service name is required'}, status=400)
 
-        service = Service(service_name=service_name)
-        service.save()
-        return redirect('requirement')
-    else:
-        return render(request, 'requirement.html')
+            if Service.objects.filter(service_name=service_name).exists():
+                return JsonResponse({'error': 'Service already exists'}, status=400)
+
+            service = Service.objects.create(service_name=service_name)
+            return JsonResponse({'id': service.id, 'service_name': service.service_name}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+@csrf_exempt
+def add_brand_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            brand_name = data.get('brand_name')
+
+            if not brand_name:
+                return JsonResponse({'error': 'Brand name is required'}, status=400)
+
+            if Brand.objects.filter(brand_name=brand_name).exists():
+                return JsonResponse({'error': 'Brand already exists'}, status=400)
+
+            brand = Brand.objects.create(brand_name=brand_name)
+            return JsonResponse({'id': brand.id, 'brand_name': brand.brand_name}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+@csrf_exempt
+def add_product_ajax(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            product_name = data.get('product_name')
+
+            if not product_name:
+                return JsonResponse({'error': 'Product name is required'}, status=400)
+
+            if Product.objects.filter(product_name=product_name).exists():
+                return JsonResponse({'error': 'Product already exists'}, status=400)
+
+            product = Product.objects.create(product_name=product_name)
+            return JsonResponse({'id': product.id, 'product_name': product.product_name}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 # Client Forgot Password
 def forget_pass(request):
