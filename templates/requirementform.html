@@ -348,7 +348,7 @@
                                                         {% endfor %}
                                                     </select>                                            
                                                         
-                                                    <button type="button" id="ajax-service-button" data-modal-target="service-crud-modal" data-modal-toggle="service-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                    <button type="button" id="ajax-service-button" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
                                                         </svg>
@@ -368,7 +368,7 @@
                                                                 {% endfor %}
                                                             </select>                                            
                                                                 
-                                                            <button type="button" id="ajax-brand-button" data-modal-target="brand-crud-modal" data-modal-toggle="brand-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                            <button type="button" id="ajax-brand-button" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
                                                                 </svg>
@@ -386,7 +386,7 @@
                                                                 {% endfor %}
                                                             </select>                                            
                                                                 
-                                                            <button type="button" id="ajax-product-button" data-modal-target="product-crud-modal" data-modal-toggle="product-crud-modal" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
+                                                            <button type="button" id="ajax-product-button" class="text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-lg hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple p-[11.25px]">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="#ffffff" d="M12 4v16m8-8H4"></path>
                                                                 </svg>
@@ -445,17 +445,6 @@
 
     <!-- Service Modal -->
     <div id="service-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h2 class="text-lg font-bold mb-4">Add Service</h2>
-            <input type="text" id="modal-service-name" placeholder="Enter service name" class="w-full p-2 border border-gray-300 rounded mb-4">
-            <div class="flex justify-end space-x-4">
-                <button id="save-service-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
-                <button id="close-service-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="service-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
         <div class="relative p-4 w-full max-w-md max-h-full">
             <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
                 <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
@@ -485,28 +474,64 @@
     </div>
 
     <!-- Brand Modal -->
-    <!-- <div id="brand-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h2 class="text-lg font-bold mb-4">Add Brand</h2>
-            <input type="text" id="modal-brand-name" placeholder="Enter brand name" class="w-full p-2 border border-gray-300 rounded mb-4">
-            <div class="flex justify-end space-x-4">
-                <button id="save-brand-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
-                <button id="close-brand-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+    <div id="brand-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
+                    <h3 class="ml-3 text-md font-semibold text-gray-900 dark:text-white">
+                        Add Brand Form
+                    </h3>
+                    <button type="button" id="close-brand-modal" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                    <div class="p-4">
+                        <input type="text" name="brand-name" id="modal-brand-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter sector name" required>
+                
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" id="save-brand-button" class="flex items-center justify-between px-10 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- Product Modal -->
-    <!-- <div id="product-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h2 class="text-lg font-bold mb-4">Add Product</h2>
-            <input type="text" id="modal-product-name" placeholder="Enter product name" class="w-full p-2 border border-gray-300 rounded mb-4">
-            <div class="flex justify-end space-x-4">
-                <button id="save-product-button" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Save</button>
-                <button id="close-product-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+    <div id="product-crud-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div class="flex items-center justify-between p-2 border-b rounded-t dark:border-gray-600">
+                    <h3 class="ml-3 text-md font-semibold text-gray-900 dark:text-white">
+                        Add Product Form
+                    </h3>
+                    <button type="button" id="close-product-modal" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+
+                    <div class="p-4">
+                        <input type="text" name="product-name" id="modal-product-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter sector name" required>
+                
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" id="save-product-button" class="flex items-center justify-between px-10 p-[9px] text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <script>
         var requirementDropdown = document.getElementById("requirement-category");
@@ -605,7 +630,7 @@
         });
     </script>
 
-    <!-- <script>
+    <script>
         document.getElementById('ajax-brand-button').addEventListener('click', function () {
             const modal = document.getElementById('brand-crud-modal');
             modal.classList.remove('hidden');
@@ -709,7 +734,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         });
-    </script> -->
+    </script>
     
     <!-- <script src="{% static 'js/script.js' %}"></script> -->
     <script src="{% static 'js/init-alpine.js' %}"></script>

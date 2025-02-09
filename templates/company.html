@@ -805,7 +805,6 @@
                 fetch(`/get-states/?country=${country}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Add states to dropdown
                         data.states.forEach(state => {
                             const option = document.createElement('option');
                             option.value = state;
